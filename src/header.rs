@@ -53,6 +53,14 @@ impl Join {
             username: username.to_string(),
         })
     }
+
+	pub fn length(&self) -> u8 {
+		self.length
+	}
+
+	pub fn username(&self) -> &str {
+		&self.username
+	}
 }
 
 impl Encode for Join {
@@ -136,6 +144,10 @@ impl JoinFail {
             id: code,
         }
     }
+
+	pub fn id(&self) -> u8 {
+		self.id
+	}
 }
 
 impl Encode for JoinFail {
@@ -177,6 +189,14 @@ impl Message {
             msg: msg.to_string(),
         })
     }
+	
+    pub fn length(&self) -> u16 {
+		self.length
+	}
+
+	pub fn msg(&self) -> &str {
+		&self.msg
+	}
 }
 
 impl Encode for Message {
@@ -242,6 +262,18 @@ impl ClientMessage {
             msg: msg.to_string(),
         })
     }
+
+	pub fn uuid(&self) -> u16 {
+		self.uuid
+	}
+
+	pub fn length(&self) -> u16 {
+		self.length
+	}
+
+	pub fn msg(&self) -> &str {
+		&self.msg
+	}
 
     pub fn from_message(message: Message, uuid: u16) -> Self {
         Self {
@@ -318,6 +350,18 @@ impl UserJoin {
             username: username.to_string(),
         })
     }
+
+    pub fn uuid(&self) -> u16 {
+		self.uuid
+	}
+
+	pub fn length(&self) -> u8 {
+		self.length
+	}
+
+	pub fn username(&self) -> &str {
+		&self.username
+	}
 }
 
 impl Encode for UserJoin {
