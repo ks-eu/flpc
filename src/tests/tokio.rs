@@ -8,6 +8,7 @@ use crate::header::{
     Message,
     ClientMessage,
     UserJoin,
+    UserLeft,
 };
 
 use crate::error::ProtocolError;
@@ -89,6 +90,39 @@ mod encoder {
                 &buffer[..],
                 &[0x06, 0x12, 0x34, 0x05, b'A', b'l', b'i', b'c', b'e']
             );
+        }
+
+        #[test]
+        fn test_encode_user_left() {
+            let message = UserLeft::new(0x1234);
+            let mut codec = FLPCodec::new();
+            let mut buffer = BytesMut::new();
+
+            codec.encode(FLPCMsg::UserLeft(message), &mut buffer).unwrap();
+
+            assert_eq!(&buffer[..], &[0x07, 0x12, 0x34]);
+        }
+
+        #[test]
+        fn test_encode_user_left_zero_uuid() {
+            let message = UserLeft::new(0x0000);
+            let mut codec = FLPCodec::new();
+            let mut buffer = BytesMut::new();
+
+            codec.encode(FLPCMsg::UserLeft(message), &mut buffer).unwrap();
+
+            assert_eq!(&buffer[..], &[0x07, 0x00, 0x00]);
+        }
+
+        #[test]
+        fn test_encode_user_left_max_uuid() {
+            let message = UserLeft::new(0xFFFF);
+            let mut codec = FLPCodec::new();
+            let mut buffer = BytesMut::new();
+
+            codec.encode(FLPCMsg::UserLeft(message), &mut buffer).unwrap();
+
+            assert_eq!(&buffer[..], &[0x07, 0xFF, 0xFF]);
         }
     }
 
@@ -196,6 +230,37 @@ mod decoder {
             assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::UserJoin(_))));
             assert!(buffer.is_empty());
         }
+
+        #[test]
+        fn test_decode_user_left() {
+            let mut codec = FLPCodec::new();
+            let mut buffer = BytesMut::from(&[0x07, 0x12, 0x34][..]);
+
+            assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::UserLeft(_))));
+            assert!(buffer.is_empty());
+        }
+
+        #[test]
+        fn test_decode_user_left_zero_uuid() {
+            let mut codec = FLPCodec::new();
+            let mut buffer = BytesMut::from(&[0x07, 0x00, 0x00][..]);
+
+            let decoded = codec.decode(&mut buffer).unwrap();
+
+            assert!(matches!(decoded, Some(FLPCMsg::UserLeft(_))));
+            assert!(buffer.is_empty());
+        }
+
+        #[test]
+        fn test_decode_user_left_max_uuid() {
+            let mut codec = FLPCodec::new();
+            let mut buffer = BytesMut::from(&[0x07, 0xFF, 0xFF][..]);
+
+            let decoded = codec.decode(&mut buffer).unwrap();
+
+            assert!(matches!(decoded, Some(FLPCMsg::UserLeft(_))));
+            assert!(buffer.is_empty());
+        }
     }
 
     mod incomplete_messages {
@@ -244,6 +309,15 @@ mod decoder {
 
             assert!(codec.decode(&mut buffer).unwrap().is_none());
             assert_eq!(&buffer[..], &[0x06, 0x12, 0x34, 0x02, b'A']);
+        }
+
+        #[test]
+        fn test_incomplete_user_left() {
+            let mut codec = FLPCodec::new();
+            let mut buffer = BytesMut::from(&[0x07, 0x12][..]);
+
+            assert!(codec.decode(&mut buffer).unwrap().is_none());
+            assert_eq!(&buffer[..], &[0x07, 0x12]);
         }
     }
 
@@ -318,12 +392,14 @@ mod decoder {
                     0x02,
                     0x01, 0x01, b'A',
                     0x04, 0x00, 0x02, b'H', b'i',
+                    0x07, 0x12, 0x34,
                 ][..]
             );
 
             assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::JoinSuccess(_))));
             assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::Join(_))));
             assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::Message(_))));
+            assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::UserLeft(_))));
 
             assert!(buffer.is_empty());
         }

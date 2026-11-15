@@ -34,6 +34,11 @@ pub struct UserJoin {
     username: String,
 }
 
+#[derive(Debug)]
+pub struct UserLeft {
+    uuid: u16
+}
+
 pub trait Encode {
     fn encode(&self) -> Result<Vec<u8>, ProtocolError>;
 }
@@ -418,6 +423,50 @@ impl Decode for UserJoin {
     }
 }
 
+impl UserLeft {
+    pub fn new(uuid: u16) -> Self {
+        Self {
+            uuid,
+        }
+    }
+
+    pub fn uuid(&self) -> u16 {
+        self.uuid
+    }
+}
+
+impl Encode for UserLeft {
+    fn encode(&self) -> Result<Vec<u8>, ProtocolError> {
+        let mut buffer = Vec::<u8>::new();
+        buffer.push(0x07);
+        buffer.extend_from_slice(&self.uuid.to_be_bytes());
+
+        Ok(buffer)
+    }
+}
+
+impl Decode for UserLeft {
+    fn decode(bytes: Option<&[u8]>) -> Result<Self, ProtocolError> {
+        let bytes = match bytes {
+            Some(bytes) => bytes,
+            None => return Err(ProtocolError::EmptyMessage),
+        };
+
+        if bytes.len() < 3 {
+            return Err(ProtocolError::IncompleteMessage);
+        }
+
+        if bytes[0] != 0x07 {
+            return Err(ProtocolError::InvalidHeader);
+        }
+
+        let uuid = u16::from_be_bytes([bytes[1], bytes[2]]);
+
+        Ok(Self {
+            uuid,
+        })
+    }
+}
 #[cfg(test)]
 #[path = "tests/header.rs"]
 mod tests;

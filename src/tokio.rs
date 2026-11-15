@@ -11,6 +11,7 @@ use crate::header::{
     Message,
     ClientMessage,
     UserJoin,
+    UserLeft,
 };
 
 use crate::error::ProtocolError;
@@ -22,6 +23,7 @@ pub enum FLPCMsg {
     Message(Message),
     ClientMessage(ClientMessage),
     UserJoin(UserJoin),
+    UserLeft(UserLeft),
 }
 
 pub struct FLPCodec;
@@ -47,6 +49,7 @@ impl Encoder<FLPCMsg> for FLPCodec {
             FLPCMsg::Message(message) => message.encode()?,
             FLPCMsg::ClientMessage(message) => message.encode()?,
             FLPCMsg::UserJoin(message) => message.encode()?,
+            FLPCMsg::UserLeft(message) => message.encode()?,
         };
 
         dst.extend_from_slice(&bytes);
@@ -67,9 +70,7 @@ impl Decoder for FLPCodec {
             return Ok(None);
         }
 
-        // Determine the frame length from the message type.
         let frame_length = match src[0] {
-            // Join
             0x01 => {
                 if src.len() < 2 {
                     return Ok(None);
@@ -77,13 +78,10 @@ impl Decoder for FLPCodec {
                 2 + src[1] as usize
             }
 
-            // JoinSuccess
             0x02 => 1,
 
-            // JoinFail
             0x03 => 2,
 
-            // Message
             0x04 => {
                 if src.len() < 3 {
                     return Ok(None);
@@ -92,7 +90,6 @@ impl Decoder for FLPCodec {
                 3 + length as usize
             }
 
-            // ClientMessage
             0x05 => {
                 if src.len() < 5 {
                     return Ok(None);
@@ -101,13 +98,14 @@ impl Decoder for FLPCodec {
                 5 + length as usize
             }
 
-            // UserJoin
             0x06 => {
                 if src.len() < 4 {
                     return Ok(None);
                 }
                 4 + src[3] as usize
             }
+
+            0x07 => 3,
 
             _ => return Err(ProtocolError::UnknownHeader),
         };
@@ -125,6 +123,7 @@ impl Decoder for FLPCodec {
             0x04 => FLPCMsg::Message(Message::decode(Some(frame))?),
             0x05 => FLPCMsg::ClientMessage(ClientMessage::decode(Some(frame))?),
             0x06 => FLPCMsg::UserJoin(UserJoin::decode(Some(frame))?),
+            0x07 => FLPCMsg::UserLeft(UserLeft::decode(Some(frame))?),
             _ => unreachable!(),
         };
 

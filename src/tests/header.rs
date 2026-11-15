@@ -610,3 +610,77 @@ mod user_join_tests {
         ));
     }
 }
+
+mod user_left_tests {
+    use super::*;
+
+    #[test]
+    fn test_encode_user_left() {
+        let message = UserLeft::new(0x1234);
+
+        assert_eq!(
+            message.encode().unwrap(),
+            vec![0x07, 0x12, 0x34]
+        );
+    }
+
+    #[test]
+    fn test_decode_user_left() {
+        let bytes = vec![0x07, 0x12, 0x34];
+        let message = UserLeft::decode(Some(&bytes)).unwrap();
+
+        assert_eq!(message.uuid, 0x1234);
+    }
+
+    #[test]
+    fn test_uuid_zero() {
+        let message = UserLeft::new(0x0000);
+
+        assert_eq!(
+            message.encode().unwrap(),
+            vec![0x07, 0x00, 0x00]
+        );
+    }
+
+    #[test]
+    fn test_uuid_maximum() {
+        let message = UserLeft::new(0xFFFF);
+
+        assert_eq!(
+            message.encode().unwrap(),
+            vec![0x07, 0xFF, 0xFF]
+        );
+    }
+
+    #[test]
+    fn test_decode_incomplete_message() {
+        assert!(matches!(
+            UserLeft::decode(Some(&[0x07, 0x12])),
+            Err(ProtocolError::IncompleteMessage)
+        ));
+    }
+
+    #[test]
+    fn test_decode_empty_input() {
+        assert!(matches!(
+            UserLeft::decode(None),
+            Err(ProtocolError::EmptyMessage)
+        ));
+    }
+
+    #[test]
+    fn test_decode_invalid_header() {
+        assert!(matches!(
+            UserLeft::decode(Some(&[0x06, 0x12, 0x34])),
+            Err(ProtocolError::InvalidHeader)
+        ));
+    }
+
+    #[test]
+    fn test_decode_trailing_bytes() {
+        let bytes = vec![0x07, 0x12, 0x34, 0xFF];
+        let message = UserLeft::decode(Some(&bytes)).unwrap();
+
+        assert_eq!(message.uuid, 0x1234);
+    }
+}
