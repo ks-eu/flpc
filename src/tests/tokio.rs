@@ -2,17 +2,11 @@ use bytes::BytesMut;
 use tokio_util::codec::{Decoder, Encoder};
 
 use crate::header::{
-    Join,
-    JoinSuccess,
-    JoinFail,
-    Message,
-    ClientMessage,
-    UserJoin,
-    UserLeft,
+    ClientMessage, Join, JoinFail, JoinSuccess, Message, UserJoin, UserLeft,
 };
 
 use crate::error::ProtocolError;
-use crate::tokio::{FLPCodec, FLPCMsg};
+use crate::tokio::{FLPCMsg, FLPCodec};
 
 mod encoder {
     use super::*;
@@ -28,7 +22,10 @@ mod encoder {
 
             codec.encode(FLPCMsg::Join(message), &mut buffer).unwrap();
 
-            assert_eq!(&buffer[..], &[0x01, 0x05, b'A', b'l', b'i', b'c', b'e']);
+            assert_eq!(
+                &buffer[..],
+                &[0x01, 0x05, b'A', b'l', b'i', b'c', b'e']
+            );
         }
 
         #[test]
@@ -37,7 +34,9 @@ mod encoder {
             let mut codec = FLPCodec::new();
             let mut buffer = BytesMut::new();
 
-            codec.encode(FLPCMsg::JoinSuccess(message), &mut buffer).unwrap();
+            codec
+                .encode(FLPCMsg::JoinSuccess(message), &mut buffer)
+                .unwrap();
 
             assert_eq!(&buffer[..], &[0x02]);
         }
@@ -48,7 +47,9 @@ mod encoder {
             let mut codec = FLPCodec::new();
             let mut buffer = BytesMut::new();
 
-            codec.encode(FLPCMsg::JoinFail(message), &mut buffer).unwrap();
+            codec
+                .encode(FLPCMsg::JoinFail(message), &mut buffer)
+                .unwrap();
 
             assert_eq!(&buffer[..], &[0x03, 0x01]);
         }
@@ -59,9 +60,14 @@ mod encoder {
             let mut codec = FLPCodec::new();
             let mut buffer = BytesMut::new();
 
-            codec.encode(FLPCMsg::Message(message), &mut buffer).unwrap();
+            codec
+                .encode(FLPCMsg::Message(message), &mut buffer)
+                .unwrap();
 
-            assert_eq!(&buffer[..], &[0x04, 0x00, 0x05, b'H', b'e', b'l', b'l', b'o']);
+            assert_eq!(
+                &buffer[..],
+                &[0x04, 0x00, 0x05, b'H', b'e', b'l', b'l', b'o']
+            );
         }
 
         #[test]
@@ -70,7 +76,9 @@ mod encoder {
             let mut codec = FLPCodec::new();
             let mut buffer = BytesMut::new();
 
-            codec.encode(FLPCMsg::ClientMessage(message), &mut buffer).unwrap();
+            codec
+                .encode(FLPCMsg::ClientMessage(message), &mut buffer)
+                .unwrap();
 
             assert_eq!(
                 &buffer[..],
@@ -84,7 +92,9 @@ mod encoder {
             let mut codec = FLPCodec::new();
             let mut buffer = BytesMut::new();
 
-            codec.encode(FLPCMsg::UserJoin(message), &mut buffer).unwrap();
+            codec
+                .encode(FLPCMsg::UserJoin(message), &mut buffer)
+                .unwrap();
 
             assert_eq!(
                 &buffer[..],
@@ -98,7 +108,9 @@ mod encoder {
             let mut codec = FLPCodec::new();
             let mut buffer = BytesMut::new();
 
-            codec.encode(FLPCMsg::UserLeft(message), &mut buffer).unwrap();
+            codec
+                .encode(FLPCMsg::UserLeft(message), &mut buffer)
+                .unwrap();
 
             assert_eq!(&buffer[..], &[0x07, 0x12, 0x34]);
         }
@@ -109,7 +121,9 @@ mod encoder {
             let mut codec = FLPCodec::new();
             let mut buffer = BytesMut::new();
 
-            codec.encode(FLPCMsg::UserLeft(message), &mut buffer).unwrap();
+            codec
+                .encode(FLPCMsg::UserLeft(message), &mut buffer)
+                .unwrap();
 
             assert_eq!(&buffer[..], &[0x07, 0x00, 0x00]);
         }
@@ -120,7 +134,9 @@ mod encoder {
             let mut codec = FLPCodec::new();
             let mut buffer = BytesMut::new();
 
-            codec.encode(FLPCMsg::UserLeft(message), &mut buffer).unwrap();
+            codec
+                .encode(FLPCMsg::UserLeft(message), &mut buffer)
+                .unwrap();
 
             assert_eq!(&buffer[..], &[0x07, 0xFF, 0xFF]);
         }
@@ -182,7 +198,10 @@ mod decoder {
             let mut codec = FLPCodec::new();
             let mut buffer = BytesMut::from(&[0x01, 0x01, b'A'][..]);
 
-            assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::Join(_))));
+            assert!(matches!(
+                codec.decode(&mut buffer).unwrap(),
+                Some(FLPCMsg::Join(_))
+            ));
             assert!(buffer.is_empty());
         }
 
@@ -191,7 +210,10 @@ mod decoder {
             let mut codec = FLPCodec::new();
             let mut buffer = BytesMut::from(&[0x02][..]);
 
-            assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::JoinSuccess(_))));
+            assert!(matches!(
+                codec.decode(&mut buffer).unwrap(),
+                Some(FLPCMsg::JoinSuccess(_))
+            ));
             assert!(buffer.is_empty());
         }
 
@@ -200,34 +222,49 @@ mod decoder {
             let mut codec = FLPCodec::new();
             let mut buffer = BytesMut::from(&[0x03, 0x01][..]);
 
-            assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::JoinFail(_))));
+            assert!(matches!(
+                codec.decode(&mut buffer).unwrap(),
+                Some(FLPCMsg::JoinFail(_))
+            ));
             assert!(buffer.is_empty());
         }
 
         #[test]
         fn test_decode_message() {
             let mut codec = FLPCodec::new();
-            let mut buffer = BytesMut::from(&[0x04, 0x00, 0x02, b'H', b'i'][..]);
+            let mut buffer =
+                BytesMut::from(&[0x04, 0x00, 0x02, b'H', b'i'][..]);
 
-            assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::Message(_))));
+            assert!(matches!(
+                codec.decode(&mut buffer).unwrap(),
+                Some(FLPCMsg::Message(_))
+            ));
             assert!(buffer.is_empty());
         }
 
         #[test]
         fn test_decode_client_message() {
             let mut codec = FLPCodec::new();
-            let mut buffer = BytesMut::from(&[0x05, 0x12, 0x34, 0x00, 0x02, b'H', b'i'][..]);
+            let mut buffer =
+                BytesMut::from(&[0x05, 0x12, 0x34, 0x00, 0x02, b'H', b'i'][..]);
 
-            assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::ClientMessage(_))));
+            assert!(matches!(
+                codec.decode(&mut buffer).unwrap(),
+                Some(FLPCMsg::ClientMessage(_))
+            ));
             assert!(buffer.is_empty());
         }
 
         #[test]
         fn test_decode_user_join() {
             let mut codec = FLPCodec::new();
-            let mut buffer = BytesMut::from(&[0x06, 0x12, 0x34, 0x01, b'A'][..]);
+            let mut buffer =
+                BytesMut::from(&[0x06, 0x12, 0x34, 0x01, b'A'][..]);
 
-            assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::UserJoin(_))));
+            assert!(matches!(
+                codec.decode(&mut buffer).unwrap(),
+                Some(FLPCMsg::UserJoin(_))
+            ));
             assert!(buffer.is_empty());
         }
 
@@ -236,7 +273,10 @@ mod decoder {
             let mut codec = FLPCodec::new();
             let mut buffer = BytesMut::from(&[0x07, 0x12, 0x34][..]);
 
-            assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::UserLeft(_))));
+            assert!(matches!(
+                codec.decode(&mut buffer).unwrap(),
+                Some(FLPCMsg::UserLeft(_))
+            ));
             assert!(buffer.is_empty());
         }
 
@@ -287,7 +327,8 @@ mod decoder {
         #[test]
         fn test_incomplete_message() {
             let mut codec = FLPCodec::new();
-            let mut buffer = BytesMut::from(&[0x04, 0x00, 0x03, b'H', b'i'][..]);
+            let mut buffer =
+                BytesMut::from(&[0x04, 0x00, 0x03, b'H', b'i'][..]);
 
             assert!(codec.decode(&mut buffer).unwrap().is_none());
             assert_eq!(&buffer[..], &[0x04, 0x00, 0x03, b'H', b'i']);
@@ -296,7 +337,8 @@ mod decoder {
         #[test]
         fn test_incomplete_client_message() {
             let mut codec = FLPCodec::new();
-            let mut buffer = BytesMut::from(&[0x05, 0x12, 0x34, 0x00, 0x02, b'H'][..]);
+            let mut buffer =
+                BytesMut::from(&[0x05, 0x12, 0x34, 0x00, 0x02, b'H'][..]);
 
             assert!(codec.decode(&mut buffer).unwrap().is_none());
             assert_eq!(&buffer[..], &[0x05, 0x12, 0x34, 0x00, 0x02, b'H']);
@@ -305,7 +347,8 @@ mod decoder {
         #[test]
         fn test_incomplete_user_join() {
             let mut codec = FLPCodec::new();
-            let mut buffer = BytesMut::from(&[0x06, 0x12, 0x34, 0x02, b'A'][..]);
+            let mut buffer =
+                BytesMut::from(&[0x06, 0x12, 0x34, 0x02, b'A'][..]);
 
             assert!(codec.decode(&mut buffer).unwrap().is_none());
             assert_eq!(&buffer[..], &[0x06, 0x12, 0x34, 0x02, b'A']);
@@ -360,7 +403,8 @@ mod decoder {
         #[test]
         fn test_invalid_utf8_client_message() {
             let mut codec = FLPCodec::new();
-            let mut buffer = BytesMut::from(&[0x05, 0x12, 0x34, 0x00, 0x01, 0xFF][..]);
+            let mut buffer =
+                BytesMut::from(&[0x05, 0x12, 0x34, 0x00, 0x01, 0xFF][..]);
 
             assert!(matches!(
                 codec.decode(&mut buffer),
@@ -371,7 +415,8 @@ mod decoder {
         #[test]
         fn test_invalid_utf8_user_join() {
             let mut codec = FLPCodec::new();
-            let mut buffer = BytesMut::from(&[0x06, 0x12, 0x34, 0x01, 0xFF][..]);
+            let mut buffer =
+                BytesMut::from(&[0x06, 0x12, 0x34, 0x01, 0xFF][..]);
 
             assert!(matches!(
                 codec.decode(&mut buffer),
@@ -389,17 +434,27 @@ mod decoder {
 
             let mut buffer = BytesMut::from(
                 &[
-                    0x02,
-                    0x01, 0x01, b'A',
-                    0x04, 0x00, 0x02, b'H', b'i',
-                    0x07, 0x12, 0x34,
-                ][..]
+                    0x02, 0x01, 0x01, b'A', 0x04, 0x00, 0x02, b'H', b'i', 0x07,
+                    0x12, 0x34,
+                ][..],
             );
 
-            assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::JoinSuccess(_))));
-            assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::Join(_))));
-            assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::Message(_))));
-            assert!(matches!(codec.decode(&mut buffer).unwrap(), Some(FLPCMsg::UserLeft(_))));
+            assert!(matches!(
+                codec.decode(&mut buffer).unwrap(),
+                Some(FLPCMsg::JoinSuccess(_))
+            ));
+            assert!(matches!(
+                codec.decode(&mut buffer).unwrap(),
+                Some(FLPCMsg::Join(_))
+            ));
+            assert!(matches!(
+                codec.decode(&mut buffer).unwrap(),
+                Some(FLPCMsg::Message(_))
+            ));
+            assert!(matches!(
+                codec.decode(&mut buffer).unwrap(),
+                Some(FLPCMsg::UserLeft(_))
+            ));
 
             assert!(buffer.is_empty());
         }

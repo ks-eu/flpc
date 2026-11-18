@@ -36,7 +36,7 @@ pub struct UserJoin {
 
 #[derive(Debug)]
 pub struct UserLeft {
-    uuid: u16
+    uuid: u16,
 }
 
 pub trait Encode {
@@ -59,13 +59,13 @@ impl Join {
         })
     }
 
-	pub fn length(&self) -> u8 {
-		self.length
-	}
+    pub fn length(&self) -> u8 {
+        self.length
+    }
 
-	pub fn username(&self) -> &str {
-		&self.username
-	}
+    pub fn username(&self) -> &str {
+        &self.username
+    }
 }
 
 impl Encode for Join {
@@ -105,15 +105,15 @@ impl Decode for Join {
         if bytes.len() < 2 + length {
             return Err(ProtocolError::IncompleteMessage);
         }
-        
-        let byte_username = &bytes[2..(2+length)];
-        
+
+        let byte_username = &bytes[2..(2 + length)];
+
         Ok(Self {
             length: length as u8,
             username: match String::from_utf8(byte_username.to_vec()) {
                 Ok(username) => username,
                 Err(_) => return Err(ProtocolError::UTF8Error),
-            }
+            },
         })
     }
 }
@@ -145,22 +145,19 @@ impl Decode for JoinSuccess {
 
 impl JoinFail {
     pub fn new(code: u8) -> Self {
-        Self {
-            id: code,
-        }
+        Self { id: code }
     }
 
-	pub fn id(&self) -> u8 {
-		self.id
-	}
+    pub fn id(&self) -> u8 {
+        self.id
+    }
 }
 
 impl Encode for JoinFail {
-    fn encode(&self) -> Result<Vec<u8>, ProtocolError>  {
+    fn encode(&self) -> Result<Vec<u8>, ProtocolError> {
         Ok(vec![0x03, self.id])
     }
 }
-
 
 impl Decode for JoinFail {
     fn decode(bytes: Option<&[u8]>) -> Result<Self, ProtocolError> {
@@ -177,9 +174,7 @@ impl Decode for JoinFail {
             return Err(ProtocolError::InvalidHeader);
         }
 
-        Ok(Self {
-            id: bytes[1],
-        })
+        Ok(Self { id: bytes[1] })
     }
 }
 
@@ -194,14 +189,14 @@ impl Message {
             msg: msg.to_string(),
         })
     }
-	
-    pub fn length(&self) -> u16 {
-		self.length
-	}
 
-	pub fn msg(&self) -> &str {
-		&self.msg
-	}
+    pub fn length(&self) -> u16 {
+        self.length
+    }
+
+    pub fn msg(&self) -> &str {
+        &self.msg
+    }
 }
 
 impl Encode for Message {
@@ -260,7 +255,7 @@ impl ClientMessage {
         if msg.len() > 65535 {
             return Err(ProtocolError::MessageTooLong);
         }
-        
+
         Ok(Self {
             uuid: uuid,
             length: msg.len() as u16,
@@ -268,17 +263,17 @@ impl ClientMessage {
         })
     }
 
-	pub fn uuid(&self) -> u16 {
-		self.uuid
-	}
+    pub fn uuid(&self) -> u16 {
+        self.uuid
+    }
 
-	pub fn length(&self) -> u16 {
-		self.length
-	}
+    pub fn length(&self) -> u16 {
+        self.length
+    }
 
-	pub fn msg(&self) -> &str {
-		&self.msg
-	}
+    pub fn msg(&self) -> &str {
+        &self.msg
+    }
 
     pub fn from_message(message: Message, uuid: u16) -> Self {
         Self {
@@ -357,16 +352,16 @@ impl UserJoin {
     }
 
     pub fn uuid(&self) -> u16 {
-		self.uuid
-	}
+        self.uuid
+    }
 
-	pub fn length(&self) -> u8 {
-		self.length
-	}
+    pub fn length(&self) -> u8 {
+        self.length
+    }
 
-	pub fn username(&self) -> &str {
-		&self.username
-	}
+    pub fn username(&self) -> &str {
+        &self.username
+    }
 }
 
 impl Encode for UserJoin {
@@ -425,9 +420,7 @@ impl Decode for UserJoin {
 
 impl UserLeft {
     pub fn new(uuid: u16) -> Self {
-        Self {
-            uuid,
-        }
+        Self { uuid }
     }
 
     pub fn uuid(&self) -> u16 {
@@ -462,9 +455,7 @@ impl Decode for UserLeft {
 
         let uuid = u16::from_be_bytes([bytes[1], bytes[2]]);
 
-        Ok(Self {
-            uuid,
-        })
+        Ok(Self { uuid })
     }
 }
 #[cfg(test)]

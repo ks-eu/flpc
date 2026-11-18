@@ -1,17 +1,10 @@
 use bytes::Buf;
 use bytes::BytesMut;
-use tokio_util::codec::{Encoder, Decoder};
+use tokio_util::codec::{Decoder, Encoder};
 
 use crate::header::{
-    Encode,
-    Decode,
-    Join,
-    JoinSuccess,
-    JoinFail,
-    Message,
-    ClientMessage,
-    UserJoin,
-    UserLeft,
+    ClientMessage, Decode, Encode, Join, JoinFail, JoinSuccess, Message,
+    UserJoin, UserLeft,
 };
 
 use crate::error::ProtocolError;

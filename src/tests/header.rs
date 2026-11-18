@@ -54,10 +54,7 @@ mod join_tests {
         let join = Join::new("é").unwrap();
 
         assert_eq!(join.length, 2);
-        assert_eq!(
-            join.encode().unwrap(),
-            vec![0x01, 0x02, 0xC3, 0xA9]
-        );
+        assert_eq!(join.encode().unwrap(), vec![0x01, 0x02, 0xC3, 0xA9]);
     }
 
     #[test]
@@ -113,10 +110,7 @@ mod join_tests {
             username: "Alice".to_string(),
         };
 
-        assert!(matches!(
-            join.encode(),
-            Err(ProtocolError::LengthMismatch)
-        ));
+        assert!(matches!(join.encode(), Err(ProtocolError::LengthMismatch)));
     }
 
     #[test]
@@ -327,19 +321,14 @@ mod client_message_tests {
 
         assert_eq!(
             message.encode().unwrap(),
-            vec![
-                0x05, 0x12, 0x34, 0x00, 0x05,
-                0x48, 0x65, 0x6C, 0x6C, 0x6F
-            ]
+            vec![0x05, 0x12, 0x34, 0x00, 0x05, 0x48, 0x65, 0x6C, 0x6C, 0x6F]
         );
     }
 
     #[test]
     fn test_decode_client_message() {
-        let bytes = vec![
-            0x05, 0x12, 0x34, 0x00, 0x05,
-            0x48, 0x65, 0x6C, 0x6C, 0x6F
-        ];
+        let bytes =
+            vec![0x05, 0x12, 0x34, 0x00, 0x05, 0x48, 0x65, 0x6C, 0x6C, 0x6F];
 
         let message = ClientMessage::decode(Some(&bytes)).unwrap();
 
@@ -402,20 +391,14 @@ mod client_message_tests {
     fn test_uuid_zero() {
         let message = ClientMessage::new(0x0000, "Hi").unwrap();
 
-        assert_eq!(
-            &message.encode().unwrap()[1..3],
-            &[0x00, 0x00]
-        );
+        assert_eq!(&message.encode().unwrap()[1..3], &[0x00, 0x00]);
     }
 
     #[test]
     fn test_uuid_maximum() {
         let message = ClientMessage::new(0xFFFF, "Hi").unwrap();
 
-        assert_eq!(
-            &message.encode().unwrap()[1..3],
-            &[0xFF, 0xFF]
-        );
+        assert_eq!(&message.encode().unwrap()[1..3], &[0xFF, 0xFF]);
     }
 
     #[test]
@@ -500,10 +483,7 @@ mod user_join_tests {
     fn test_empty_username() {
         let message = UserJoin::new("", 0x0001).unwrap();
 
-        assert_eq!(
-            message.encode().unwrap(),
-            vec![0x06, 0x00, 0x01, 0x00]
-        );
+        assert_eq!(message.encode().unwrap(), vec![0x06, 0x00, 0x01, 0x00]);
     }
 
     #[test]
@@ -540,20 +520,14 @@ mod user_join_tests {
     fn test_uuid_zero() {
         let message = UserJoin::new("Alice", 0x0000).unwrap();
 
-        assert_eq!(
-            &message.encode().unwrap()[1..3],
-            &[0x00, 0x00]
-        );
+        assert_eq!(&message.encode().unwrap()[1..3], &[0x00, 0x00]);
     }
 
     #[test]
     fn test_uuid_maximum() {
         let message = UserJoin::new("Alice", 0xFFFF).unwrap();
 
-        assert_eq!(
-            &message.encode().unwrap()[1..3],
-            &[0xFF, 0xFF]
-        );
+        assert_eq!(&message.encode().unwrap()[1..3], &[0xFF, 0xFF]);
     }
 
     #[test]
@@ -618,10 +592,7 @@ mod user_left_tests {
     fn test_encode_user_left() {
         let message = UserLeft::new(0x1234);
 
-        assert_eq!(
-            message.encode().unwrap(),
-            vec![0x07, 0x12, 0x34]
-        );
+        assert_eq!(message.encode().unwrap(), vec![0x07, 0x12, 0x34]);
     }
 
     #[test]
@@ -636,20 +607,14 @@ mod user_left_tests {
     fn test_uuid_zero() {
         let message = UserLeft::new(0x0000);
 
-        assert_eq!(
-            message.encode().unwrap(),
-            vec![0x07, 0x00, 0x00]
-        );
+        assert_eq!(message.encode().unwrap(), vec![0x07, 0x00, 0x00]);
     }
 
     #[test]
     fn test_uuid_maximum() {
         let message = UserLeft::new(0xFFFF);
 
-        assert_eq!(
-            message.encode().unwrap(),
-            vec![0x07, 0xFF, 0xFF]
-        );
+        assert_eq!(message.encode().unwrap(), vec![0x07, 0xFF, 0xFF]);
     }
 
     #[test]
