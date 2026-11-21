@@ -5,10 +5,18 @@
 //! encoded with UTF8]
 //!
 
+mod admin;
+mod client;
+mod ping;
+mod server;
+
 /// Unit
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Unit {
     Client,
     Server,
     Admin,
     Ping,
 }
+
+
