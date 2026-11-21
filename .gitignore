@@ -1,5 +1,6 @@
 # Rust build artefacts
-/target/
+rust/target/
+target/
 
 # Environment variables and secrets
 .env
