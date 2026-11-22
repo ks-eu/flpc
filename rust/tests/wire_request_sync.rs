@@ -43,6 +43,20 @@ fn decode_waits_for_all_bytes_and_consumes_one_frame() {
 }
 
 #[test]
+fn round_trips_bounds_as_opaque_big_endian_values() {
+    let unit = RequestSync::new(u64::MAX, 0);
+    let bytes = [
+        0x06, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0, 0, 0, 0, 0, 0, 0, 0,
+    ];
+
+    assert_eq!(unit.to_bytes().unwrap(), bytes);
+    assert_eq!(
+        decode(&bytes).unwrap(),
+        Some((FlpcUnit::Client(ClientUnit::RequestSync(unit)), bytes.len(),))
+    );
+}
+
+#[test]
 fn undersized_destination_is_unchanged() {
     let mut dst = [0xaa; FRAME.len() - 1];
     assert!(matches!(
