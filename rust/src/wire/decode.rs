@@ -2,7 +2,7 @@ use super::DecodeError;
 use crate::unit::{
     Add, AdminUnit, ChangeUsername, ChangedUsername, ClientUnit, FlpcUnit, Kick, Login, MakeAdmin,
     Message, Ping, PingUnit, PrivateMessage, Register, Remove, RemoveAdmin, RequestSync,
-    ServerLogin, ServerMessage, ServerPrivateMessage, ServerRegister, SyncMessage,
+    ServerLogin, ServerMessage, ServerPrivateMessage, ServerRegister, ServerUnit, SyncMessage,
     SyncPrivateMessage, UserJoined, UserLeft, UserRegistered, UserRemoved,
 };
 
@@ -130,8 +130,15 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 u16::from_be_bytes(id),
             ))))
         }
-        ServerRegister::OPCODE
-        | ServerLogin::OPCODE
+        ServerRegister::OPCODE => {
+            let Some([outcome]) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Server(ServerUnit::ServerRegister(
+                ServerRegister::new(outcome),
+            )))
+        }
+        ServerLogin::OPCODE
         | ServerMessage::OPCODE
         | ServerPrivateMessage::OPCODE
         | UserRegistered::OPCODE
