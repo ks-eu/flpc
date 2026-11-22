@@ -24,6 +24,20 @@ async fn sends_wire_bytes_to_raw_peer() {
 }
 
 #[tokio::test]
+async fn receives_complete_frame_then_clean_eof() {
+    let (stream, mut peer) = duplex(16);
+    let mut framed = Framed::new(stream, FlpcCodec);
+    peer.write_all(FRAME).await.unwrap();
+    peer.shutdown().await.unwrap();
+
+    assert_eq!(
+        framed.next().await.unwrap().unwrap(),
+        FlpcUnit::Client(ClientUnit::ChangeUsername(ChangeUsername::new("é".into())))
+    );
+    assert!(framed.next().await.is_none());
+}
+
+#[tokio::test]
 async fn receives_fragmented_frame_and_truncated_frame_at_eof() {
     let (stream, mut peer) = duplex(16);
     let mut framed = Framed::new(stream, FlpcCodec);

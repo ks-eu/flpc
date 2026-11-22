@@ -23,6 +23,16 @@ fn encode_matches_independent_bytes_and_preserves_tail() {
 }
 
 #[test]
+fn undersized_destination_is_unchanged() {
+    let mut dst = [0xaa; FRAME.len() - 1];
+    assert!(matches!(
+        ChangeUsername::new("é".into()).encode_into(&mut dst),
+        Err(EncodeError::BufferTooSmall)
+    ));
+    assert_eq!(dst, [0xaa; FRAME.len() - 1]);
+}
+
+#[test]
 fn decode_waits_for_complete_username_and_consumes_one_frame() {
     for end in 0..FRAME.len() {
         assert_eq!(decode(&FRAME[..end]).unwrap(), None, "prefix {end}");
