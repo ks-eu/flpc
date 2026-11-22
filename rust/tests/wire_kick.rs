@@ -24,13 +24,17 @@ fn decode_waits_for_id_and_consumes_one_frame() {
         assert_eq!(decode(&FRAME[..end]).unwrap(), None, "prefix {end}");
     }
 
-    let adjacent = [FRAME, &[0x7f, 0, 0]].concat();
+    let adjacent = [FRAME, &[0x7f, 0x01, 0x23]].concat();
     assert_eq!(
         decode(&adjacent).unwrap(),
         Some((
             FlpcUnit::Admin(AdminUnit::Kick(Kick::new(0xcdef))),
             FRAME.len(),
         ))
+    );
+    assert_eq!(
+        decode(&adjacent[FRAME.len()..]).unwrap(),
+        Some((FlpcUnit::Admin(AdminUnit::Kick(Kick::new(0x0123))), 3,))
     );
 }
 

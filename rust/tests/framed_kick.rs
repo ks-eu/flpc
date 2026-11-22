@@ -34,9 +34,15 @@ async fn receives_fragmented_frame() {
 
     peer.write_all(&FRAME[..2]).await.unwrap();
     assert!(framed.next().now_or_never().is_none());
-    peer.write_all(&FRAME[2..]).await.unwrap();
+    peer.write_all(&[&FRAME[2..], &[0x7f, 0x01, 0x23]].concat())
+        .await
+        .unwrap();
     peer.shutdown().await.unwrap();
 
     assert_eq!(framed.next().await.unwrap().unwrap(), expected());
+    assert_eq!(
+        framed.next().await.unwrap().unwrap(),
+        FlpcUnit::Admin(AdminUnit::Kick(Kick::new(0x0123)))
+    );
     assert!(framed.next().await.is_none());
 }
