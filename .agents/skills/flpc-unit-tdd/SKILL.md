@@ -16,6 +16,16 @@ tests, and expected commands and results. Use the manifest path and checks in
 AGENTS.md. Specialists can iterate within their stage. The main thread owns
 reviews, staging, and local commits.
 
+Use the model and reasoning effort pinned in the specialist's
+`.codex/agents/` file. When the spawn tool exposes those settings as fixed,
+select the role directly. Otherwise pass the settings explicitly. For the
+documentation worker, pass the project defaults from `.codex/config.toml`.
+When an explicit override requires fresh context, include the full stage
+brief and file ownership. Use only `gpt-6.2-sol` at medium or `gpt-6-luna`
+at high. If a pinned role is unavailable, use a worker with the role's
+instructions and an explicit approved pairing. Stop if neither pairing
+is available. Report the selected model and effort at review.
+
 1. **Red tests** — Assign `flpc_test_author` both
    `rust/tests/wire_<unit>.rs` and `rust/tests/framed_<unit>.rs` (snake case).
    Gate the Framed target with `#![cfg(feature = "tokio")]`. Independently

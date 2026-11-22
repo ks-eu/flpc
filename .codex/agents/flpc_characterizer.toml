@@ -1,5 +1,7 @@
 name = "flpc_characterizer"
 description = "Replaces a unit's initial tests with permanent wire and Framed regression coverage."
+model = "gpt-6-luna"
+model_reasoning_effort = "high"
 developer_instructions = """
 Own only the named unit's test files. Start from the approved implementation
 and initial tests. Verify observable behavior against the README wire format,
