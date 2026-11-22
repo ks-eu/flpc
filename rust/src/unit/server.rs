@@ -421,6 +421,30 @@ impl ChangedUsername {
     }
 }
 
+/// A chat message returned during synchronization (opcode `0x89`).
+///
+/// The sender ID and timestamp are big-endian. The UTF-8 message has a
+/// two-byte big-endian length prefix.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{FlpcUnit, ServerUnit, SyncMessage},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = SyncMessage::new(7, 42, "hi".into());
+/// let bytes: &[u8] = &[0x89, 0, 7, 0, 0, 0, 0, 0, 0, 0, 42, 0, 2, b'h', b'i'];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(bytes).unwrap(),
+///     Some((
+///         FlpcUnit::Server(ServerUnit::SyncMessage(unit)),
+///         bytes.len(),
+///     )),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SyncMessage {
     id: u16,
