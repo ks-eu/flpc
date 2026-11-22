@@ -1,9 +1,9 @@
 use super::DecodeError;
 use crate::unit::{
-    Add, ChangeUsername, ChangedUsername, ClientUnit, FlpcUnit, Kick, Login, MakeAdmin, Message,
-    Ping, PingUnit, PrivateMessage, Register, Remove, RemoveAdmin, RequestSync, ServerLogin,
-    ServerMessage, ServerPrivateMessage, ServerRegister, SyncMessage, SyncPrivateMessage,
-    UserJoined, UserLeft, UserRegistered, UserRemoved,
+    Add, AdminUnit, ChangeUsername, ChangedUsername, ClientUnit, FlpcUnit, Kick, Login, MakeAdmin,
+    Message, Ping, PingUnit, PrivateMessage, Register, Remove, RemoveAdmin, RequestSync,
+    ServerLogin, ServerMessage, ServerPrivateMessage, ServerRegister, SyncMessage,
+    SyncPrivateMessage, UserJoined, UserLeft, UserRegistered, UserRemoved,
 };
 
 /// Decodes the first unit and returns it with the byte count, including its opcode.
@@ -86,8 +86,15 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 u64::from_be_bytes(last),
             ))))
         }
-        RemoveAdmin::OPCODE
-        | MakeAdmin::OPCODE
+        RemoveAdmin::OPCODE => {
+            let Some(id) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Admin(AdminUnit::RemoveAdmin(RemoveAdmin::new(
+                u16::from_be_bytes(id),
+            ))))
+        }
+        MakeAdmin::OPCODE
         | Add::OPCODE
         | Remove::OPCODE
         | Kick::OPCODE
