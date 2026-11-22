@@ -1,30 +1,40 @@
 use flpc::{
     unit::{FlpcUnit, ServerUnit, UserRemoved},
-    wire::{Encode, decode},
+    wire::{Encode, EncodeError, decode},
 };
 
+// Independent bytes from README opcode 0x85 field layout.
 const FRAME: &[u8] = &[0x85, 0x12, 0x34];
 
 #[test]
-fn wire_bytes_and_decode_match_protocol() {
+fn encoding_and_decoding_match_the_wire_vector() {
     let unit = UserRemoved::new(0x1234);
+    let expected = FlpcUnit::Server(ServerUnit::UserRemoved(UserRemoved::new(0x1234)));
+    let mut dst = [0xaa; FRAME.len() + 2];
+    assert_eq!(unit.encoded_len().unwrap(), FRAME.len());
+    assert_eq!(unit.encode_into(&mut dst).unwrap(), FRAME.len());
+    assert_eq!(&dst[..FRAME.len()], FRAME);
+    assert_eq!(&dst[FRAME.len()..], &[0xaa; 2]);
     assert_eq!(unit.to_bytes().unwrap(), FRAME);
     assert_eq!(
         decode(FRAME).unwrap(),
-        Some((
-            FlpcUnit::Server(ServerUnit::UserRemoved(UserRemoved::new(0x1234))),
-            FRAME.len()
-        ))
+        Some((expected.clone(), FRAME.len()))
     );
+
     for end in 0..FRAME.len() {
         assert_eq!(decode(&FRAME[..end]).unwrap(), None, "prefix {end}");
     }
     let adjacent = [FRAME, FRAME].concat();
-    assert_eq!(
-        decode(&adjacent).unwrap(),
-        Some((
-            FlpcUnit::Server(ServerUnit::UserRemoved(UserRemoved::new(0x1234))),
-            FRAME.len()
-        ))
-    );
+    assert_eq!(decode(&adjacent).unwrap(), Some((expected, FRAME.len())));
+}
+
+#[test]
+fn undersized_destination_stays_unchanged() {
+    let unit = UserRemoved::new(0x1234);
+    let mut dst = vec![0xaa; FRAME.len() - 1];
+    assert!(matches!(
+        unit.encode_into(&mut dst),
+        Err(EncodeError::BufferTooSmall)
+    ));
+    assert_eq!(dst, vec![0xaa; FRAME.len() - 1]);
 }
