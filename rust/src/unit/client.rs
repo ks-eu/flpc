@@ -159,6 +159,32 @@ impl Message {
     }
 }
 
+/// A private message sent to a target (opcode `0x04`).
+///
+/// The target is an unsigned 16-bit big-endian integer. The message follows
+/// as UTF-8 preceded by a two-byte big-endian length counting UTF-8 bytes, so
+/// it may contain at most 65,535 bytes. Encoding a longer message returns
+/// [`crate::wire::EncodeError::StringTooLong`].
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{ClientUnit, FlpcUnit, PrivateMessage},
+///     wire::{decode, Encode},
+/// };
+///
+/// let message = PrivateMessage::new(0x1234, "é".into());
+/// let bytes = [0x04, 0x12, 0x34, 0x00, 0x02, 0xc3, 0xa9];
+/// assert_eq!(message.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(&bytes).unwrap(),
+///     Some((
+///         FlpcUnit::Client(ClientUnit::PrivateMessage(message)),
+///         bytes.len(),
+///     )),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PrivateMessage {
     target: u16,
