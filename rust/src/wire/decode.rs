@@ -1,7 +1,7 @@
 use super::DecodeError;
 use crate::unit::{
-    Add, ChangeUsername, ChangedUsername, FlpcUnit, Kick, Login, MakeAdmin, Message, Ping,
-    PrivateMessage, Register, Remove, RemoveAdmin, RequestSync, ServerLogin, ServerMessage,
+    Add, ChangeUsername, ChangedUsername, ClientUnit, FlpcUnit, Kick, Login, MakeAdmin, Message,
+    Ping, PrivateMessage, Register, Remove, RemoveAdmin, RequestSync, ServerLogin, ServerMessage,
     ServerPrivateMessage, ServerRegister, SyncMessage, SyncPrivateMessage, UserJoined, UserLeft,
     UserRegistered, UserRemoved,
 };
@@ -22,8 +22,27 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
     };
 
     match opcode {
+        Register::OPCODE => {
+            let mut remaining = &buf[1..];
+            let mut fields = [""; 3];
+            for field in &mut fields {
+                let Some((&len, payload)) = remaining.split_first() else {
+                    return Ok(None);
+                };
+                let Some((bytes, rest)) = payload.split_at_checked(usize::from(len)) else {
+                    return Ok(None);
+                };
+                *field = std::str::from_utf8(bytes).map_err(|_| DecodeError::InvalidUTF8)?;
+                remaining = rest;
+            }
+            let [token, username, password] = fields;
+            let unit = Register::new(token.into(), username.into(), password.into());
+            Ok(Some((
+                FlpcUnit::Client(ClientUnit::Register(unit)),
+                buf.len() - remaining.len(),
+            )))
+        }
         Ping::OPCODE
-        | Register::OPCODE
         | Login::OPCODE
         | Message::OPCODE
         | PrivateMessage::OPCODE
