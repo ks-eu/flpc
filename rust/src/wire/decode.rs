@@ -102,8 +102,19 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 u16::from_be_bytes(id),
             ))))
         }
-        Add::OPCODE
-        | Remove::OPCODE
+        Add::OPCODE => {
+            let Some(username) = read_short_string(&mut remaining)? else {
+                return Ok(None);
+            };
+            let Some(password) = read_short_string(&mut remaining)? else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Admin(AdminUnit::Add(Add::new(
+                username.into(),
+                password.into(),
+            ))))
+        }
+        Remove::OPCODE
         | Kick::OPCODE
         | ServerRegister::OPCODE
         | ServerLogin::OPCODE
