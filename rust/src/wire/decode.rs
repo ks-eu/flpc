@@ -1,9 +1,9 @@
 use super::DecodeError;
 use crate::unit::{
     Add, ChangeUsername, ChangedUsername, ClientUnit, FlpcUnit, Kick, Login, MakeAdmin, Message,
-    Ping, PrivateMessage, Register, Remove, RemoveAdmin, RequestSync, ServerLogin, ServerMessage,
-    ServerPrivateMessage, ServerRegister, SyncMessage, SyncPrivateMessage, UserJoined, UserLeft,
-    UserRegistered, UserRemoved,
+    Ping, PingUnit, PrivateMessage, Register, Remove, RemoveAdmin, RequestSync, ServerLogin,
+    ServerMessage, ServerPrivateMessage, ServerRegister, SyncMessage, SyncPrivateMessage,
+    UserJoined, UserLeft, UserRegistered, UserRemoved,
 };
 
 /// Decodes the first unit and returns it with the byte count, including its opcode.
@@ -22,6 +22,7 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
     };
 
     match opcode {
+        Ping::OPCODE => Ok(Some((FlpcUnit::Ping(PingUnit::Ping(Ping::new())), 1))),
         Register::OPCODE => {
             let mut remaining = &buf[1..];
             let mut fields = [""; 3];
@@ -42,8 +43,7 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 buf.len() - remaining.len(),
             )))
         }
-        Ping::OPCODE
-        | Login::OPCODE
+        Login::OPCODE
         | Message::OPCODE
         | PrivateMessage::OPCODE
         | ChangeUsername::OPCODE
