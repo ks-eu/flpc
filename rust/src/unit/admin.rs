@@ -82,6 +82,26 @@ impl MakeAdmin {
     }
 }
 
+/// A request to remove a user's administrator privileges (opcode `0x7B`).
+///
+/// The user ID is an unsigned 16-bit integer encoded in big-endian byte order.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{AdminUnit, FlpcUnit, RemoveAdmin},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = RemoveAdmin::new(0x1234);
+/// let bytes = [0x7b, 0x12, 0x34];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(&bytes).unwrap(),
+///     Some((FlpcUnit::Admin(AdminUnit::RemoveAdmin(unit)), bytes.len())),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RemoveAdmin {
     id: u16,
