@@ -197,8 +197,15 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 UserRegistered::new(u16::from_be_bytes(id), username.into()),
             )))
         }
-        UserRemoved::OPCODE
-        | UserJoined::OPCODE
+        UserRemoved::OPCODE => {
+            let Some(id) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Server(ServerUnit::UserRemoved(UserRemoved::new(
+                u16::from_be_bytes(id),
+            ))))
+        }
+        UserJoined::OPCODE
         | UserLeft::OPCODE
         | ChangedUsername::OPCODE
         | SyncMessage::OPCODE
