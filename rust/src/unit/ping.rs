@@ -5,6 +5,24 @@ pub enum PingUnit {
     Ping(Ping),
 }
 
+/// A ping encoded as the single byte `0x00`.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{FlpcUnit, Ping, PingUnit},
+///     wire::{decode, Encode},
+/// };
+///
+/// let ping = Ping::new();
+/// let bytes = [0x00];
+/// assert_eq!(ping.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(&bytes).unwrap(),
+///     Some((FlpcUnit::Ping(PingUnit::Ping(ping)), bytes.len())),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Ping {}
 

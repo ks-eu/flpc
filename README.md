@@ -13,8 +13,8 @@ minimising header size as much as possible.
 
 ## Wire format
 
-The Rust crate currently encodes and decodes `Register`. With the optional
-`tokio` feature, the shared `FlpcCodec` adapts supported units to
+The Rust crate currently encodes and decodes `Ping` and `Register`. With the
+optional `tokio` feature, the shared `FlpcCodec` adapts supported units to
 `tokio_util::codec::Framed`.
 
 Each unit starts with a one-byte opcode. Its fields follow in the order shown below. All multibyte integers use big-endian byte order. IDs and targets are unsigned 16-bit integers. Timestamps and sync bounds are unsigned 64-bit integers.
