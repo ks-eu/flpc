@@ -150,6 +150,30 @@ impl ServerMessage {
     }
 }
 
+/// A private chat message from a user (opcode `0x83`).
+///
+/// The sender ID, target ID, and timestamp are big-endian. The UTF-8 message
+/// has a two-byte big-endian length prefix.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{FlpcUnit, ServerUnit, ServerPrivateMessage},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = ServerPrivateMessage::new(7, 8, 42, "hi".into());
+/// let bytes: &[u8] = &[0x83, 0, 7, 0, 8, 0, 0, 0, 0, 0, 0, 0, 42, 0, 2, b'h', b'i'];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(bytes).unwrap(),
+///     Some((
+///         FlpcUnit::Server(ServerUnit::ServerPrivateMessage(unit)),
+///         bytes.len(),
+///     )),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerPrivateMessage {
     id: u16,
