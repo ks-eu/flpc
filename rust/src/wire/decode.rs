@@ -114,8 +114,15 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 password.into(),
             ))))
         }
-        Remove::OPCODE
-        | Kick::OPCODE
+        Remove::OPCODE => {
+            let Some(id) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Admin(AdminUnit::Remove(Remove::new(
+                u16::from_be_bytes(id),
+            ))))
+        }
+        Kick::OPCODE
         | ServerRegister::OPCODE
         | ServerLogin::OPCODE
         | ServerMessage::OPCODE
