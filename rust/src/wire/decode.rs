@@ -13,8 +13,7 @@ use crate::unit::{
 ///
 /// # Errors
 ///
-/// Returns [`DecodeError::UnknownOpcode`] for an unassigned opcode,
-/// [`DecodeError::UnsupportedOpcode`] for an assigned opcode whose codec is pending,
+/// Returns [`DecodeError::UnknownOpcode`] for an unassigned opcode
 /// or [`DecodeError::InvalidUTF8`] for an invalid UTF-8 field.
 pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
     let Some((&opcode, mut remaining)) = buf.split_first() else {
@@ -248,7 +247,28 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 message.into(),
             ))))
         }
-        SyncPrivateMessage::OPCODE => return Err(DecodeError::UnsupportedOpcode(opcode)),
+        SyncPrivateMessage::OPCODE => {
+            let Some(id) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            let Some(target) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            let Some(timestamp) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            let Some(message) = read_long_string(&mut remaining)? else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Server(ServerUnit::SyncPrivateMessage(
+                SyncPrivateMessage::new(
+                    u16::from_be_bytes(id),
+                    u16::from_be_bytes(target),
+                    u64::from_be_bytes(timestamp),
+                    message.into(),
+                ),
+            )))
+        }
         _ => return Err(DecodeError::UnknownOpcode),
     };
     Ok(unit.map(|unit| (unit, buf.len() - remaining.len())))
