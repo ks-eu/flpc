@@ -2,11 +2,11 @@
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AdminUnit {
-    Kick,
-    Remove,
-    Add,
-    MakeAdmin,
-    RemoveAdmin,
+    Kick(Kick),
+    Remove(Remove),
+    Add(Add),
+    MakeAdmin(MakeAdmin),
+    RemoveAdmin(RemoveAdmin),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -14,9 +14,33 @@ pub struct Kick {
     id: u16,
 }
 
+impl Kick {
+    pub(crate) const OPCODE: u8 = 0x7F;
+
+    pub fn new(id: u16) -> Self {
+        Self { id }
+    }
+
+    pub fn id(&self) -> &u16 {
+        &self.id
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Remove {
     id: u16,
+}
+
+impl Remove {
+    pub(crate) const OPCODE: u8 = 0x7E;
+
+    pub fn new(id: u16) -> Self {
+        Self { id }
+    }
+
+    pub fn id(&self) -> &u16 {
+        &self.id
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -25,12 +49,52 @@ pub struct Add {
     password: String,
 }
 
+impl Add {
+    pub(crate) const OPCODE: u8 = 0x7D;
+
+    pub fn new(username: String, password: String) -> Self {
+        Self { username, password }
+    }
+
+    pub fn username(&self) -> &String {
+        &self.username
+    }
+
+    pub fn password(&self) -> &String {
+        &self.password
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)] 
 pub struct MakeAdmin {
     id: u16,
 }
 
+impl MakeAdmin {
+    pub(crate) const OPCODE: u8 = 0x7C;
+
+    pub fn new(id: u16) -> Self {
+        Self { id }
+    }
+
+    pub fn id(&self) -> &u16 {
+        &self.id
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)] 
 pub struct RemoveAdmin {
     id: u16,
+}
+
+impl RemoveAdmin {
+    pub(crate) const OPCODE: u8 = 0x7B;
+
+    pub fn new(id: u16) -> Self {
+        Self { id }
+    }
+
+    pub fn id(&self) -> &u16 {
+        &self.id
+    }
 }

@@ -5,6 +5,11 @@
 //! encoded with UTF8]
 //!
 
+use crate::unit::admin::AdminUnit;
+use crate::unit::client::ClientUnit;
+use crate::unit::ping::PingUnit;
+use crate::unit::server::ServerUnit;
+
 mod admin;
 mod client;
 mod ping;
@@ -12,11 +17,11 @@ mod server;
 
 /// Unit
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Unit {
-    Client,
-    Server,
-    Admin,
-    Ping,
+pub enum FlpcUnit {
+    Admin(AdminUnit),
+    Client(ClientUnit),
+    Ping(PingUnit),
+    Server(ServerUnit),
 }
 
 
