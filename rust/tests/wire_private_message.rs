@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{ClientUnit, FlpcUnit, PrivateMessage},
+    unit::{ClientUnit, FlpcUnit, Ping, PingUnit, PrivateMessage},
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
@@ -23,11 +23,20 @@ fn encodes_independent_bytes_and_decodes_one_unit() {
     assert_eq!(&dst[..FRAME.len()], FRAME);
     assert_eq!(&dst[FRAME.len()..], &[0xaa; 2]);
     assert_eq!(unit.to_bytes().unwrap(), FRAME);
-    assert_eq!(decode(FRAME).unwrap(), Some((decoded(0x1234, "é"), FRAME.len())));
+    assert_eq!(
+        decode(FRAME).unwrap(),
+        Some((decoded(0x1234, "é"), FRAME.len()))
+    );
 
     let adjacent = [FRAME, &[0x00][..]].concat();
-    assert_eq!(decode(&adjacent).unwrap(), Some((decoded(0x1234, "é"), FRAME.len())));
-    assert_eq!(decode(&adjacent[FRAME.len()..]).unwrap().unwrap().1, 1);
+    assert_eq!(
+        decode(&adjacent).unwrap(),
+        Some((decoded(0x1234, "é"), FRAME.len()))
+    );
+    assert_eq!(
+        decode(&adjacent[FRAME.len()..]).unwrap(),
+        Some((FlpcUnit::Ping(PingUnit::Ping(Ping::new())), 1))
+    );
 }
 
 #[test]
@@ -49,7 +58,10 @@ fn supports_empty_and_maximum_messages() {
     let unit = private_message(u16::MAX, &max);
     assert_eq!(unit.encoded_len().unwrap(), frame.len());
     assert_eq!(unit.to_bytes().unwrap(), frame);
-    assert_eq!(decode(&frame).unwrap(), Some((decoded(u16::MAX, &max), frame.len())));
+    assert_eq!(
+        decode(&frame).unwrap(),
+        Some((decoded(u16::MAX, &max), frame.len()))
+    );
 }
 
 #[test]
@@ -62,9 +74,15 @@ fn encode_errors_leave_the_destination_unchanged() {
     assert_eq!(short, [0xaa; FRAME.len() - 1]);
 
     let too_long = private_message(1, &"x".repeat(65_536));
-    assert!(matches!(too_long.encoded_len(), Err(EncodeError::StringTooLong)));
+    assert!(matches!(
+        too_long.encoded_len(),
+        Err(EncodeError::StringTooLong)
+    ));
     let mut dst = [0xaa; 5];
-    assert!(matches!(too_long.encode_into(&mut dst), Err(EncodeError::StringTooLong)));
+    assert!(matches!(
+        too_long.encode_into(&mut dst),
+        Err(EncodeError::StringTooLong)
+    ));
     assert_eq!(dst, [0xaa; 5]);
 }
 

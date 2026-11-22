@@ -42,7 +42,9 @@ async fn receives_fragmented_target_and_utf8_then_adjacent_frame() {
     peer.write_all(&FRAME[2..6]).await.unwrap();
     assert!(framed.next().now_or_never().is_none());
     peer.write_all(&FRAME[6..]).await.unwrap();
-    peer.write_all(&[0x04, 0x00, 0x01, 0x00, 0x00]).await.unwrap();
+    peer.write_all(&[0x04, 0x00, 0x01, 0x00, 0x00])
+        .await
+        .unwrap();
     peer.shutdown().await.unwrap();
 
     assert_eq!(framed.next().await.unwrap().unwrap(), expected(0x1234, "é"));
@@ -55,7 +57,9 @@ async fn reports_truncated_private_message_at_eof_after_complete_frame() {
     let (stream, mut peer) = duplex(32);
     let mut framed = Framed::new(stream, FlpcCodec);
     peer.write_all(FRAME).await.unwrap();
-    peer.write_all(&[0x04, 0x12, 0x34, 0x00, 0x02, b'x']).await.unwrap();
+    peer.write_all(&[0x04, 0x12, 0x34, 0x00, 0x02, b'x'])
+        .await
+        .unwrap();
     peer.shutdown().await.unwrap();
 
     assert_eq!(framed.next().await.unwrap().unwrap(), expected(0x1234, "é"));
