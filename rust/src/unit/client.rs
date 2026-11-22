@@ -116,6 +116,32 @@ impl Login {
     }
 }
 
+/// A message sent to the server (opcode `0x03`).
+///
+/// The message is encoded as UTF-8 after a two-byte big-endian length prefix.
+/// The prefix counts UTF-8 bytes, so a message may contain at most 65,535
+/// bytes. Encoding a longer message returns
+/// [`crate::wire::EncodeError::StringTooLong`].
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{ClientUnit, FlpcUnit, Message},
+///     wire::{decode, Encode},
+/// };
+///
+/// let message = Message::new("é".into());
+/// let bytes = [0x03, 0x00, 0x02, 0xc3, 0xa9];
+/// assert_eq!(message.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(&bytes).unwrap(),
+///     Some((
+///         FlpcUnit::Client(ClientUnit::Message(message)),
+///         bytes.len(),
+///     )),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Message {
     message: String,

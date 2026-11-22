@@ -13,7 +13,8 @@ minimising header size as much as possible.
 
 ## Wire format
 
-The Rust crate currently encodes and decodes `Ping`, `Register`, and `Login`.
+The Rust crate currently encodes and decodes `Ping`, `Register`, `Login`, and
+`Message`.
 The optional `tokio` feature exposes the shared `FlpcCodec` for
 `tokio_util::codec::Framed`.
 
@@ -61,3 +62,6 @@ The outcome byte is opaque to the wire codec. The timestamp epoch and precision 
 TCP may split one unit across reads or deliver multiple units in one read. The Rust decoder reports one complete unit and its size, or asks for more bytes if a supported unit is incomplete. An unassigned opcode or invalid UTF-8 in a complete field is a decoding error. There is no outer length with which to skip an unrecognized unit.
 
 For example, registering with token `t`, username `é`, and password `pw` yields `01 01 74 02 C3 A9 02 70 77`. The username starts with `02` because `é` occupies two UTF-8 bytes.
+
+Sending the message `é` yields `03 00 02 C3 A9`. The two-byte big-endian prefix
+`00 02` counts the UTF-8 bytes in `é`.
