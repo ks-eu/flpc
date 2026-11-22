@@ -28,8 +28,15 @@ fn decode_waits_for_both_fields_and_consumes_one_frame() {
         assert_eq!(decode(&FRAME[..end]).unwrap(), None, "prefix {end}");
     }
 
-    let adjacent = [FRAME, &[0x7d, 0, 0]].concat();
+    let adjacent = [FRAME, &[0x7d, 1, b'u', 1, b'p']].concat();
     assert_eq!(decode(&adjacent).unwrap(), Some((expected(), FRAME.len())));
+    assert_eq!(
+        decode(&adjacent[FRAME.len()..]).unwrap(),
+        Some((
+            FlpcUnit::Admin(AdminUnit::Add(Add::new("u".into(), "p".into()))),
+            5,
+        ))
+    );
 }
 
 #[test]
@@ -49,15 +56,19 @@ fn empty_and_255_byte_fields_round_trip() {
         assert_eq!(unit.to_bytes().unwrap(), bytes);
         assert_eq!(
             decode(bytes).unwrap(),
-            Some((
-                FlpcUnit::Admin(AdminUnit::Add(Add::new(
-                    unit.username().clone(),
-                    unit.password().clone(),
-                ))),
-                bytes.len(),
-            ))
+            Some((FlpcUnit::Admin(AdminUnit::Add(unit)), bytes.len()))
         );
     }
+}
+
+#[test]
+fn undersized_destination_is_unchanged() {
+    let mut dst = [0xaa; FRAME.len() - 1];
+    assert!(matches!(
+        Add::new("Zoë".into(), "p".into()).encode_into(&mut dst),
+        Err(EncodeError::BufferTooSmall)
+    ));
+    assert_eq!(dst, [0xaa; FRAME.len() - 1]);
 }
 
 #[test]
