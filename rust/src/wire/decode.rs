@@ -221,7 +221,18 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 u16::from_be_bytes(id),
             ))))
         }
-        ChangedUsername::OPCODE | SyncMessage::OPCODE | SyncPrivateMessage::OPCODE => {
+        ChangedUsername::OPCODE => {
+            let Some(id) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            let Some(username) = read_short_string(&mut remaining)? else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Server(ServerUnit::ChangedUsername(
+                ChangedUsername::new(u16::from_be_bytes(id), username.into()),
+            )))
+        }
+        SyncMessage::OPCODE | SyncPrivateMessage::OPCODE => {
             return Err(DecodeError::UnsupportedOpcode(opcode));
         }
         _ => return Err(DecodeError::UnknownOpcode),
