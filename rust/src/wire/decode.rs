@@ -74,8 +74,19 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 ChangeUsername::new(username.into()),
             )))
         }
-        RequestSync::OPCODE
-        | RemoveAdmin::OPCODE
+        RequestSync::OPCODE => {
+            let Some(first) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            let Some(last) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Client(ClientUnit::RequestSync(RequestSync::new(
+                u64::from_be_bytes(first),
+                u64::from_be_bytes(last),
+            ))))
+        }
+        RemoveAdmin::OPCODE
         | MakeAdmin::OPCODE
         | Add::OPCODE
         | Remove::OPCODE

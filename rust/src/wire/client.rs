@@ -4,7 +4,21 @@ use super::{
     Encode, EncodeError,
     fields::{encode_frame, short_strings_len, write_short_string},
 };
-use crate::unit::{ChangeUsername, Login, Message, PrivateMessage, Register};
+use crate::unit::{ChangeUsername, Login, Message, PrivateMessage, Register, RequestSync};
+
+impl Encode for RequestSync {
+    fn encoded_len(&self) -> Result<usize, EncodeError> {
+        Ok(17)
+    }
+
+    fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
+        encode_frame(buf, self.encoded_len()?, Self::OPCODE, |dst| {
+            let (first, last) = dst.split_at_mut(8);
+            first.copy_from_slice(&self.first().to_be_bytes());
+            last.copy_from_slice(&self.last().to_be_bytes());
+        })
+    }
+}
 
 impl Encode for ChangeUsername {
     fn encoded_len(&self) -> Result<usize, EncodeError> {
