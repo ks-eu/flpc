@@ -207,6 +207,31 @@ impl PrivateMessage {
     }
 }
 
+/// A request to change the client's username (opcode `0x05`).
+///
+/// The username is UTF-8 preceded by a one-byte length counting UTF-8 bytes,
+/// so it may contain at most 255 bytes. Encoding a longer username returns
+/// [`crate::wire::EncodeError::StringTooLong`].
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{ChangeUsername, ClientUnit, FlpcUnit},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = ChangeUsername::new("Zoë".into());
+/// let bytes = [0x05, 0x04, 0x5a, 0x6f, 0xc3, 0xab];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(&bytes).unwrap(),
+///     Some((
+///         FlpcUnit::Client(ClientUnit::ChangeUsername(unit)),
+///         bytes.len(),
+///     )),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ChangeUsername {
     username: String,
