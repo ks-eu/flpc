@@ -31,3 +31,14 @@ pub(super) fn write_short_string(dst: &mut &mut [u8], field: &str) {
     write_bytes(dst, &[field.len() as u8]);
     write_bytes(dst, field.as_bytes());
 }
+
+pub(super) fn long_string_len(value: &str) -> Result<usize, EncodeError> {
+    u16::try_from(value.len()).map_err(|_| EncodeError::StringTooLong)?;
+    Ok(2 + value.len())
+}
+
+pub(super) fn write_long_string(dst: &mut [u8], value: &str) {
+    let (prefix, body) = dst.split_at_mut(2);
+    prefix.copy_from_slice(&(value.len() as u16).to_be_bytes());
+    body.copy_from_slice(value.as_bytes());
+}

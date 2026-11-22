@@ -2,7 +2,9 @@
 
 use super::{
     Encode, EncodeError,
-    fields::{encode_frame, short_strings_len, write_short_string},
+    fields::{
+        encode_frame, long_string_len, short_strings_len, write_long_string, write_short_string,
+    },
 };
 use crate::unit::{ChangeUsername, Login, Message, PrivateMessage, Register, RequestSync};
 
@@ -83,15 +85,4 @@ impl Encode for PrivateMessage {
             write_long_string(dst, self.message());
         })
     }
-}
-
-fn long_string_len(value: &str) -> Result<usize, EncodeError> {
-    u16::try_from(value.len()).map_err(|_| EncodeError::StringTooLong)?;
-    Ok(2 + value.len())
-}
-
-fn write_long_string(dst: &mut [u8], value: &str) {
-    let (prefix, body) = dst.split_at_mut(2);
-    prefix.copy_from_slice(&(value.len() as u16).to_be_bytes());
-    body.copy_from_slice(value.as_bytes());
 }

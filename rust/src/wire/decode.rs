@@ -146,8 +146,25 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 outcome,
             ))))
         }
-        ServerMessage::OPCODE
-        | ServerPrivateMessage::OPCODE
+        ServerMessage::OPCODE => {
+            let Some(id) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            let Some(timestamp) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            let Some(message) = read_long_string(&mut remaining)? else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Server(ServerUnit::ServerMessage(
+                ServerMessage::new(
+                    u16::from_be_bytes(id),
+                    u64::from_be_bytes(timestamp),
+                    message.into(),
+                ),
+            )))
+        }
+        ServerPrivateMessage::OPCODE
         | UserRegistered::OPCODE
         | UserRemoved::OPCODE
         | UserJoined::OPCODE
