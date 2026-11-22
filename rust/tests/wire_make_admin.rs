@@ -1,0 +1,45 @@
+use flpc::{
+    unit::{AdminUnit, FlpcUnit, MakeAdmin},
+    wire::{Encode, EncodeError, decode},
+};
+
+// Opcode 7C carries unsigned big-endian ID 0x4567.
+const FRAME: &[u8] = b"\x7c\x45\x67";
+
+#[test]
+fn encode_matches_independent_bytes_and_preserves_tail() {
+    let unit = MakeAdmin::new(0x4567);
+    let mut dst = [0xaa; FRAME.len() + 1];
+
+    assert_eq!(unit.encoded_len().unwrap(), FRAME.len());
+    assert_eq!(unit.encode_into(&mut dst).unwrap(), FRAME.len());
+    assert_eq!(&dst[..FRAME.len()], FRAME);
+    assert_eq!(&dst[FRAME.len()..], &[0xaa]);
+    assert_eq!(unit.to_bytes().unwrap(), FRAME);
+}
+
+#[test]
+fn decode_waits_for_id_and_consumes_one_frame() {
+    for end in 0..FRAME.len() {
+        assert_eq!(decode(&FRAME[..end]).unwrap(), None, "prefix {end}");
+    }
+
+    let adjacent = [FRAME, &[0x7c, 0, 0]].concat();
+    assert_eq!(
+        decode(&adjacent).unwrap(),
+        Some((
+            FlpcUnit::Admin(AdminUnit::MakeAdmin(MakeAdmin::new(0x4567))),
+            FRAME.len(),
+        ))
+    );
+}
+
+#[test]
+fn undersized_destination_is_unchanged() {
+    let mut dst = [0xaa; FRAME.len() - 1];
+    assert!(matches!(
+        MakeAdmin::new(0x4567).encode_into(&mut dst),
+        Err(EncodeError::BufferTooSmall)
+    ));
+    assert_eq!(dst, [0xaa; FRAME.len() - 1]);
+}
