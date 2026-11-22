@@ -3,7 +3,7 @@
 - The Rust crate lives in `rust/`. Run Cargo commands from the repository root with `--manifest-path rust/Cargo.toml`.
 - Read the README's [wire format](README.md#wire-format) for byte layouts, field limits, and the Register reference vector.
 - Implement `Encode` in the unit family's `wire` module and dispatch incoming units in `wire/decode.rs`. Keep wire I/O on standard-library byte slices. The optional Tokio adapter handles `BytesMut` and shares one `FlpcCodec` across units.
-- Run `$flpc-unit-tdd Register` in the main thread to build the reference. After Register's documentation commit, use `$flpc-unit-tdd <Unit>` for each named unit. The skill defines delegation, review, and commit order.
+- Run `$flpc-unit-tdd <Unit>` in the main thread. Use Register as the reference and process remaining opcodes in README order for a full rollout. The skill defines delegation, verification, and local commit order.
 
 ## Verification
 

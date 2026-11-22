@@ -1,18 +1,19 @@
 ---
 name: flpc-unit-tdd
-description: Orchestrate four user-approved local commits for one named FLPC unit, starting with Register or using the completed Register reference.
+description: Orchestrate four verified local commits per FLPC unit, for a named unit or a rollout in opcode order.
 ---
 
-# Implement one FLPC unit
+# Implement FLPC units
 
 Run in the main thread. Identify the concrete struct and its opcode in the
 README's Wire format section. Record HEAD and the working tree and index status.
-For Register, start from the README vector. For later units, use the approved
+For Register, start from the README vector. For later units, use the committed
 Register implementation and permanent tests as the reference.
 
-Delegate one stage at a time on the shared checkout. Give the specialist the
-unit, opcode, protocol section, permitted files, last approved commit, relevant
-tests, and expected commands and results. Use the manifest path and checks in
+Apply and commit one stage at a time on the shared checkout. For an all-unit
+rollout, prepare repeated stage edits in scratch, then apply and verify them
+in order for each unit. Give the specialist the unit, opcode, protocol section,
+permitted files, last verified commit, relevant tests, and expected results. Use the manifest path and checks in
 AGENTS.md. Specialists can iterate within their stage. The main thread owns
 reviews, staging, and local commits.
 
@@ -20,11 +21,14 @@ Use the model and reasoning effort pinned in the specialist's
 `.codex/agents/` file. When the spawn tool exposes those settings as fixed,
 select the role directly. Otherwise pass the settings explicitly. For the
 documentation worker, pass the project defaults from `.codex/config.toml`.
-When an explicit override requires fresh context, include the full stage
-brief and file ownership. Use only `gpt-6.2-sol` at medium or `gpt-6-luna`
-at high. If a pinned role is unavailable, use a worker with the role's
+Reuse a compatible idle specialist. If the runtime offers a close operation,
+close finished specialists before replacing them. On thread exhaustion, run
+one ephemeral `codex exec --sandbox workspace-write` worker at a time with
+explicit `--model` and `model_reasoning_effort` settings. Wait for it to exit
+before starting another. Include the full stage brief and file ownership. Use
+only `gpt-6.2-sol` at medium or `gpt-6-luna` at high. If a pinned role is unavailable, use a worker with the role's
 instructions and an explicit approved pairing. Stop if neither pairing
-is available. Report the selected model and effort at review.
+is available. Record the selected model and effort.
 
 1. **Red tests** — Assign `flpc_test_author` both
    `rust/tests/wire_<unit>.rs` and `rust/tests/framed_<unit>.rs` (snake case).
@@ -39,23 +43,23 @@ is available. Report the selected model and effort at review.
 2. **Implementation** — Assign `flpc_implementer` the family wire module and
    decoder. Implement Encode for the concrete unit and dispatch its opcode in
    wire::decode. Run the focused tests and full core and Tokio suites. Keep
-   approved assertions intact. Bring a contract conflict back for test review.
+   the red-test assertions intact. Resolve conflicts against the README.
 3. **Characterization** — Assign `flpc_characterizer` the unit's two test
    files. Replace the initial suite with lasting public wire and Framed
-   regression tests. Retain independent expected bytes and account for each
-   approved guarantee in the review. Consolidate duplicate cases and report
-   observed discrepancies with the protocol before encoding them as expectations.
+   regression tests. Retain independent expected bytes and the guarantees
+   covered by the initial tests. Consolidate duplicate cases and check any
+   discrepancies against the protocol before recording them as expectations.
    Run both full suites.
 4. **Documentation** — Assign a `worker` the unit's public API documentation,
    a runnable example, and any relevant README update. Run doctests and all
-   AGENTS.md verification commands. The approved fourth commit finishes this
-   unit. Begin another unit only when named.
+   AGENTS.md verification commands. The fourth commit finishes this unit. During a
+   rollout continue with the next unsupported opcode.
 
-## Review each stage
+## Verify and commit automatically
 
-Show the diff or relevant excerpts, exact commands and results, files to stage,
-and proposed commit message. Wait for the user's approval of this specific
-stage. If revised, show the new diff for approval. After approval, stage only
-the reviewed changes, inspect the staged diff, and preserve unrelated edits
-including anything already staged. Commit locally, report the hash, then
-delegate the next stage. Stage 1 deliberately commits the failing tests.
+Inspect the diff and test results for each stage. Stage only the verified
+changes, check the staged diff, and preserve unrelated edits including
+anything already staged. Commit locally and record the hash. Continue to the
+next stage without a user approval prompt. Stage 1 deliberately commits
+failing tests. Stop the rollout for a real protocol ambiguity or a failure
+that cannot be corrected within the current stage.
