@@ -67,6 +67,33 @@ impl Register {
     }
 }
 
+/// The `Login` wire unit (opcode `0x02`).
+///
+/// After the opcode, the username comes first, followed by the password. Each
+/// field has a one-byte length prefix that counts UTF-8 bytes and allows up to
+/// 255 bytes.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{ClientUnit, FlpcUnit, Login},
+///     wire::{Encode, decode},
+/// };
+///
+/// let unit = Login::new("Zoë".into(), "pāss".into());
+/// let bytes = [
+///     0x02, 0x04, 0x5a, 0x6f, 0xc3, 0xab, 0x05, 0x70, 0xc4, 0x81, 0x73, 0x73,
+/// ];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(&bytes).unwrap(),
+///     Some((
+///         FlpcUnit::Client(ClientUnit::Login(unit)),
+///         bytes.len(),
+///     )),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Login {
     username: String,
