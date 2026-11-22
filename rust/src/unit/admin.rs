@@ -65,6 +65,26 @@ impl Add {
     }
 }
 
+/// A request to grant a user's administrator privileges (opcode `0x7C`).
+///
+/// The user ID is an unsigned 16-bit integer encoded in big-endian byte order.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{AdminUnit, FlpcUnit, MakeAdmin},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = MakeAdmin::new(0x1234);
+/// let bytes = [0x7c, 0x12, 0x34];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(&bytes).unwrap(),
+///     Some((FlpcUnit::Admin(AdminUnit::MakeAdmin(unit)), bytes.len())),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MakeAdmin {
     id: u16,

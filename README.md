@@ -14,8 +14,8 @@ minimising header size as much as possible.
 ## Wire format
 
 The Rust crate currently encodes and decodes `Ping`, `Register`, `Login`,
-`Message`, `PrivateMessage`, `ChangeUsername`, `RequestSync`, and
-`RemoveAdmin`.
+`Message`, `PrivateMessage`, `ChangeUsername`, `RequestSync`,
+`RemoveAdmin`, and `MakeAdmin`.
 The optional `tokio` feature exposes the shared `FlpcCodec` for
 `tokio_util::codec::Framed`.
 
