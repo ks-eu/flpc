@@ -376,6 +376,29 @@ impl UserLeft {
     }
 }
 
+/// A notification that a username changed (opcode `0x88`).
+///
+/// The user ID is big-endian. The UTF-8 username has a one-byte length prefix.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{FlpcUnit, ServerUnit, ChangedUsername},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = ChangedUsername::new(7, "é".into());
+/// let bytes: &[u8] = &[0x88, 0, 7, 2, 0xc3, 0xa9];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(bytes).unwrap(),
+///     Some((
+///         FlpcUnit::Server(ServerUnit::ChangedUsername(unit)),
+///         bytes.len(),
+///     )),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ChangedUsername {
     id: u16,
