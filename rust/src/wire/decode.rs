@@ -47,8 +47,19 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 password.into(),
             ))))
         }
-        Message::OPCODE
-        | PrivateMessage::OPCODE
+        Message::OPCODE => {
+            let Some(prefix) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            let len = usize::from(u16::from_be_bytes(prefix));
+            let Some(message) = read_string(&mut remaining, len)? else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Client(ClientUnit::Message(Message::new(
+                message.into(),
+            ))))
+        }
+        PrivateMessage::OPCODE
         | ChangeUsername::OPCODE
         | RequestSync::OPCODE
         | RemoveAdmin::OPCODE
