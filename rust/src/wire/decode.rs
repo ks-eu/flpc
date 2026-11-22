@@ -48,19 +48,25 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             ))))
         }
         Message::OPCODE => {
-            let Some(prefix) = read_array(&mut remaining) else {
-                return Ok(None);
-            };
-            let len = usize::from(u16::from_be_bytes(prefix));
-            let Some(message) = read_string(&mut remaining, len)? else {
+            let Some(message) = read_long_string(&mut remaining)? else {
                 return Ok(None);
             };
             Some(FlpcUnit::Client(ClientUnit::Message(Message::new(
                 message.into(),
             ))))
         }
-        PrivateMessage::OPCODE
-        | ChangeUsername::OPCODE
+        PrivateMessage::OPCODE => {
+            let Some(target) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            let Some(message) = read_long_string(&mut remaining)? else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Client(ClientUnit::PrivateMessage(
+                PrivateMessage::new(u16::from_be_bytes(target), message.into()),
+            )))
+        }
+        ChangeUsername::OPCODE
         | RequestSync::OPCODE
         | RemoveAdmin::OPCODE
         | MakeAdmin::OPCODE
@@ -104,6 +110,13 @@ fn read_short_string<'a>(remaining: &mut &'a [u8]) -> Result<Option<&'a str>, De
         return Ok(None);
     };
     read_string(remaining, usize::from(len))
+}
+
+fn read_long_string<'a>(remaining: &mut &'a [u8]) -> Result<Option<&'a str>, DecodeError> {
+    let Some(prefix) = read_array(remaining) else {
+        return Ok(None);
+    };
+    read_string(remaining, usize::from(u16::from_be_bytes(prefix)))
 }
 
 #[cfg(test)]
