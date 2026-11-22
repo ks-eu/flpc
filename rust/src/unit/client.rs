@@ -10,6 +10,32 @@ pub enum ClientUnit {
     RequestSync(RequestSync),
 }
 
+/// A client registration request (opcode `0x01`).
+///
+/// The wire format contains the token, username, and password in that order.
+/// Each field is UTF-8 preceded by a one-byte length, so each may contain at
+/// most 255 UTF-8 bytes. Encoding a longer field returns
+/// [`crate::wire::EncodeError::StringTooLong`].
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{ClientUnit, FlpcUnit, Register},
+///     wire::{decode, Encode},
+/// };
+///
+/// let register = Register::new("t".into(), "é".into(), "pw".into());
+/// let bytes = [0x01, 0x01, b't', 0x02, 0xc3, 0xa9, 0x02, b'p', b'w'];
+/// assert_eq!(register.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(&bytes).unwrap(),
+///     Some((
+///         FlpcUnit::Client(ClientUnit::Register(register)),
+///         bytes.len(),
+///     )),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Register {
     token: String,
