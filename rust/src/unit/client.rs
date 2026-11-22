@@ -249,6 +249,31 @@ impl ChangeUsername {
     }
 }
 
+/// A request for a range of synchronized messages (opcode `0x06`).
+///
+/// The `first` and `last` bounds are opaque unsigned 64-bit values encoded in
+/// that order as big-endian integers. The wire codec does not define their
+/// meaning or inclusivity.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{ClientUnit, FlpcUnit, RequestSync},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = RequestSync::new(1, 2);
+/// let bytes = [
+///     0x06, 0, 0, 0, 0, 0, 0, 0, 1,
+///     0, 0, 0, 0, 0, 0, 0, 2,
+/// ];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(&bytes).unwrap(),
+///     Some((FlpcUnit::Client(ClientUnit::RequestSync(unit)), bytes.len())),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RequestSync {
     first: u64,
