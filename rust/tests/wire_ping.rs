@@ -1,9 +1,10 @@
 use flpc::{
-    unit::{FlpcUnit, Ping, PingUnit},
+    unit::{ClientUnit, FlpcUnit, Ping, PingUnit, Register},
     wire::{Encode, EncodeError, decode},
 };
 
-const FRAME: &[u8] = &[0x00];
+const PING: &[u8] = &[0x00];
+const REGISTER: &[u8] = b"\x01\x01t\x02\xc3\xa9\x02pw";
 
 fn decoded() -> FlpcUnit {
     FlpcUnit::Ping(PingUnit::Ping(Ping::new()))
@@ -14,20 +15,38 @@ fn encode_matches_the_readme_vector_and_preserves_the_tail() {
     let unit = Ping::new();
     let mut dst = [0xaa; 3];
 
-    assert_eq!(unit.encoded_len().unwrap(), FRAME.len());
-    assert_eq!(unit.encode_into(&mut dst).unwrap(), FRAME.len());
-    assert_eq!(&dst[..FRAME.len()], FRAME);
-    assert_eq!(&dst[FRAME.len()..], &[0xaa; 2]);
-    assert_eq!(unit.to_bytes().unwrap(), FRAME);
+    assert_eq!(unit.encoded_len().unwrap(), PING.len());
+    assert_eq!(unit.encode_into(&mut dst).unwrap(), PING.len());
+    assert_eq!(&dst[..PING.len()], PING);
+    assert_eq!(&dst[PING.len()..], &[0xaa; 2]);
+    assert_eq!(unit.to_bytes().unwrap(), PING);
 }
 
 #[test]
-fn decode_consumes_one_byte_and_leaves_adjacent_frames() {
+fn decode_consumes_one_byte_before_a_differently_sized_unit() {
     assert_eq!(decode(&[]).unwrap(), None);
-    assert_eq!(decode(FRAME).unwrap(), Some((decoded(), FRAME.len())));
+    assert_eq!(decode(PING).unwrap(), Some((decoded(), PING.len())));
 
-    let adjacent = [0x00, 0x00];
-    assert_eq!(decode(&adjacent).unwrap(), Some((decoded(), 1)));
+    let stream = [PING, PING, REGISTER].concat();
+    let (first, consumed) = decode(&stream).unwrap().unwrap();
+    assert_eq!(first, decoded());
+    assert_eq!(consumed, PING.len());
+
+    let (second, consumed) = decode(&stream[consumed..]).unwrap().unwrap();
+    assert_eq!(second, decoded());
+    assert_eq!(consumed, PING.len());
+
+    assert_eq!(
+        decode(&stream[2 * PING.len()..]).unwrap(),
+        Some((
+            FlpcUnit::Client(ClientUnit::Register(Register::new(
+                "t".into(),
+                "é".into(),
+                "pw".into(),
+            ))),
+            REGISTER.len(),
+        ))
+    );
 }
 
 #[test]

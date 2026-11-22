@@ -2,13 +2,14 @@
 
 use flpc::{
     tokio::FlpcCodec,
-    unit::{FlpcUnit, Ping, PingUnit},
+    unit::{ClientUnit, FlpcUnit, Ping, PingUnit, Register},
 };
 use futures_util::{SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-const FRAME: &[u8] = &[0x00];
+const PING: &[u8] = &[0x00];
+const REGISTER: &[u8] = b"\x01\x01t\x02\xc3\xa9\x02pw";
 
 fn unit() -> FlpcUnit {
     FlpcUnit::Ping(PingUnit::Ping(Ping::new()))
@@ -25,18 +26,28 @@ async fn sends_adjacent_ping_frames_to_a_raw_peer() {
 
     let mut bytes = Vec::new();
     peer.read_to_end(&mut bytes).await.unwrap();
-    assert_eq!(bytes, [FRAME, FRAME].concat());
+    assert_eq!(bytes, [PING, PING].concat());
 }
 
 #[tokio::test]
-async fn receives_adjacent_ping_frames_from_a_raw_peer() {
+async fn receives_adjacent_pings_then_a_differently_sized_frame() {
     let (stream, mut peer) = duplex(16);
     let mut framed = Framed::new(stream, FlpcCodec);
 
-    peer.write_all(&[0x00, 0x00]).await.unwrap();
+    peer.write_all(&[PING, PING, REGISTER].concat())
+        .await
+        .unwrap();
     peer.shutdown().await.unwrap();
 
     assert_eq!(framed.next().await.unwrap().unwrap(), unit());
     assert_eq!(framed.next().await.unwrap().unwrap(), unit());
+    assert_eq!(
+        framed.next().await.unwrap().unwrap(),
+        FlpcUnit::Client(ClientUnit::Register(Register::new(
+            "t".into(),
+            "é".into(),
+            "pw".into(),
+        )))
+    );
     assert!(framed.next().await.is_none());
 }
