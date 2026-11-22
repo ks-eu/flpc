@@ -15,6 +15,29 @@ pub enum ServerUnit {
     SyncPrivateMessage(SyncPrivateMessage),
 }
 
+/// Registration outcome from the server (opcode `0x80`).
+///
+/// The outcome byte is opaque to the wire codec.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{FlpcUnit, ServerUnit, ServerRegister},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = ServerRegister::new(1);
+/// let bytes: &[u8] = &[0x80, 0x01];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(bytes).unwrap(),
+///     Some((
+///         FlpcUnit::Server(ServerUnit::ServerRegister(unit)),
+///         bytes.len(),
+///     )),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerRegister {
     outcome: u8,
