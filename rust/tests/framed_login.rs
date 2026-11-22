@@ -2,7 +2,7 @@
 
 use flpc::{
     tokio::{CodecError, FlpcCodec},
-    unit::{ClientUnit, FlpcUnit, Login},
+    unit::{ClientUnit, FlpcUnit, Login, Ping, PingUnit},
 };
 use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
@@ -33,23 +33,31 @@ async fn sends_the_literal_vector_to_a_raw_peer() {
 }
 
 #[tokio::test]
-async fn receives_fragmented_frame_and_clean_eof_from_a_raw_peer() {
+async fn receives_fragmented_unit_before_ping_and_clean_eof() {
     let (stream, mut peer) = duplex(128);
     let mut framed = Framed::new(stream, FlpcCodec);
-    let split = FRAME.len() / 2;
+    // Split the two-byte UTF-8 encoding of `ë` across reads.
+    let split = 5;
     peer.write_all(&FRAME[..split]).await.unwrap();
     assert!(framed.next().now_or_never().is_none());
     peer.write_all(&FRAME[split..]).await.unwrap();
+    peer.write_all(&[0x00]).await.unwrap();
     peer.shutdown().await.unwrap();
     assert_eq!(framed.next().await.unwrap().unwrap(), expected());
+    assert_eq!(
+        framed.next().await.unwrap().unwrap(),
+        FlpcUnit::Ping(PingUnit::Ping(Ping::new()))
+    );
     assert!(framed.next().await.is_none());
 }
 
 #[tokio::test]
-async fn partial_frame_at_eof_is_an_io_error() {
+async fn delivers_complete_unit_before_reporting_partial_eof() {
     let (stream, mut peer) = duplex(128);
     let mut framed = Framed::new(stream, FlpcCodec);
+    peer.write_all(FRAME).await.unwrap();
     peer.write_all(&FRAME[..FRAME.len() - 1]).await.unwrap();
     peer.shutdown().await.unwrap();
+    assert_eq!(framed.next().await.unwrap().unwrap(), expected());
     assert!(matches!(framed.next().await, Some(Err(CodecError::Io(_)))));
 }

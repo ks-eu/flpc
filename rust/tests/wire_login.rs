@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{ClientUnit, FlpcUnit, Login},
+    unit::{ClientUnit, FlpcUnit, Login, Ping, PingUnit},
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
@@ -16,7 +16,7 @@ fn decoded(unit: Login) -> FlpcUnit {
 }
 
 #[test]
-fn encode_and_decode_match_the_independent_wire_vector() {
+fn matches_the_wire_vector_and_consumes_only_one_unit() {
     let value = unit();
     let mut dst = vec![0xaa; FRAME.len() + 2];
     assert_eq!(value.encoded_len().unwrap(), FRAME.len());
@@ -29,6 +29,10 @@ fn encode_and_decode_match_the_independent_wire_vector() {
     assert_eq!(
         decode(&adjacent).unwrap(),
         Some((decoded(unit()), FRAME.len()))
+    );
+    assert_eq!(
+        decode(&adjacent[FRAME.len()..]).unwrap(),
+        Some((FlpcUnit::Ping(PingUnit::Ping(Ping::new())), 1))
     );
 }
 
@@ -51,7 +55,7 @@ fn short_destination_fails_without_mutation() {
 
 #[test]
 fn utf8_lengths_and_field_limits_are_measured_in_bytes() {
-    let empty = [&FRAME[..1], &[0; 2][..]].concat();
+    let empty = [0x02, 0x00, 0x00];
     let empty_unit = Login::new(String::new(), String::new());
     assert_eq!(empty_unit.to_bytes().unwrap(), empty);
     assert_eq!(
@@ -60,14 +64,10 @@ fn utf8_lengths_and_field_limits_are_measured_in_bytes() {
     );
 
     let max = "é".repeat(127) + "x";
-    let max_frame = [
-        FRAME[..1].to_vec(),
-        vec![0xff],
-        max.as_bytes().to_vec(),
-        vec![0xff],
-        max.as_bytes().to_vec(),
-    ]
-    .concat();
+    let mut max_frame = vec![0x02, 0xff];
+    max_frame.extend_from_slice(max.as_bytes());
+    max_frame.push(0xff);
+    max_frame.extend_from_slice(max.as_bytes());
     let max_unit = Login::new(max.clone(), max.clone());
     assert_eq!(max_unit.to_bytes().unwrap(), max_frame);
     assert_eq!(
