@@ -94,8 +94,15 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 u16::from_be_bytes(id),
             ))))
         }
-        MakeAdmin::OPCODE
-        | Add::OPCODE
+        MakeAdmin::OPCODE => {
+            let Some(id) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Admin(AdminUnit::MakeAdmin(MakeAdmin::new(
+                u16::from_be_bytes(id),
+            ))))
+        }
+        Add::OPCODE
         | Remove::OPCODE
         | Kick::OPCODE
         | ServerRegister::OPCODE
