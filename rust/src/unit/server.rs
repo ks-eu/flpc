@@ -55,6 +55,29 @@ impl ServerRegister {
     }
 }
 
+/// Login outcome from the server (opcode `0x81`).
+///
+/// The outcome byte is opaque to the wire codec.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{FlpcUnit, ServerUnit, ServerLogin},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = ServerLogin::new(1);
+/// let bytes: &[u8] = &[0x81, 0x01];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(bytes).unwrap(),
+///     Some((
+///         FlpcUnit::Server(ServerUnit::ServerLogin(unit)),
+///         bytes.len(),
+///     )),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerLogin {
     outcome: u8,
