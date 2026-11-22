@@ -122,8 +122,15 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 u16::from_be_bytes(id),
             ))))
         }
-        Kick::OPCODE
-        | ServerRegister::OPCODE
+        Kick::OPCODE => {
+            let Some(id) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Admin(AdminUnit::Kick(Kick::new(
+                u16::from_be_bytes(id),
+            ))))
+        }
+        ServerRegister::OPCODE
         | ServerLogin::OPCODE
         | ServerMessage::OPCODE
         | ServerPrivateMessage::OPCODE
