@@ -43,6 +43,27 @@ impl Remove {
     }
 }
 
+/// A request to add a user (opcode `0x7D`).
+///
+/// The username and password are UTF-8 strings, each preceded by a one-byte
+/// length counting UTF-8 bytes. Each field may contain at most 255 bytes.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{Add, AdminUnit, FlpcUnit},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = Add::new("Zoë".into(), "p".into());
+/// let bytes = [0x7d, 0x04, 0x5a, 0x6f, 0xc3, 0xab, 0x01, b'p'];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(&bytes).unwrap(),
+///     Some((FlpcUnit::Admin(AdminUnit::Add(unit)), bytes.len())),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Add {
     username: String,
