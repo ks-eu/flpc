@@ -2,7 +2,7 @@
 
 use flpc::{
     tokio::FlpcCodec,
-    unit::{AdminUnit, FlpcUnit, Remove},
+    unit::{AdminUnit, FlpcUnit, Ping, PingUnit, Remove},
 };
 use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
@@ -34,9 +34,15 @@ async fn receives_fragmented_frame() {
 
     peer.write_all(&FRAME[..2]).await.unwrap();
     assert!(framed.next().now_or_never().is_none());
-    peer.write_all(&FRAME[2..]).await.unwrap();
+    peer.write_all(&[&FRAME[2..], &[0x00]].concat())
+        .await
+        .unwrap();
     peer.shutdown().await.unwrap();
 
     assert_eq!(framed.next().await.unwrap().unwrap(), expected());
+    assert_eq!(
+        framed.next().await.unwrap().unwrap(),
+        FlpcUnit::Ping(PingUnit::Ping(Ping::new()))
+    );
     assert!(framed.next().await.is_none());
 }
