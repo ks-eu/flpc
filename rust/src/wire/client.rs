@@ -4,7 +4,19 @@ use super::{
     Encode, EncodeError,
     fields::{encode_frame, short_strings_len, write_short_string},
 };
-use crate::unit::{Login, Message, PrivateMessage, Register};
+use crate::unit::{ChangeUsername, Login, Message, PrivateMessage, Register};
+
+impl Encode for ChangeUsername {
+    fn encoded_len(&self) -> Result<usize, EncodeError> {
+        Ok(1 + short_strings_len(&[self.username()])?)
+    }
+
+    fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
+        encode_frame(buf, self.encoded_len()?, Self::OPCODE, |mut dst| {
+            write_short_string(&mut dst, self.username());
+        })
+    }
+}
 
 impl Encode for Register {
     fn encoded_len(&self) -> Result<usize, EncodeError> {

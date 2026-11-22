@@ -66,8 +66,15 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 PrivateMessage::new(u16::from_be_bytes(target), message.into()),
             )))
         }
-        ChangeUsername::OPCODE
-        | RequestSync::OPCODE
+        ChangeUsername::OPCODE => {
+            let Some(username) = read_short_string(&mut remaining)? else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Client(ClientUnit::ChangeUsername(
+                ChangeUsername::new(username.into()),
+            )))
+        }
+        RequestSync::OPCODE
         | RemoveAdmin::OPCODE
         | MakeAdmin::OPCODE
         | Add::OPCODE
