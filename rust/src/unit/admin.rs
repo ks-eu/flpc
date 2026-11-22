@@ -9,6 +9,26 @@ pub enum AdminUnit {
     RemoveAdmin(RemoveAdmin),
 }
 
+/// A request to kick a user (opcode `0x7F`).
+///
+/// The user ID is an unsigned 16-bit integer encoded in big-endian byte order.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{AdminUnit, FlpcUnit, Kick},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = Kick::new(0x1234);
+/// let bytes = [0x7f, 0x12, 0x34];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(&bytes).unwrap(),
+///     Some((FlpcUnit::Admin(AdminUnit::Kick(unit)), bytes.len())),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Kick {
     id: u16,
