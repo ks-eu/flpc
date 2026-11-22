@@ -13,10 +13,13 @@ target/
 *.swp
 *.swo
 *~
+.agents/
+.codex/
 
 # OS files
 .DS_Store
 Thumbs.db
+.nvim.lua
 
 # Logs
 *.log
