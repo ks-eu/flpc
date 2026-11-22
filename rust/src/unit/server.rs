@@ -211,6 +211,29 @@ impl ServerPrivateMessage {
     }
 }
 
+/// A notification that a user registered (opcode `0x84`).
+///
+/// The user ID is big-endian. The UTF-8 username has a one-byte length prefix.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{FlpcUnit, ServerUnit, UserRegistered},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = UserRegistered::new(7, "é".into());
+/// let bytes: &[u8] = &[0x84, 0, 7, 2, 0xc3, 0xa9];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(bytes).unwrap(),
+///     Some((
+///         FlpcUnit::Server(ServerUnit::UserRegistered(unit)),
+///         bytes.len(),
+///     )),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UserRegistered {
     id: u16,
