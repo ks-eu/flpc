@@ -336,6 +336,29 @@ impl UserJoined {
     }
 }
 
+/// A notification that a user left (opcode `0x87`).
+///
+/// The user ID is big-endian.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{FlpcUnit, ServerUnit, UserLeft},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = UserLeft::new(7);
+/// let bytes: &[u8] = &[0x87, 0, 7];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(bytes).unwrap(),
+///     Some((
+///         FlpcUnit::Server(ServerUnit::UserLeft(unit)),
+///         bytes.len(),
+///     )),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UserLeft {
     id: u16,
