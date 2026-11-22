@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{AdminUnit, FlpcUnit, MakeAdmin},
+    unit::{AdminUnit, FlpcUnit, MakeAdmin, RemoveAdmin},
     wire::{Encode, EncodeError, decode},
 };
 
@@ -24,12 +24,19 @@ fn decode_waits_for_id_and_consumes_one_frame() {
         assert_eq!(decode(&FRAME[..end]).unwrap(), None, "prefix {end}");
     }
 
-    let adjacent = [FRAME, &[0x7c, 0, 0]].concat();
+    let adjacent = [FRAME, &[0x7b, 0x89, 0xab]].concat();
     assert_eq!(
         decode(&adjacent).unwrap(),
         Some((
             FlpcUnit::Admin(AdminUnit::MakeAdmin(MakeAdmin::new(0x4567))),
             FRAME.len(),
+        ))
+    );
+    assert_eq!(
+        decode(&adjacent[FRAME.len()..]).unwrap(),
+        Some((
+            FlpcUnit::Admin(AdminUnit::RemoveAdmin(RemoveAdmin::new(0x89ab))),
+            3,
         ))
     );
 }
