@@ -138,8 +138,15 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 ServerRegister::new(outcome),
             )))
         }
-        ServerLogin::OPCODE
-        | ServerMessage::OPCODE
+        ServerLogin::OPCODE => {
+            let Some([outcome]) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Server(ServerUnit::ServerLogin(ServerLogin::new(
+                outcome,
+            ))))
+        }
+        ServerMessage::OPCODE
         | ServerPrivateMessage::OPCODE
         | UserRegistered::OPCODE
         | UserRemoved::OPCODE
