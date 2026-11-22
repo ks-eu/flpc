@@ -1,31 +1,34 @@
 //! Wire implementations for client units.
 
-use super::{Encode, EncodeError};
-use crate::unit::Register;
+use super::{
+    Encode, EncodeError,
+    fields::{encode_frame, short_strings_len, write_short_string},
+};
+use crate::unit::{Login, Register};
 
 impl Encode for Register {
     fn encoded_len(&self) -> Result<usize, EncodeError> {
-        let mut len = 1;
-        for field in [self.token(), self.username(), self.password()] {
-            if field.len() > u8::MAX as usize {
-                return Err(EncodeError::StringTooLong);
-            }
-            len += 1 + field.len();
-        }
-        Ok(len)
+        Ok(1 + short_strings_len(&[self.token(), self.username(), self.password()])?)
     }
 
     fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
-        let len = self.encoded_len()?;
-        let dst = buf.get_mut(..len).ok_or(EncodeError::BufferTooSmall)?;
-        dst[0] = Self::OPCODE;
-        let mut offset = 1;
-        for field in [self.token(), self.username(), self.password()] {
-            dst[offset] = field.len() as u8;
-            offset += 1;
-            dst[offset..offset + field.len()].copy_from_slice(field.as_bytes());
-            offset += field.len();
-        }
-        Ok(len)
+        encode_frame(buf, self.encoded_len()?, Self::OPCODE, |mut dst| {
+            write_short_string(&mut dst, self.token());
+            write_short_string(&mut dst, self.username());
+            write_short_string(&mut dst, self.password());
+        })
+    }
+}
+
+impl Encode for Login {
+    fn encoded_len(&self) -> Result<usize, EncodeError> {
+        Ok(1 + short_strings_len(&[self.username(), self.password()])?)
+    }
+
+    fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
+        encode_frame(buf, self.encoded_len()?, Self::OPCODE, |mut dst| {
+            write_short_string(&mut dst, self.username());
+            write_short_string(&mut dst, self.password());
+        })
     }
 }

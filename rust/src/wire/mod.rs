@@ -7,6 +7,7 @@ mod admin;
 mod client;
 mod decode;
 mod error;
+mod fields;
 mod ping;
 mod server;
 
