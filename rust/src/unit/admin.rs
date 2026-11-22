@@ -26,6 +26,26 @@ impl Kick {
     }
 }
 
+/// A request to remove a user (opcode `0x7E`).
+///
+/// The user ID is an unsigned 16-bit integer encoded in big-endian byte order.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{AdminUnit, FlpcUnit, Remove},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = Remove::new(0x1234);
+/// let bytes = [0x7e, 0x12, 0x34];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(&bytes).unwrap(),
+///     Some((FlpcUnit::Admin(AdminUnit::Remove(unit)), bytes.len())),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Remove {
     id: u16,
