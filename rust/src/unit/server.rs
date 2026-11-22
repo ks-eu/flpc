@@ -1,6 +1,6 @@
 //! Units for servers.
 
-#[derive(Debug, Clone, PartialEq, Eq)] 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ServerUnit {
     ServerRegister(ServerRegister),
     ServerLogin(ServerLogin),
@@ -17,7 +17,7 @@ pub enum ServerUnit {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerRegister {
-    outcome: u8
+    outcome: u8,
 }
 
 impl ServerRegister {
@@ -34,7 +34,7 @@ impl ServerRegister {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerLogin {
-    outcome: u8
+    outcome: u8,
 }
 
 impl ServerLogin {
@@ -60,7 +60,11 @@ impl ServerMessage {
     pub(crate) const OPCODE: u8 = 0x82;
 
     pub fn new(id: u16, timestamp: u64, message: String) -> Self {
-        Self { id, timestamp, message }
+        Self {
+            id,
+            timestamp,
+            message,
+        }
     }
 
     pub fn id(&self) -> &u16 {
@@ -76,7 +80,7 @@ impl ServerMessage {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)] 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerPrivateMessage {
     id: u16,
     target: u16,
@@ -135,7 +139,7 @@ impl UserRegistered {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)] 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UserRemoved {
     id: u16,
 }
@@ -152,7 +156,7 @@ impl UserRemoved {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)] 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UserJoined {
     id: u16,
 }
@@ -169,7 +173,7 @@ impl UserJoined {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)] 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UserLeft {
     id: u16,
 }
@@ -208,7 +212,7 @@ impl ChangedUsername {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)] 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SyncMessage {
     id: u16,
     timestamp: u64,
@@ -219,7 +223,11 @@ impl SyncMessage {
     pub(crate) const OPCODE: u8 = 0x89;
 
     pub fn new(id: u16, timestamp: u64, message: String) -> Self {
-        Self { id, timestamp, message }
+        Self {
+            id,
+            timestamp,
+            message,
+        }
     }
 
     pub fn id(&self) -> &u16 {
@@ -235,7 +243,7 @@ impl SyncMessage {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)] 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SyncPrivateMessage {
     id: u16,
     target: u16,

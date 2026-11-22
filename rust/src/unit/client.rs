@@ -5,7 +5,7 @@ pub enum ClientUnit {
     Register(Register),
     Login(Login),
     Message(Message),
-    PrivateMessage(PrivateMesage),
+    PrivateMessage(PrivateMessage),
     ChangeUsername(ChangeUsername),
     RequestSync(RequestSync),
 }
@@ -20,11 +20,7 @@ pub struct Register {
 impl Register {
     pub(crate) const OPCODE: u8 = 0x01;
 
-    pub fn new(
-        token: String,
-        username: String,
-        password: String,
-    ) -> Self {
+    pub fn new(token: String, username: String, password: String) -> Self {
         Self {
             token,
             username,
@@ -69,7 +65,7 @@ impl Login {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Message {
-    message: String
+    message: String,
 }
 
 impl Message {
@@ -85,12 +81,12 @@ impl Message {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PrivateMesage {
+pub struct PrivateMessage {
     target: u16,
     message: String,
 }
 
-impl PrivateMesage {
+impl PrivateMessage {
     pub(crate) const OPCODE: u8 = 0x04;
 
     pub fn new(target: u16, message: String) -> Self {

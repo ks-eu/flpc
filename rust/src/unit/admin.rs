@@ -65,7 +65,7 @@ impl Add {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)] 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MakeAdmin {
     id: u16,
 }
@@ -82,7 +82,7 @@ impl MakeAdmin {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)] 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RemoveAdmin {
     id: u16,
 }
