@@ -1,7 +1,7 @@
 #![cfg(feature = "tokio")]
 
 use flpc::{
-    tokio::FlpcCodec,
+    tokio::{CodecError, FlpcCodec},
     unit::{AdminUnit, FlpcUnit, RemoveAdmin},
 };
 use futures_util::{FutureExt, SinkExt, StreamExt};
@@ -39,4 +39,14 @@ async fn receives_fragmented_frame() {
 
     assert_eq!(framed.next().await.unwrap().unwrap(), expected());
     assert!(framed.next().await.is_none());
+}
+
+#[tokio::test]
+async fn reports_truncated_id_at_eof() {
+    let (stream, mut peer) = duplex(8);
+    let mut framed = Framed::new(stream, FlpcCodec);
+    peer.write_all(&[0x7b, 0x12]).await.unwrap();
+    peer.shutdown().await.unwrap();
+
+    assert!(matches!(framed.next().await, Some(Err(CodecError::Io(_)))));
 }

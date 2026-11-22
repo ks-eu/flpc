@@ -35,6 +35,18 @@ fn decode_waits_for_id_and_consumes_one_frame() {
 }
 
 #[test]
+fn round_trips_id_boundaries() {
+    for (id, bytes) in [(0, &[0x7b, 0, 0][..]), (u16::MAX, &[0x7b, 0xff, 0xff][..])] {
+        let unit = RemoveAdmin::new(id);
+        assert_eq!(unit.to_bytes().unwrap(), bytes);
+        assert_eq!(
+            decode(bytes).unwrap(),
+            Some((FlpcUnit::Admin(AdminUnit::RemoveAdmin(unit)), bytes.len(),))
+        );
+    }
+}
+
+#[test]
 fn undersized_destination_is_unchanged() {
     let mut dst = [0xaa; FRAME.len() - 1];
     assert!(matches!(
