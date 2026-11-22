@@ -205,8 +205,15 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 u16::from_be_bytes(id),
             ))))
         }
-        UserJoined::OPCODE
-        | UserLeft::OPCODE
+        UserJoined::OPCODE => {
+            let Some(id) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Server(ServerUnit::UserJoined(UserJoined::new(
+                u16::from_be_bytes(id),
+            ))))
+        }
+        UserLeft::OPCODE
         | ChangedUsername::OPCODE
         | SyncMessage::OPCODE
         | SyncPrivateMessage::OPCODE => return Err(DecodeError::UnsupportedOpcode(opcode)),
