@@ -104,10 +104,19 @@ impl Remove {
 ///     Some((FlpcUnit::Admin(AdminUnit::Add(unit)), bytes.len())),
 /// );
 /// ```
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct Add {
     username: String,
     password: String,
+}
+
+impl std::fmt::Debug for Add {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Add")
+            .field("username", &self.username)
+            .field("password", &"[redacted]")
+            .finish()
+    }
 }
 
 impl Add {
