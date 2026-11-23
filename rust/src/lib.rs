@@ -3,6 +3,34 @@
 //! [`unit`](mod@unit) defines the protocol units. [`wire`] provides the byte codec API.
 //! Enable the `tokio` feature to use the codec with asynchronous framed I/O.
 //!
+//! # Quickstart
+//!
+//! Encode a concrete unit with [`wire::Encode`]. [`wire::decode()`] returns
+//! the first decoded unit as a nested [`unit::FlpcUnit`] and the number of
+//! bytes it consumed. Keep the full input when it returns `Ok(None)` so you
+//! can retry with more bytes.
+//!
+//! ```
+//! use flpc::{
+//!     unit::{ClientUnit, FlpcUnit, Message, Ping},
+//!     wire::{Encode, decode},
+//! };
+//!
+//! let mut input = Message::new("é".into()).to_bytes()?;
+//! input.extend(Ping::new().to_bytes()?);
+//!
+//! let (unit, consumed) = decode(&input)?.expect("expected a complete message");
+//! match unit {
+//!     FlpcUnit::Client(ClientUnit::Message(message)) => assert_eq!(message.message(), "é"),
+//!     _ => panic!("expected a client message"),
+//! }
+//! assert!(matches!(
+//!     decode(&input[consumed..])?,
+//!     Some((FlpcUnit::Ping(_), 1))
+//! ));
+//! # Ok::<(), Box<dyn std::error::Error>>(())
+//! ```
+//!
 //! # Credentials
 //!
 //! [`unit::Register`], [`unit::Login`], and [`unit::Add`] carry passwords

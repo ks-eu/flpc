@@ -1,5 +1,6 @@
 //! Units for Clients
 
+/// Client requests and messages sent to the server.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ClientUnit {
     Register(Register),
@@ -169,6 +170,7 @@ pub struct Message {
 impl Message {
     pub(crate) const OPCODE: u8 = 0x03;
 
+    /// Creates a message. Encoding checks the 65,535 UTF-8 byte limit.
     pub fn new(message: String) -> Self {
         Self { message }
     }
@@ -271,8 +273,8 @@ impl ChangeUsername {
 /// A request for a range of synchronized messages (opcode `0x06`).
 ///
 /// The `first` and `last` bounds are opaque unsigned 64-bit values encoded in
-/// that order as big-endian integers. The wire codec does not define their
-/// meaning or inclusivity.
+/// that order as big-endian integers. Peers agree on what the bounds
+/// represent and whether they are inclusive.
 ///
 /// # Examples
 ///

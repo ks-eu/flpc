@@ -1,5 +1,4 @@
-// Units for Clients with Admin Permissions
-
+/// Administrative requests sent by a client to the server.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AdminUnit {
     Kick(Kick),

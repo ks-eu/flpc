@@ -1,5 +1,6 @@
 //! Unit for Pings, used by clients and servers alike.
 
+/// Ping units sent by either peer.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PingUnit {
     Ping(Ping),

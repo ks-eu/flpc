@@ -59,7 +59,9 @@ Each string has an unsigned length prefix followed by that many UTF-8 bytes. The
 | `89` | `SyncMessage` | id, timestamp, message |
 | `8A` | `SyncPrivateMessage` | id, target, timestamp, message |
 
-The outcome byte is opaque to the wire codec. The timestamp epoch and precision and the meaning and inclusivity of sync bounds still need to be specified.
+The wire codec preserves outcome bytes, timestamps, and sync bounds as raw
+values. Peers need to agree on what outcome codes mean, the timestamp epoch
+and precision, and what sync bounds represent and whether they are inclusive.
 
 ### Framing
 

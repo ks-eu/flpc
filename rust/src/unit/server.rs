@@ -1,5 +1,10 @@
 //! Units for servers.
 
+/// Responses, notifications, and messages sent by the server.
+///
+/// The codec preserves timestamps as unsigned 64-bit values and outcomes as
+/// single bytes. Peers agree on the timestamp epoch and precision and on the
+/// meaning of outcome codes.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ServerUnit {
     ServerRegister(ServerRegister),
@@ -17,7 +22,7 @@ pub enum ServerUnit {
 
 /// Registration outcome from the server (opcode `0x80`).
 ///
-/// The outcome byte is opaque to the wire codec.
+/// The codec preserves the outcome byte. Peers agree on what each value means.
 ///
 /// # Examples
 ///
@@ -57,7 +62,7 @@ impl ServerRegister {
 
 /// Login outcome from the server (opcode `0x81`).
 ///
-/// The outcome byte is opaque to the wire codec.
+/// The codec preserves the outcome byte. Peers agree on what each value means.
 ///
 /// # Examples
 ///
@@ -141,6 +146,7 @@ impl ServerMessage {
         &self.id
     }
 
+    /// Returns the raw timestamp. Peers agree on its epoch and precision.
     pub fn timestamp(&self) -> &u64 {
         &self.timestamp
     }
@@ -202,6 +208,7 @@ impl ServerPrivateMessage {
         &self.target
     }
 
+    /// Returns the raw timestamp. Peers agree on its epoch and precision.
     pub fn timestamp(&self) -> &u64 {
         &self.timestamp
     }
@@ -467,6 +474,7 @@ impl SyncMessage {
         &self.id
     }
 
+    /// Returns the raw timestamp. Peers agree on its epoch and precision.
     pub fn timestamp(&self) -> &u64 {
         &self.timestamp
     }
@@ -528,6 +536,7 @@ impl SyncPrivateMessage {
         &self.target
     }
 
+    /// Returns the raw timestamp. Peers agree on its epoch and precision.
     pub fn timestamp(&self) -> &u64 {
         &self.timestamp
     }

@@ -2,6 +2,13 @@
 name = "flpc"
 version = "0.1.0"
 edition = "2024"
+description = "A Rust implementation of the FLPC chat protocol, with optional Tokio framing."
+repository = "https://github.com/ks-eu/flpc"
+readme = "../README.md"
+license-file = "../LICENSE"
+
+[package.metadata.docs.rs]
+features = ["tokio"]
 
 [features]
 tokio = ["dep:bytes", "dep:tokio-util"]
