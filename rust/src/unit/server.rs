@@ -547,6 +547,24 @@ impl SyncPrivateMessage {
     }
 }
 
+/// A server response indicating that a client's first unit was unexpected (opcode `0x8B`).
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{FlpcUnit, ServerUnit, WrongUnit},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = WrongUnit::new();
+/// let bytes: &[u8] = &[0x8B];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// assert_eq!(
+///     decode(bytes).unwrap(),
+///     Some((FlpcUnit::Server(ServerUnit::WrongUnit(unit)), bytes.len())),
+/// );
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WrongUnit {}
 

@@ -18,7 +18,7 @@ The Rust crate currently encodes and decodes
 `RequestSync`, `RemoveAdmin`, `MakeAdmin`, `Add`, `Remove`, and `Kick`, plus
 `ServerRegister`, `ServerLogin`, `ServerMessage`, `ServerPrivateMessage`,
 `UserRegistered`, `UserRemoved`, `UserJoined`, `UserLeft`, `ChangedUsername`,
-`SyncMessage`, and `SyncPrivateMessage`.
+`SyncMessage`, `SyncPrivateMessage`, and `WrongUnit`.
 The optional `tokio` feature exposes the shared `FlpcCodec` for
 `tokio_util::codec::Framed`.
 
@@ -58,6 +58,9 @@ Each string has an unsigned length prefix followed by that many UTF-8 bytes. The
 | `88` | `ChangedUsername` | id, username |
 | `89` | `SyncMessage` | id, timestamp, message |
 | `8A` | `SyncPrivateMessage` | id, target, timestamp, message |
+| `8B` | `WrongUnit` | None |
+
+`WrongUnit` is a server response for an unexpected first unit from a client.
 
 The wire codec preserves outcome bytes, timestamps, and sync bounds as raw
 values. Peers need to agree on what outcome codes mean, the timestamp epoch
