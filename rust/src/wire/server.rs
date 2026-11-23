@@ -7,8 +7,18 @@ use super::{
 };
 use crate::unit::{
     ChangedUsername, ServerLogin, ServerMessage, ServerPrivateMessage, ServerRegister, SyncMessage,
-    SyncPrivateMessage, UserJoined, UserLeft, UserRegistered, UserRemoved,
+    SyncPrivateMessage, UserJoined, UserLeft, UserRegistered, UserRemoved, WrongUnit,
 };
+
+impl Encode for WrongUnit {
+    fn encoded_len(&self) -> Result<usize, EncodeError> {
+        Ok(1)
+    }
+
+    fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
+        encode_frame(buf, self.encoded_len()?, Self::OPCODE, |_| {})
+    }
+}
 
 impl Encode for ServerRegister {
     fn encoded_len(&self) -> Result<usize, EncodeError> {

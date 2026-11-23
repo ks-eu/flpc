@@ -3,7 +3,7 @@ use crate::unit::{
     Add, AdminUnit, ChangeUsername, ChangedUsername, ClientUnit, FlpcUnit, Kick, Login, MakeAdmin,
     Message, Ping, PingUnit, PrivateMessage, Register, Remove, RemoveAdmin, RequestSync,
     ServerLogin, ServerMessage, ServerPrivateMessage, ServerRegister, ServerUnit, SyncMessage,
-    SyncPrivateMessage, UserJoined, UserLeft, UserRegistered, UserRemoved,
+    SyncPrivateMessage, UserJoined, UserLeft, UserRegistered, UserRemoved, WrongUnit,
 };
 
 /// Decodes the first unit and returns it with the byte count, including its opcode.
@@ -129,6 +129,7 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 u16::from_be_bytes(id),
             ))))
         }
+        WrongUnit::OPCODE => Some(FlpcUnit::Server(ServerUnit::WrongUnit(WrongUnit::new()))),
         ServerRegister::OPCODE => {
             let Some([outcome]) = read_array(&mut remaining) else {
                 return Ok(None);

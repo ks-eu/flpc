@@ -18,6 +18,7 @@ pub enum ServerUnit {
     ChangedUsername(ChangedUsername),
     SyncMessage(SyncMessage),
     SyncPrivateMessage(SyncPrivateMessage),
+    WrongUnit(WrongUnit),
 }
 
 /// Registration outcome from the server (opcode `0x80`).
@@ -543,5 +544,16 @@ impl SyncPrivateMessage {
 
     pub fn message(&self) -> &String {
         &self.message
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WrongUnit {}
+
+impl WrongUnit {
+    pub(crate) const OPCODE: u8 = 0x8B;
+
+    pub fn new() -> Self {
+        Self {}
     }
 }
