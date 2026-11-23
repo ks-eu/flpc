@@ -69,3 +69,9 @@ For example, registering with token `t`, username `é`, and password `pw` yields
 
 Sending the message `é` yields `03 00 02 C3 A9`. The two-byte big-endian prefix
 `00 02` counts the UTF-8 bytes in `é`.
+
+### Credentials
+
+`Register`, `Login`, and `Add` carry passwords as plaintext UTF-8. The
+registration token in `Register` is also plaintext. The Rust types display
+passwords and the registration token as `[redacted]` in `Debug` output.
