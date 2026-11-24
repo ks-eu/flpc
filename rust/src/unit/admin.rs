@@ -136,6 +136,12 @@ impl Add {
     }
 }
 
+impl From<Add> for FlpcUnit {
+    fn from(unit: Add) -> Self {
+        Self::Admin(AdminUnit::Add(unit))
+    }
+}
+
 /// A request to grant a user's administrator privileges (opcode `0x7C`).
 ///
 /// The user ID is an unsigned 16-bit integer encoded in big-endian byte order.
