@@ -34,6 +34,10 @@ fn matches_the_wire_vector_and_consumes_only_one_unit() {
         decode(&adjacent[FRAME.len()..]).unwrap(),
         Some((FlpcUnit::Ping(PingUnit::Ping(Ping::new())), 1))
     );
+
+    let wrapped: FlpcUnit = Login::new("Zoë".into(), "pāss".into()).into();
+    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
 
 #[test]
@@ -98,12 +102,4 @@ fn invalid_utf8_is_a_decode_error() {
     assert!(matches!(decode(&invalid), Err(DecodeError::InvalidUTF8)));
     let invalid = [&FRAME[..1], &[0, 1, 255][..]].concat();
     assert!(matches!(decode(&invalid), Err(DecodeError::InvalidUTF8)));
-}
-
-#[test]
-fn converts_to_flpc_unit_and_encodes() {
-    let concrete = Login::new("Zoë".into(), "pāss".into());
-    let wrapped: FlpcUnit = concrete.into();
-    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
-    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
