@@ -235,6 +235,12 @@ impl ServerPrivateMessage {
     }
 }
 
+impl From<ServerPrivateMessage> for FlpcUnit {
+    fn from(unit: ServerPrivateMessage) -> Self {
+        Self::Server(ServerUnit::ServerPrivateMessage(unit))
+    }
+}
+
 /// A notification that a user registered (opcode `0x84`).
 ///
 /// The user ID is big-endian. The UTF-8 username has a one-byte length prefix.
