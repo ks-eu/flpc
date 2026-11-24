@@ -98,3 +98,11 @@ fn invalid_utf8_in_any_complete_field_is_a_decode_error() {
         assert!(matches!(decode(input), Err(DecodeError::InvalidUTF8)));
     }
 }
+
+#[test]
+fn converts_to_flpc_unit_and_encodes() {
+    let concrete = Register::new("t".into(), "é".into(), "pw".into());
+    let wrapped: FlpcUnit = concrete.into();
+    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
+}
