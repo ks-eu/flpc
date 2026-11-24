@@ -1,5 +1,7 @@
 //! Unit for Pings, used by clients and servers alike.
 
+use super::FlpcUnit;
+
 /// Ping units sent by either peer.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PingUnit {
@@ -32,5 +34,11 @@ impl Ping {
 
     pub fn new() -> Self {
         Self {}
+    }
+}
+
+impl From<Ping> for FlpcUnit {
+    fn from(unit: Ping) -> Self {
+        Self::Ping(PingUnit::Ping(unit))
     }
 }
