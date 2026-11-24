@@ -182,19 +182,17 @@ impl From<ServerMessage> for FlpcUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{FlpcUnit, ServerUnit, ServerPrivateMessage},
+///     unit::{FlpcUnit, ServerPrivateMessage},
 ///     wire::{decode, Encode},
 /// };
 ///
 /// let unit = ServerPrivateMessage::new(7, 8, 42, "hi".into());
 /// let bytes: &[u8] = &[0x83, 0, 7, 0, 8, 0, 0, 0, 0, 0, 0, 0, 42, 0, 2, b'h', b'i'];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
 ///     decode(bytes).unwrap(),
-///     Some((
-///         FlpcUnit::Server(ServerUnit::ServerPrivateMessage(unit)),
-///         bytes.len(),
-///     )),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
