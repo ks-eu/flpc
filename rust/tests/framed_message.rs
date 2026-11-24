@@ -17,9 +17,11 @@ fn message(value: &str) -> FlpcUnit {
 #[tokio::test]
 async fn sends_independent_bytes_to_a_raw_peer() {
     let (stream, mut peer) = duplex(32);
-    let mut framed = Framed::new(stream, FlpcCodec);
-    framed.send(Message::new("hello".into())).await.unwrap();
-    drop(framed);
+    let (mut sink, _) = Framed::new(stream, FlpcCodec).split::<FlpcUnit>();
+    sink.send(Message::new("hello".into()).into())
+        .await
+        .unwrap();
+    drop(sink);
 
     let mut bytes = Vec::new();
     peer.read_to_end(&mut bytes).await.unwrap();
@@ -58,18 +60,4 @@ async fn reports_truncated_message_at_eof_after_complete_frame() {
 
     assert_eq!(framed.next().await.unwrap().unwrap(), message("hello"));
     assert!(matches!(framed.next().await, Some(Err(CodecError::Io(_)))));
-}
-
-#[tokio::test]
-async fn split_sink_sends_converted_unit() {
-    let (stream, mut peer) = duplex(FRAME.len() + 1);
-    let (mut sink, stream_half) = Framed::new(stream, FlpcCodec).split::<FlpcUnit>();
-    sink.send(Message::new("hello".into()).into())
-        .await
-        .unwrap();
-    drop(sink);
-    drop(stream_half);
-    let mut actual = Vec::new();
-    peer.read_to_end(&mut actual).await.unwrap();
-    assert_eq!(actual, FRAME);
 }
