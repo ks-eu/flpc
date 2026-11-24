@@ -94,7 +94,7 @@ impl From<Register> for FlpcUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{ClientUnit, FlpcUnit, Login},
+///     unit::{FlpcUnit, Login},
 ///     wire::{Encode, decode},
 /// };
 ///
@@ -103,12 +103,10 @@ impl From<Register> for FlpcUnit {
 ///     0x02, 0x04, 0x5a, 0x6f, 0xc3, 0xab, 0x05, 0x70, 0xc4, 0x81, 0x73, 0x73,
 /// ];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
 ///     decode(&bytes).unwrap(),
-///     Some((
-///         FlpcUnit::Client(ClientUnit::Login(unit)),
-///         bytes.len(),
-///     )),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Clone, PartialEq, Eq)]
