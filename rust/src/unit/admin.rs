@@ -18,16 +18,17 @@ pub enum AdminUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{AdminUnit, FlpcUnit, Kick},
+///     unit::{FlpcUnit, Kick},
 ///     wire::{decode, Encode},
 /// };
 ///
 /// let unit = Kick::new(0x1234);
 /// let bytes = [0x7f, 0x12, 0x34];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
 ///     decode(&bytes).unwrap(),
-///     Some((FlpcUnit::Admin(AdminUnit::Kick(unit)), bytes.len())),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
