@@ -1,5 +1,7 @@
 //! Units for Clients
 
+use super::FlpcUnit;
+
 /// Client requests and messages sent to the server.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ClientUnit {
@@ -75,6 +77,12 @@ impl Register {
 
     pub fn password(&self) -> &String {
         &self.password
+    }
+}
+
+impl From<Register> for FlpcUnit {
+    fn from(unit: Register) -> Self {
+        Self::Client(ClientUnit::Register(unit))
     }
 }
 
