@@ -302,7 +302,7 @@ impl From<ChangeUsername> for FlpcUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{ClientUnit, FlpcUnit, RequestSync},
+///     unit::{FlpcUnit, RequestSync},
 ///     wire::{decode, Encode},
 /// };
 ///
@@ -312,9 +312,10 @@ impl From<ChangeUsername> for FlpcUnit {
 ///     0, 0, 0, 0, 0, 0, 0, 2,
 /// ];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
 ///     decode(&bytes).unwrap(),
-///     Some((FlpcUnit::Client(ClientUnit::RequestSync(unit)), bytes.len())),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
