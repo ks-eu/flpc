@@ -525,6 +525,12 @@ impl SyncMessage {
     }
 }
 
+impl From<SyncMessage> for FlpcUnit {
+    fn from(unit: SyncMessage) -> Self {
+        Self::Server(ServerUnit::SyncMessage(unit))
+    }
+}
+
 /// A private chat message returned during synchronization (opcode `0x8A`).
 ///
 /// The sender ID, target ID, and timestamp are big-endian. The UTF-8 message
