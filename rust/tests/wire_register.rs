@@ -24,6 +24,10 @@ fn encode_matches_the_readme_vector_and_preserves_the_tail() {
     assert_eq!(&dst[..FRAME.len()], FRAME);
     assert_eq!(&dst[FRAME.len()..], &[0xaa; 2]);
     assert_eq!(unit.to_bytes().unwrap(), FRAME);
+
+    let wrapped: FlpcUnit = Register::new("t".into(), "é".into(), "pw".into()).into();
+    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
 
 #[test]
@@ -97,12 +101,4 @@ fn invalid_utf8_in_any_complete_field_is_a_decode_error() {
     for input in [&[1, 1, 255][..], &[1, 0, 1, 255], &[1, 0, 0, 1, 255]] {
         assert!(matches!(decode(input), Err(DecodeError::InvalidUTF8)));
     }
-}
-
-#[test]
-fn converts_to_flpc_unit_and_encodes() {
-    let concrete = Register::new("t".into(), "é".into(), "pw".into());
-    let wrapped: FlpcUnit = concrete.into();
-    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
-    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
