@@ -601,16 +601,17 @@ impl From<SyncPrivateMessage> for FlpcUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{FlpcUnit, ServerUnit, WrongUnit},
+///     unit::{FlpcUnit, WrongUnit},
 ///     wire::{decode, Encode},
 /// };
 ///
 /// let unit = WrongUnit::new();
 /// let bytes: &[u8] = &[0x8B];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
 ///     decode(bytes).unwrap(),
-///     Some((FlpcUnit::Server(ServerUnit::WrongUnit(unit)), bytes.len())),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]

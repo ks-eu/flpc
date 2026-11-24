@@ -21,6 +21,7 @@ The Rust crate currently encodes and decodes
 `SyncMessage`, `SyncPrivateMessage`, and `WrongUnit`.
 The optional `tokio` feature exposes the shared `FlpcCodec` for
 `tokio_util::codec::Framed`.
+Concrete units implement `Into<FlpcUnit>` for use with the codec.
 
 Each unit starts with a one-byte opcode. Its fields follow in the order shown below. All multibyte integers use big-endian byte order. IDs and targets are unsigned 16-bit integers. Timestamps and sync bounds are unsigned 64-bit integers.
 
