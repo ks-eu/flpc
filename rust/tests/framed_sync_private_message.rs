@@ -46,3 +46,17 @@ async fn framed_sends_and_receives_independent_wire_bytes() {
         )))
     );
 }
+
+#[tokio::test]
+async fn split_sink_sends_converted_unit() {
+    let (stream, mut peer) = duplex(FRAME.len() + 1);
+    let (mut sink, stream_half) = Framed::new(stream, FlpcCodec).split::<FlpcUnit>();
+    sink.send(SyncPrivateMessage::new(0x1234, 0x5678, 0x0102030405060708, "é".into()).into())
+        .await
+        .unwrap();
+    drop(sink);
+    drop(stream_half);
+    let mut actual = Vec::new();
+    peer.read_to_end(&mut actual).await.unwrap();
+    assert_eq!(actual, FRAME);
+}
