@@ -55,16 +55,17 @@ impl Kick {
 ///
 /// ```
 /// use flpc::{
-///     unit::{AdminUnit, FlpcUnit, Remove},
+///     unit::{FlpcUnit, Remove},
 ///     wire::{decode, Encode},
 /// };
 ///
 /// let unit = Remove::new(0x1234);
 /// let bytes = [0x7e, 0x12, 0x34];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
 ///     decode(&bytes).unwrap(),
-///     Some((FlpcUnit::Admin(AdminUnit::Remove(unit)), bytes.len())),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
