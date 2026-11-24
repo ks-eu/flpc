@@ -84,6 +84,12 @@ impl Remove {
     }
 }
 
+impl From<Remove> for FlpcUnit {
+    fn from(unit: Remove) -> Self {
+        Self::Admin(AdminUnit::Remove(unit))
+    }
+}
+
 /// A request to add a user (opcode `0x7D`).
 ///
 /// The username and password are UTF-8 strings, each preceded by a one-byte
