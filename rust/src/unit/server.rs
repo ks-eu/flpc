@@ -465,6 +465,12 @@ impl ChangedUsername {
     }
 }
 
+impl From<ChangedUsername> for FlpcUnit {
+    fn from(unit: ChangedUsername) -> Self {
+        Self::Server(ServerUnit::ChangedUsername(unit))
+    }
+}
+
 /// A chat message returned during synchronization (opcode `0x89`).
 ///
 /// The sender ID and timestamp are big-endian. The UTF-8 message has a
