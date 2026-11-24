@@ -157,19 +157,17 @@ impl From<Login> for FlpcUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{ClientUnit, FlpcUnit, Message},
+///     unit::{FlpcUnit, Message},
 ///     wire::{decode, Encode},
 /// };
 ///
 /// let message = Message::new("é".into());
 /// let bytes = [0x03, 0x00, 0x02, 0xc3, 0xa9];
 /// assert_eq!(message.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = message.into();
 /// assert_eq!(
 ///     decode(&bytes).unwrap(),
-///     Some((
-///         FlpcUnit::Client(ClientUnit::Message(message)),
-///         bytes.len(),
-///     )),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
