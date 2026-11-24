@@ -93,16 +93,17 @@ impl Remove {
 ///
 /// ```
 /// use flpc::{
-///     unit::{Add, AdminUnit, FlpcUnit},
+///     unit::{Add, FlpcUnit},
 ///     wire::{decode, Encode},
 /// };
 ///
 /// let unit = Add::new("Zoë".into(), "p".into());
 /// let bytes = [0x7d, 0x04, 0x5a, 0x6f, 0xc3, 0xab, 0x01, b'p'];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
 ///     decode(&bytes).unwrap(),
-///     Some((FlpcUnit::Admin(AdminUnit::Add(unit)), bytes.len())),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Clone, PartialEq, Eq)]
