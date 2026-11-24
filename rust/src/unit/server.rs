@@ -1,5 +1,7 @@
 //! Units for servers.
 
+use super::FlpcUnit;
+
 /// Responses, notifications, and messages sent by the server.
 ///
 /// The codec preserves timestamps as unsigned 64-bit values and outcomes as
@@ -58,6 +60,12 @@ impl ServerRegister {
 
     pub fn outcome(&self) -> &u8 {
         &self.outcome
+    }
+}
+
+impl From<ServerRegister> for FlpcUnit {
+    fn from(unit: ServerRegister) -> Self {
+        Self::Server(ServerUnit::ServerRegister(unit))
     }
 }
 
