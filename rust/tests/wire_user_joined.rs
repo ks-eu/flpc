@@ -26,6 +26,10 @@ fn encoding_and_decoding_match_the_wire_vector() {
     }
     let adjacent = [FRAME, FRAME].concat();
     assert_eq!(decode(&adjacent).unwrap(), Some((expected, FRAME.len())));
+
+    let wrapped: FlpcUnit = UserJoined::new(0x1234).into();
+    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
 
 #[test]
@@ -37,12 +41,4 @@ fn undersized_destination_stays_unchanged() {
         Err(EncodeError::BufferTooSmall)
     ));
     assert_eq!(dst, vec![0xaa; FRAME.len() - 1]);
-}
-
-#[test]
-fn converts_to_flpc_unit_and_encodes() {
-    let concrete = UserJoined::new(0x1234);
-    let wrapped: FlpcUnit = concrete.into();
-    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
-    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
