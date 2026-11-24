@@ -338,3 +338,9 @@ impl RequestSync {
         &self.last
     }
 }
+
+impl From<RequestSync> for FlpcUnit {
+    fn from(unit: RequestSync) -> Self {
+        Self::Client(ClientUnit::RequestSync(unit))
+    }
+}
