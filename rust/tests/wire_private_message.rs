@@ -93,3 +93,11 @@ fn rejects_invalid_utf8_in_a_complete_message() {
         Err(DecodeError::InvalidUTF8)
     ));
 }
+
+#[test]
+fn converts_to_flpc_unit_and_encodes() {
+    let concrete = PrivateMessage::new(0x1234, "é".into());
+    let wrapped: FlpcUnit = concrete.into();
+    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
+}
