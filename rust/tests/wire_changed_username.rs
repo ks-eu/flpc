@@ -29,6 +29,10 @@ fn encoding_and_decoding_match_the_wire_vector() {
     }
     let adjacent = [FRAME, FRAME].concat();
     assert_eq!(decode(&adjacent).unwrap(), Some((expected, FRAME.len())));
+
+    let wrapped: FlpcUnit = ChangedUsername::new(0x1234, "é".into()).into();
+    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
 
 #[test]
@@ -62,12 +66,4 @@ fn invalid_utf8_username_is_rejected() {
         decode(&[0x88, 0, 1, 1, 0xff]),
         Err(DecodeError::InvalidUTF8)
     ));
-}
-
-#[test]
-fn converts_to_flpc_unit_and_encodes() {
-    let concrete = ChangedUsername::new(0x1234, "é".into());
-    let wrapped: FlpcUnit = concrete.into();
-    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
-    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
