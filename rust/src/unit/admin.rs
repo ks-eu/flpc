@@ -1,3 +1,5 @@
+use super::FlpcUnit;
+
 /// Administrative requests sent by a client to the server.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AdminUnit {
@@ -205,5 +207,11 @@ impl RemoveAdmin {
 
     pub fn id(&self) -> &u16 {
         &self.id
+    }
+}
+
+impl From<RemoveAdmin> for FlpcUnit {
+    fn from(unit: RemoveAdmin) -> Self {
+        Self::Admin(AdminUnit::RemoveAdmin(unit))
     }
 }
