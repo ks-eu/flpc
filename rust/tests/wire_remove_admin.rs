@@ -16,6 +16,10 @@ fn encode_matches_independent_bytes_and_preserves_tail() {
     assert_eq!(&dst[..FRAME.len()], FRAME);
     assert_eq!(&dst[FRAME.len()..], &[0xaa]);
     assert_eq!(unit.to_bytes().unwrap(), FRAME);
+
+    let wrapped: FlpcUnit = RemoveAdmin::new(0x1234).into();
+    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
 
 #[test]
@@ -54,12 +58,4 @@ fn undersized_destination_is_unchanged() {
         Err(EncodeError::BufferTooSmall)
     ));
     assert_eq!(dst, [0xaa; FRAME.len() - 1]);
-}
-
-#[test]
-fn converts_to_flpc_unit_and_encodes() {
-    let concrete = RemoveAdmin::new(0x1234);
-    let wrapped: FlpcUnit = concrete.into();
-    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
-    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
