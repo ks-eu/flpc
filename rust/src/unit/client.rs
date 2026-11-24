@@ -242,6 +242,12 @@ impl PrivateMessage {
     }
 }
 
+impl From<PrivateMessage> for FlpcUnit {
+    fn from(unit: PrivateMessage) -> Self {
+        Self::Client(ClientUnit::PrivateMessage(unit))
+    }
+}
+
 /// A request to change the client's username (opcode `0x05`).
 ///
 /// The username is UTF-8 preceded by a one-byte length counting UTF-8 bytes,
