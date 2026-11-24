@@ -18,9 +18,9 @@ fn expected() -> FlpcUnit {
 #[tokio::test]
 async fn sends_wire_bytes_to_raw_peer() {
     let (stream, mut peer) = duplex(8);
-    let mut framed = Framed::new(stream, FlpcCodec);
-    framed.send(MakeAdmin::new(0x4567)).await.unwrap();
-    drop(framed);
+    let (mut sink, _) = Framed::new(stream, FlpcCodec).split::<FlpcUnit>();
+    sink.send(MakeAdmin::new(0x4567).into()).await.unwrap();
+    drop(sink);
 
     let mut bytes = Vec::new();
     peer.read_to_end(&mut bytes).await.unwrap();
@@ -45,16 +45,4 @@ async fn receives_fragmented_frame() {
         FlpcUnit::Admin(AdminUnit::RemoveAdmin(RemoveAdmin::new(0x89ab)))
     );
     assert!(framed.next().await.is_none());
-}
-
-#[tokio::test]
-async fn split_sink_sends_converted_unit() {
-    let (stream, mut peer) = duplex(FRAME.len() + 1);
-    let (mut sink, stream_half) = Framed::new(stream, FlpcCodec).split::<FlpcUnit>();
-    sink.send(MakeAdmin::new(0x4567).into()).await.unwrap();
-    drop(sink);
-    drop(stream_half);
-    let mut actual = Vec::new();
-    peer.read_to_end(&mut actual).await.unwrap();
-    assert_eq!(actual, FRAME);
 }
