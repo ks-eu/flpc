@@ -38,3 +38,11 @@ fn undersized_destination_stays_unchanged() {
     ));
     assert_eq!(dst, vec![0xaa; FRAME.len() - 1]);
 }
+
+#[test]
+fn converts_to_flpc_unit_and_encodes() {
+    let concrete = UserRemoved::new(0x1234);
+    let wrapped: FlpcUnit = concrete.into();
+    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
+}
