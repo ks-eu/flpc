@@ -169,6 +169,12 @@ impl ServerMessage {
     }
 }
 
+impl From<ServerMessage> for FlpcUnit {
+    fn from(unit: ServerMessage) -> Self {
+        Self::Server(ServerUnit::ServerMessage(unit))
+    }
+}
+
 /// A private chat message from a user (opcode `0x83`).
 ///
 /// The sender ID, target ID, and timestamp are big-endian. The UTF-8 message
