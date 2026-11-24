@@ -77,19 +77,17 @@ impl From<ServerRegister> for FlpcUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{FlpcUnit, ServerUnit, ServerLogin},
+///     unit::{FlpcUnit, ServerLogin},
 ///     wire::{decode, Encode},
 /// };
 ///
 /// let unit = ServerLogin::new(1);
 /// let bytes: &[u8] = &[0x81, 0x01];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
 ///     decode(bytes).unwrap(),
-///     Some((
-///         FlpcUnit::Server(ServerUnit::ServerLogin(unit)),
-///         bytes.len(),
-///     )),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
