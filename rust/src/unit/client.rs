@@ -142,6 +142,12 @@ impl Login {
     }
 }
 
+impl From<Login> for FlpcUnit {
+    fn from(unit: Login) -> Self {
+        Self::Client(ClientUnit::Login(unit))
+    }
+}
+
 /// A message sent to the server (opcode `0x03`).
 ///
 /// The message is encoded as UTF-8 after a two-byte big-endian length prefix.
