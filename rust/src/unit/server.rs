@@ -384,19 +384,17 @@ impl From<UserJoined> for FlpcUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{FlpcUnit, ServerUnit, UserLeft},
+///     unit::{FlpcUnit, UserLeft},
 ///     wire::{decode, Encode},
 /// };
 ///
 /// let unit = UserLeft::new(7);
 /// let bytes: &[u8] = &[0x87, 0, 7];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
 ///     decode(bytes).unwrap(),
-///     Some((
-///         FlpcUnit::Server(ServerUnit::UserLeft(unit)),
-///         bytes.len(),
-///     )),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
