@@ -122,19 +122,17 @@ impl From<ServerLogin> for FlpcUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{FlpcUnit, ServerUnit, ServerMessage},
+///     unit::{FlpcUnit, ServerMessage},
 ///     wire::{decode, Encode},
 /// };
 ///
 /// let unit = ServerMessage::new(7, 42, "hi".into());
 /// let bytes: &[u8] = &[0x82, 0x00, 0x07, 0, 0, 0, 0, 0, 0, 0, 42, 0, 2, b'h', b'i'];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
 ///     decode(bytes).unwrap(),
-///     Some((
-///         FlpcUnit::Server(ServerUnit::ServerMessage(unit)),
-///         bytes.len(),
-///     )),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
