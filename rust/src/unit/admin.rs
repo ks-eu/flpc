@@ -144,16 +144,17 @@ impl Add {
 ///
 /// ```
 /// use flpc::{
-///     unit::{AdminUnit, FlpcUnit, MakeAdmin},
+///     unit::{FlpcUnit, MakeAdmin},
 ///     wire::{decode, Encode},
 /// };
 ///
 /// let unit = MakeAdmin::new(0x1234);
 /// let bytes = [0x7c, 0x12, 0x34];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
 ///     decode(&bytes).unwrap(),
-///     Some((FlpcUnit::Admin(AdminUnit::MakeAdmin(unit)), bytes.len())),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
