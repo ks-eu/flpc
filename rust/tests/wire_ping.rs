@@ -20,6 +20,10 @@ fn encode_matches_the_readme_vector_and_preserves_the_tail() {
     assert_eq!(&dst[..PING.len()], PING);
     assert_eq!(&dst[PING.len()..], &[0xaa; 2]);
     assert_eq!(unit.to_bytes().unwrap(), PING);
+
+    let wrapped: FlpcUnit = Ping::new().into();
+    assert_eq!(wrapped, decode(PING).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), PING);
 }
 
 #[test]
@@ -55,12 +59,4 @@ fn encode_rejects_an_empty_destination() {
         Ping::new().encode_into(&mut []),
         Err(EncodeError::BufferTooSmall)
     ));
-}
-
-#[test]
-fn converts_to_flpc_unit_and_encodes() {
-    let concrete = Ping::new();
-    let wrapped: FlpcUnit = concrete.into();
-    assert_eq!(wrapped, decode(PING).unwrap().unwrap().0);
-    assert_eq!(wrapped.to_bytes().unwrap(), PING);
 }
