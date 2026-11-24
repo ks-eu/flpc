@@ -623,3 +623,9 @@ impl WrongUnit {
         Self {}
     }
 }
+
+impl From<WrongUnit> for FlpcUnit {
+    fn from(unit: WrongUnit) -> Self {
+        Self::Server(ServerUnit::WrongUnit(unit))
+    }
+}
