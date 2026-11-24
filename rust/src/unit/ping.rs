@@ -14,16 +14,17 @@ pub enum PingUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{FlpcUnit, Ping, PingUnit},
+///     unit::{FlpcUnit, Ping},
 ///     wire::{decode, Encode},
 /// };
 ///
 /// let ping = Ping::new();
 /// let bytes = [0x00];
 /// assert_eq!(ping.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = ping.into();
 /// assert_eq!(
 ///     decode(&bytes).unwrap(),
-///     Some((FlpcUnit::Ping(PingUnit::Ping(ping)), bytes.len())),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
