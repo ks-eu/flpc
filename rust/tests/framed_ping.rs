@@ -51,3 +51,15 @@ async fn receives_adjacent_pings_then_a_differently_sized_frame() {
     );
     assert!(framed.next().await.is_none());
 }
+
+#[tokio::test]
+async fn split_sink_sends_converted_unit() {
+    let (stream, mut peer) = duplex(PING.len() + 1);
+    let (mut sink, stream_half) = Framed::new(stream, FlpcCodec).split::<FlpcUnit>();
+    sink.send(Ping::new().into()).await.unwrap();
+    drop(sink);
+    drop(stream_half);
+    let mut actual = Vec::new();
+    peer.read_to_end(&mut actual).await.unwrap();
+    assert_eq!(actual, PING);
+}

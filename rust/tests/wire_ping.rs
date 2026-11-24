@@ -56,3 +56,11 @@ fn encode_rejects_an_empty_destination() {
         Err(EncodeError::BufferTooSmall)
     ));
 }
+
+#[test]
+fn converts_to_flpc_unit_and_encodes() {
+    let concrete = Ping::new();
+    let wrapped: FlpcUnit = concrete.into();
+    assert_eq!(wrapped, decode(PING).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), PING);
+}
