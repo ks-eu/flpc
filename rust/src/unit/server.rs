@@ -416,6 +416,12 @@ impl UserLeft {
     }
 }
 
+impl From<UserLeft> for FlpcUnit {
+    fn from(unit: UserLeft) -> Self {
+        Self::Server(ServerUnit::UserLeft(unit))
+    }
+}
+
 /// A notification that a username changed (opcode `0x88`).
 ///
 /// The user ID is big-endian. The UTF-8 username has a one-byte length prefix.
