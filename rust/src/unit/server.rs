@@ -109,6 +109,12 @@ impl ServerLogin {
     }
 }
 
+impl From<ServerLogin> for FlpcUnit {
+    fn from(unit: ServerLogin) -> Self {
+        Self::Server(ServerUnit::ServerLogin(unit))
+    }
+}
+
 /// A chat message from a user (opcode `0x82`).
 ///
 /// The sender ID and timestamp are big-endian. The UTF-8 message has a
