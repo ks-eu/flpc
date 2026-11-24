@@ -190,6 +190,12 @@ impl Message {
     }
 }
 
+impl From<Message> for FlpcUnit {
+    fn from(unit: Message) -> Self {
+        Self::Client(ClientUnit::Message(unit))
+    }
+}
+
 /// A private message sent to a target (opcode `0x04`).
 ///
 /// The target is an unsigned 16-bit big-endian integer. The message follows
