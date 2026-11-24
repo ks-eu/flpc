@@ -37,6 +37,10 @@ fn encodes_independent_bytes_and_decodes_one_unit() {
         decode(&adjacent[FRAME.len()..]).unwrap(),
         Some((FlpcUnit::Ping(PingUnit::Ping(Ping::new())), 1))
     );
+
+    let wrapped: FlpcUnit = PrivateMessage::new(0x1234, "é".into()).into();
+    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
 
 #[test]
@@ -92,12 +96,4 @@ fn rejects_invalid_utf8_in_a_complete_message() {
         decode(&[0x04, 0, 1, 0, 1, 0xff]),
         Err(DecodeError::InvalidUTF8)
     ));
-}
-
-#[test]
-fn converts_to_flpc_unit_and_encodes() {
-    let concrete = PrivateMessage::new(0x1234, "é".into());
-    let wrapped: FlpcUnit = concrete.into();
-    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
-    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
