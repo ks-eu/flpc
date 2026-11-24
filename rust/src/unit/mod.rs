@@ -21,10 +21,10 @@ pub use server::{
     SyncMessage, SyncPrivateMessage, UserJoined, UserLeft, UserRegistered, UserRemoved, WrongUnit,
 };
 
-/// A unit decoded from an FLPC byte stream.
+/// A unit that can be encoded to or decoded from an FLPC byte stream.
 ///
 /// The outer variant identifies the unit family. The inner variant contains
-/// the concrete unit for the decoded opcode.
+/// the concrete unit for the opcode.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FlpcUnit {
     /// An administrative request.

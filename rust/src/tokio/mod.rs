@@ -14,7 +14,8 @@ pub use error::CodecError;
 
 /// Stateless FLPC codec for [`tokio_util::codec::Framed`].
 ///
-/// Send any unit that implements [`Encode`]. Incoming units are returned as [`FlpcUnit`].
+/// Send any unit that implements [`Encode`], including concrete units such as
+/// [`ServerRegister`](crate::unit::ServerRegister). Incoming units are returned as [`FlpcUnit`].
 ///
 /// # Example
 ///
@@ -31,7 +32,7 @@ pub use error::CodecError;
 /// ```
 /// use flpc::{
 ///     tokio::FlpcCodec,
-///     unit::{ClientUnit, FlpcUnit, Message},
+///     unit::{FlpcUnit, ServerRegister, ServerUnit},
 /// };
 /// use futures_util::{SinkExt, StreamExt};
 /// use tokio::io::duplex;
@@ -40,14 +41,14 @@ pub use error::CodecError;
 /// #[tokio::main(flavor = "current_thread")]
 /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ///     let (sender, receiver) = duplex(32);
-///     let mut sender = Framed::new(sender, FlpcCodec);
+///     let (mut sink, _sender_stream) = Framed::new(sender, FlpcCodec).split::<FlpcUnit>();
 ///     let mut receiver = Framed::new(receiver, FlpcCodec);
 ///
-///     sender.send(Message::new("hello".into())).await?;
+///     sink.send(ServerRegister::new(0).into()).await?;
 ///     let unit = receiver.next().await.expect("expected a message")?;
 ///     assert_eq!(
 ///         unit,
-///         FlpcUnit::Client(ClientUnit::Message(Message::new("hello".into())))
+///         FlpcUnit::Server(ServerUnit::ServerRegister(ServerRegister::new(0)))
 ///     );
 ///     Ok(())
 /// }
