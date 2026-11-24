@@ -328,6 +328,12 @@ impl UserRemoved {
     }
 }
 
+impl From<UserRemoved> for FlpcUnit {
+    fn from(unit: UserRemoved) -> Self {
+        Self::Server(ServerUnit::UserRemoved(unit))
+    }
+}
+
 /// A notification that a user joined (opcode `0x86`).
 ///
 /// The user ID is big-endian.
