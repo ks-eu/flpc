@@ -256,19 +256,17 @@ impl From<PrivateMessage> for FlpcUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{ChangeUsername, ClientUnit, FlpcUnit},
+///     unit::{ChangeUsername, FlpcUnit},
 ///     wire::{decode, Encode},
 /// };
 ///
 /// let unit = ChangeUsername::new("Zoë".into());
 /// let bytes = [0x05, 0x04, 0x5a, 0x6f, 0xc3, 0xab];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
 ///     decode(&bytes).unwrap(),
-///     Some((
-///         FlpcUnit::Client(ClientUnit::ChangeUsername(unit)),
-///         bytes.len(),
-///     )),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
