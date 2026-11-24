@@ -181,16 +181,17 @@ impl MakeAdmin {
 ///
 /// ```
 /// use flpc::{
-///     unit::{AdminUnit, FlpcUnit, RemoveAdmin},
+///     unit::{FlpcUnit, RemoveAdmin},
 ///     wire::{decode, Encode},
 /// };
 ///
 /// let unit = RemoveAdmin::new(0x1234);
 /// let bytes = [0x7b, 0x12, 0x34];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
 ///     decode(&bytes).unwrap(),
-///     Some((FlpcUnit::Admin(AdminUnit::RemoveAdmin(unit)), bytes.len())),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
