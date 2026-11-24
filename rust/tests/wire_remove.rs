@@ -47,3 +47,11 @@ fn undersized_destination_is_unchanged() {
     ));
     assert_eq!(dst, [0xaa; FRAME.len() - 1]);
 }
+
+#[test]
+fn converts_to_flpc_unit_and_encodes() {
+    let concrete = Remove::new(0x89ab);
+    let wrapped: FlpcUnit = concrete.into();
+    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
+}
