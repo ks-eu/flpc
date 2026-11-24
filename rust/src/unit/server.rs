@@ -284,6 +284,12 @@ impl UserRegistered {
     }
 }
 
+impl From<UserRegistered> for FlpcUnit {
+    fn from(unit: UserRegistered) -> Self {
+        Self::Server(ServerUnit::UserRegistered(unit))
+    }
+}
+
 /// A notification that a user was removed (opcode `0x85`).
 ///
 /// The user ID is big-endian.
