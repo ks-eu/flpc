@@ -47,6 +47,12 @@ impl Kick {
     }
 }
 
+impl From<Kick> for FlpcUnit {
+    fn from(unit: Kick) -> Self {
+        Self::Admin(AdminUnit::Kick(unit))
+    }
+}
+
 /// A request to remove a user (opcode `0x7E`).
 ///
 /// The user ID is an unsigned 16-bit integer encoded in big-endian byte order.
