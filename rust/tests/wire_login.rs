@@ -99,3 +99,11 @@ fn invalid_utf8_is_a_decode_error() {
     let invalid = [&FRAME[..1], &[0, 1, 255][..]].concat();
     assert!(matches!(decode(&invalid), Err(DecodeError::InvalidUTF8)));
 }
+
+#[test]
+fn converts_to_flpc_unit_and_encodes() {
+    let concrete = Login::new("Zoë".into(), "pāss".into());
+    let wrapped: FlpcUnit = concrete.into();
+    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
+}
