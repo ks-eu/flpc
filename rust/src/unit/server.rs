@@ -428,19 +428,17 @@ impl From<UserLeft> for FlpcUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{FlpcUnit, ServerUnit, ChangedUsername},
+///     unit::{FlpcUnit, ChangedUsername},
 ///     wire::{decode, Encode},
 /// };
 ///
 /// let unit = ChangedUsername::new(7, "é".into());
 /// let bytes: &[u8] = &[0x88, 0, 7, 2, 0xc3, 0xa9];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
 ///     decode(bytes).unwrap(),
-///     Some((
-///         FlpcUnit::Server(ServerUnit::ChangedUsername(unit)),
-///         bytes.len(),
-///     )),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
