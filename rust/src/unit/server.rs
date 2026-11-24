@@ -591,6 +591,12 @@ impl SyncPrivateMessage {
     }
 }
 
+impl From<SyncPrivateMessage> for FlpcUnit {
+    fn from(unit: SyncPrivateMessage) -> Self {
+        Self::Server(ServerUnit::SyncPrivateMessage(unit))
+    }
+}
+
 /// A server response indicating that a client's first unit was unexpected (opcode `0x8B`).
 ///
 /// # Examples
