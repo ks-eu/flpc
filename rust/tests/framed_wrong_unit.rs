@@ -13,10 +13,10 @@ const FRAME: &[u8] = &[0x8B];
 #[tokio::test]
 async fn sends_opcode_to_a_raw_peer() {
     let (stream, mut peer) = duplex(16);
-    let mut framed = Framed::new(stream, FlpcCodec);
+    let (mut sink, _) = Framed::new(stream, FlpcCodec).split::<FlpcUnit>();
 
-    framed.send(WrongUnit::new()).await.unwrap();
-    drop(framed);
+    sink.send(WrongUnit::new().into()).await.unwrap();
+    drop(sink);
 
     let mut bytes = Vec::new();
     peer.read_to_end(&mut bytes).await.unwrap();
@@ -43,16 +43,4 @@ async fn receives_wrong_unit_then_ping_and_clean_eof() {
         FlpcUnit::Ping(PingUnit::Ping(Ping::new()))
     );
     assert!(framed.next().await.is_none());
-}
-
-#[tokio::test]
-async fn split_sink_sends_converted_unit() {
-    let (stream, mut peer) = duplex(FRAME.len() + 1);
-    let (mut sink, stream_half) = Framed::new(stream, FlpcCodec).split::<FlpcUnit>();
-    sink.send(WrongUnit::new().into()).await.unwrap();
-    drop(sink);
-    drop(stream_half);
-    let mut actual = Vec::new();
-    peer.read_to_end(&mut actual).await.unwrap();
-    assert_eq!(actual, FRAME);
 }

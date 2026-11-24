@@ -20,6 +20,10 @@ fn encode_matches_opcode_and_preserves_tail() {
         unit.encode_into(&mut []),
         Err(EncodeError::BufferTooSmall)
     ));
+
+    let wrapped: FlpcUnit = WrongUnit::new().into();
+    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
 
 #[test]
@@ -29,12 +33,4 @@ fn decode_consumes_one_byte_before_the_next_unit() {
     assert_eq!(decode(&[]).unwrap(), None);
     assert_eq!(decode(FRAME).unwrap(), Some((expected.clone(), 1)));
     assert_eq!(decode(&[0x8B, 0x00]).unwrap(), Some((expected, 1)));
-}
-
-#[test]
-fn converts_to_flpc_unit_and_encodes() {
-    let concrete = WrongUnit::new();
-    let wrapped: FlpcUnit = concrete.into();
-    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
-    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
