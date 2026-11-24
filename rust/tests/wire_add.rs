@@ -20,6 +20,10 @@ fn encode_matches_independent_bytes_and_preserves_tail() {
     assert_eq!(&dst[..FRAME.len()], FRAME);
     assert_eq!(&dst[FRAME.len()..], &[0xaa]);
     assert_eq!(unit.to_bytes().unwrap(), FRAME);
+
+    let wrapped: FlpcUnit = Add::new("Zoë".into(), "p".into()).into();
+    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
 
 #[test]
@@ -101,12 +105,4 @@ fn invalid_utf8_in_either_field_is_a_decode_error() {
         decode(&[0x7d, 0, 1, 0xff]),
         Err(DecodeError::InvalidUTF8)
     ));
-}
-
-#[test]
-fn converts_to_flpc_unit_and_encodes() {
-    let concrete = Add::new("Zoë".into(), "p".into());
-    let wrapped: FlpcUnit = concrete.into();
-    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
-    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
