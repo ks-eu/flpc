@@ -173,6 +173,12 @@ impl MakeAdmin {
     }
 }
 
+impl From<MakeAdmin> for FlpcUnit {
+    fn from(unit: MakeAdmin) -> Self {
+        Self::Admin(AdminUnit::MakeAdmin(unit))
+    }
+}
+
 /// A request to remove a user's administrator privileges (opcode `0x7B`).
 ///
 /// The user ID is an unsigned 16-bit integer encoded in big-endian byte order.
