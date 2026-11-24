@@ -85,3 +85,11 @@ fn invalid_utf8_is_a_decode_error() {
         Err(DecodeError::InvalidUTF8)
     ));
 }
+
+#[test]
+fn converts_to_flpc_unit_and_encodes() {
+    let concrete = ChangeUsername::new("é".into());
+    let wrapped: FlpcUnit = concrete.into();
+    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
+}

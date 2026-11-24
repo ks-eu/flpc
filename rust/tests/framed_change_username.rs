@@ -54,3 +54,17 @@ async fn receives_fragmented_frame_and_truncated_frame_at_eof() {
     );
     assert!(matches!(framed.next().await, Some(Err(CodecError::Io(_)))));
 }
+
+#[tokio::test]
+async fn split_sink_sends_converted_unit() {
+    let (stream, mut peer) = duplex(FRAME.len() + 1);
+    let (mut sink, stream_half) = Framed::new(stream, FlpcCodec).split::<FlpcUnit>();
+    sink.send(ChangeUsername::new("é".into()).into())
+        .await
+        .unwrap();
+    drop(sink);
+    drop(stream_half);
+    let mut actual = Vec::new();
+    peer.read_to_end(&mut actual).await.unwrap();
+    assert_eq!(actual, FRAME);
+}
