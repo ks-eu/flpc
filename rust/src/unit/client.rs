@@ -24,19 +24,17 @@ pub enum ClientUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{ClientUnit, FlpcUnit, Register},
+///     unit::{FlpcUnit, Register},
 ///     wire::{decode, Encode},
 /// };
 ///
 /// let register = Register::new("t".into(), "é".into(), "pw".into());
 /// let bytes = [0x01, 0x01, b't', 0x02, 0xc3, 0xa9, 0x02, b'p', b'w'];
 /// assert_eq!(register.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = register.into();
 /// assert_eq!(
 ///     decode(&bytes).unwrap(),
-///     Some((
-///         FlpcUnit::Client(ClientUnit::Register(register)),
-///         bytes.len(),
-///     )),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Clone, PartialEq, Eq)]
