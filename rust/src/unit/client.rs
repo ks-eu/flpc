@@ -288,6 +288,12 @@ impl ChangeUsername {
     }
 }
 
+impl From<ChangeUsername> for FlpcUnit {
+    fn from(unit: ChangeUsername) -> Self {
+        Self::Client(ClientUnit::ChangeUsername(unit))
+    }
+}
+
 /// A request for a range of synchronized messages (opcode `0x06`).
 ///
 /// The `first` and `last` bounds are opaque unsigned 64-bit values encoded in
