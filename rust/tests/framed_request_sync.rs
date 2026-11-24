@@ -51,3 +51,17 @@ async fn receives_fragmented_frame() {
     );
     assert!(framed.next().await.is_none());
 }
+
+#[tokio::test]
+async fn split_sink_sends_converted_unit() {
+    let (stream, mut peer) = duplex(FRAME.len() + 1);
+    let (mut sink, stream_half) = Framed::new(stream, FlpcCodec).split::<FlpcUnit>();
+    sink.send(RequestSync::new(0x0102_0304_0506_0708, 0x1122_3344_5566_7788).into())
+        .await
+        .unwrap();
+    drop(sink);
+    drop(stream_half);
+    let mut actual = Vec::new();
+    peer.read_to_end(&mut actual).await.unwrap();
+    assert_eq!(actual, FRAME);
+}
