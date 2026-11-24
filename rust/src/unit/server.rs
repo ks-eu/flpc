@@ -247,19 +247,17 @@ impl From<ServerPrivateMessage> for FlpcUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{FlpcUnit, ServerUnit, UserRegistered},
+///     unit::{FlpcUnit, UserRegistered},
 ///     wire::{decode, Encode},
 /// };
 ///
 /// let unit = UserRegistered::new(7, "é".into());
 /// let bytes: &[u8] = &[0x84, 0, 7, 2, 0xc3, 0xa9];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
 ///     decode(bytes).unwrap(),
-///     Some((
-///         FlpcUnit::Server(ServerUnit::UserRegistered(unit)),
-///         bytes.len(),
-///     )),
+///     Some((wrapped, bytes.len())),
 /// );
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
