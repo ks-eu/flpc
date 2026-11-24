@@ -62,3 +62,11 @@ fn invalid_utf8_message_is_rejected() {
     *invalid.last_mut().unwrap() = 0xff;
     assert!(matches!(decode(&invalid), Err(DecodeError::InvalidUTF8)));
 }
+
+#[test]
+fn converts_to_flpc_unit_and_encodes() {
+    let concrete = ServerMessage::new(0x1234, 0x0102030405060708, "é".into());
+    let wrapped: FlpcUnit = concrete.into();
+    assert_eq!(wrapped, decode(FRAME).unwrap().unwrap().0);
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
+}
