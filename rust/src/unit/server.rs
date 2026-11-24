@@ -372,6 +372,12 @@ impl UserJoined {
     }
 }
 
+impl From<UserJoined> for FlpcUnit {
+    fn from(unit: UserJoined) -> Self {
+        Self::Server(ServerUnit::UserJoined(unit))
+    }
+}
+
 /// A notification that a user left (opcode `0x87`).
 ///
 /// The user ID is big-endian.
