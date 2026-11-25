@@ -1,23 +1,55 @@
-use flpc::unit::{ClientUnit, FlpcUnit, RequestSyncUsername};
-use flpc::wire::{Encode, decode};
+use flpc::{
+    unit::{ClientUnit, FlpcUnit, RequestSyncUsername},
+    wire::{Encode, EncodeError, decode},
+};
+
 const FRAME: &[u8] = &[0x08, 0x12, 0x34];
-fn expected() -> FlpcUnit {
-    FlpcUnit::Client(ClientUnit::RequestSyncUsername(RequestSyncUsername::new(
-        0x1234,
-    )))
+
+fn unit() -> RequestSyncUsername {
+    RequestSyncUsername::new(0x1234)
 }
+
 #[test]
-fn literal_wire_decode_encode_and_conversion() {
-    let unit = RequestSyncUsername::new(0x1234);
-    let wrapped: FlpcUnit = unit.clone().into();
-    assert_eq!(wrapped, expected());
+fn encodes_literal_frame_without_touching_tail() {
+    let unit = unit();
+    let mut dst = [0xaa; FRAME.len() + 2];
+
+    assert_eq!(unit.encoded_len().unwrap(), FRAME.len());
+    assert_eq!(unit.encode_into(&mut dst).unwrap(), FRAME.len());
+    assert_eq!(&dst[..FRAME.len()], FRAME);
+    assert_eq!(&dst[FRAME.len()..], &[0xaa; 2]);
     assert_eq!(unit.to_bytes().unwrap(), FRAME);
-    assert_eq!(decode(FRAME).unwrap(), Some((expected(), FRAME.len())));
-    for n in 0..FRAME.len() {
-        assert_eq!(decode(&FRAME[..n]).unwrap(), None);
+
+    let wrapped: FlpcUnit = unit.into();
+    assert_eq!(
+        wrapped,
+        FlpcUnit::Client(ClientUnit::RequestSyncUsername(self::unit()))
+    );
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
+}
+
+#[test]
+fn decodes_one_frame_and_waits_for_all_fields() {
+    let expected = FlpcUnit::Client(ClientUnit::RequestSyncUsername(unit()));
+    assert_eq!(
+        decode(FRAME).unwrap(),
+        Some((expected.clone(), FRAME.len()))
+    );
+    for end in 0..FRAME.len() {
+        assert_eq!(decode(&FRAME[..end]).unwrap(), None, "prefix {end}");
     }
     assert_eq!(
-        decode(&[FRAME, FRAME].concat()).unwrap(),
-        Some((expected(), FRAME.len()))
+        decode(&[FRAME, &[0x00]].concat()).unwrap(),
+        Some((expected, FRAME.len()))
     );
+}
+
+#[test]
+fn undersized_destination_is_unchanged() {
+    let mut dst = [0xaa; FRAME.len() - 1];
+    assert!(matches!(
+        unit().encode_into(&mut dst),
+        Err(EncodeError::BufferTooSmall)
+    ));
+    assert_eq!(dst, [0xaa; FRAME.len() - 1]);
 }

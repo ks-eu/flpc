@@ -1,32 +1,60 @@
 #![cfg(feature = "tokio")]
+
 use flpc::{
-    tokio::FlpcCodec,
-    unit::{ClientUnit, FlpcUnit, RequestSyncUsername},
+    tokio::{CodecError, FlpcCodec},
+    unit::{ClientUnit, FlpcUnit, Ping, PingUnit, RequestSyncUsername},
 };
-use futures_util::{SinkExt, StreamExt};
+use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
+
 const FRAME: &[u8] = &[0x08, 0x12, 0x34];
+const NEXT: &[u8] = &[0x00];
+
+fn unit() -> RequestSyncUsername {
+    RequestSyncUsername::new(0x1234)
+}
+
 #[tokio::test]
-async fn raw_peer_roundtrip() {
-    let (s, mut p) = duplex(32);
-    let (mut sink, _) = Framed::new(s, FlpcCodec).split::<FlpcUnit>();
-    sink.send(RequestSyncUsername::new(0x1234).into())
+async fn sends_literal_frame_to_raw_peer() {
+    let (stream, mut peer) = duplex(32);
+    let (mut sink, _) = Framed::new(stream, FlpcCodec).split::<FlpcUnit>();
+    sink.send(unit().into()).await.unwrap();
+    drop(sink);
+
+    let mut bytes = Vec::new();
+    peer.read_to_end(&mut bytes).await.unwrap();
+    assert_eq!(bytes, FRAME);
+}
+
+#[tokio::test]
+async fn receives_adjacent_frames_then_clean_eof() {
+    let (stream, mut peer) = duplex(32);
+    let mut framed = Framed::new(stream, FlpcCodec);
+    let split = FRAME.len() - 1;
+    peer.write_all(&FRAME[..split]).await.unwrap();
+    assert!(framed.next().now_or_never().is_none());
+    peer.write_all(&[&FRAME[split..], NEXT].concat())
         .await
         .unwrap();
-    drop(sink);
-    let mut got = Vec::new();
-    p.read_to_end(&mut got).await.unwrap();
-    assert_eq!(got, FRAME);
-    let (s, mut p) = duplex(32);
-    let mut f = Framed::new(s, FlpcCodec);
-    p.write_all(FRAME).await.unwrap();
-    p.shutdown().await.unwrap();
+    peer.shutdown().await.unwrap();
+
     assert_eq!(
-        f.next().await.unwrap().unwrap(),
-        FlpcUnit::Client(ClientUnit::RequestSyncUsername(RequestSyncUsername::new(
-            0x1234
-        )))
+        framed.next().await.unwrap().unwrap(),
+        FlpcUnit::Client(ClientUnit::RequestSyncUsername(unit()))
     );
-    assert!(f.next().await.is_none());
+    assert_eq!(
+        framed.next().await.unwrap().unwrap(),
+        FlpcUnit::Ping(PingUnit::Ping(Ping::new()))
+    );
+    assert!(framed.next().await.is_none());
+}
+
+#[tokio::test]
+async fn reports_truncated_frame_at_eof() {
+    let (stream, mut peer) = duplex(32);
+    let mut framed = Framed::new(stream, FlpcCodec);
+    peer.write_all(&FRAME[..FRAME.len() - 1]).await.unwrap();
+    peer.shutdown().await.unwrap();
+    assert!(matches!(framed.next().await, Some(Err(CodecError::Io(_)))));
 }
