@@ -712,7 +712,23 @@ impl From<ServerSyncEnd> for FlpcUnit {
     }
 }
 
-/// Indicates that a requested user is not online (opcode `0x8E`).
+/// A server response indicating that a requested user is not online
+/// (opcode `0x8E`). The unit contains only its opcode.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{FlpcUnit, UserNotOnline},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = UserNotOnline::new();
+/// let bytes = [0x8e];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UserNotOnline;
 

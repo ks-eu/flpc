@@ -20,7 +20,7 @@ The Rust crate currently encodes and decodes
 `Kick`, plus `ServerRegister`, `ServerLogin`, `ServerMessage`,
 `ServerPrivateMessage`, `UserRegistered`, `UserRemoved`, `UserJoined`,
 `UserLeft`, `ChangedUsername`, `SyncMessage`, `SyncPrivateMessage`,
-`WrongUnit`, `ServerRemoveSelf`, and `ServerSyncEnd`.
+`WrongUnit`, `ServerRemoveSelf`, `ServerSyncEnd`, and `UserNotOnline`.
 The optional `tokio` feature exposes the shared `FlpcCodec` for
 `tokio_util::codec::Framed`.
 Concrete units implement `Into<FlpcUnit>` for use with the codec.
