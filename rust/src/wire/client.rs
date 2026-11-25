@@ -8,7 +8,20 @@ use super::{
 };
 use crate::unit::{
     ChangeUsername, Login, Message, PrivateMessage, Register, RemoveSelf, RequestSync,
+    RequestSyncUsername,
 };
+
+impl Encode for RequestSyncUsername {
+    fn encoded_len(&self) -> Result<usize, EncodeError> {
+        Ok(3)
+    }
+
+    fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
+        encode_frame(buf, 3, Self::OPCODE, |dst| {
+            dst.copy_from_slice(&self.id().to_be_bytes());
+        })
+    }
+}
 
 impl Encode for RemoveSelf {
     fn encoded_len(&self) -> Result<usize, EncodeError> {

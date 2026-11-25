@@ -12,6 +12,7 @@ pub enum ClientUnit {
     ChangeUsername(ChangeUsername),
     RequestSync(RequestSync),
     RemoveSelf(RemoveSelf),
+    RequestSyncUsername(RequestSyncUsername),
 }
 
 /// A client registration request (opcode `0x01`).
@@ -401,5 +402,29 @@ impl RemoveSelf {
 impl From<RemoveSelf> for FlpcUnit {
     fn from(unit: RemoveSelf) -> Self {
         Self::Client(ClientUnit::RemoveSelf(unit))
+    }
+}
+
+/// A request for a user's current username during synchronization (opcode `0x08`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RequestSyncUsername {
+    id: u16,
+}
+
+impl RequestSyncUsername {
+    pub(crate) const OPCODE: u8 = 0x08;
+
+    pub fn new(id: u16) -> Self {
+        Self { id }
+    }
+
+    pub fn id(&self) -> &u16 {
+        &self.id
+    }
+}
+
+impl From<RequestSyncUsername> for FlpcUnit {
+    fn from(unit: RequestSyncUsername) -> Self {
+        Self::Client(ClientUnit::RequestSyncUsername(unit))
     }
 }

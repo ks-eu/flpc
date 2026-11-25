@@ -73,6 +73,7 @@ fn concrete_unit(unit: &FlpcUnit) -> &dyn Encode {
             ClientUnit::ChangeUsername(unit) => unit,
             ClientUnit::RequestSync(unit) => unit,
             ClientUnit::RemoveSelf(unit) => unit,
+            ClientUnit::RequestSyncUsername(unit) => unit,
         },
         FlpcUnit::Ping(unit) => match unit {
             PingUnit::Ping(unit) => unit,
