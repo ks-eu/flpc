@@ -45,6 +45,7 @@ Each string has an unsigned length prefix followed by that many UTF-8 bytes. The
 | `05` | `ChangeUsername` | username |
 | `06` | `RequestSync` | first, last |
 | `07` | `RemoveSelf` | username, password |
+| `08` | `RequestSyncUsername` | id |
 | `7B` | `RemoveAdmin` | id |
 | `7C` | `MakeAdmin` | id |
 | `7D` | `Add` | username, password |
