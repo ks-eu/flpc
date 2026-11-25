@@ -8,13 +8,13 @@ use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-const FRAME: &[u8] = b"\x07\x02Zo\x02pw";
+const FRAME: &[u8] = b"\x07\x04Zo\xc3\xab\x03p\xc3\xa4";
 
 #[tokio::test]
 async fn sends_literal_frame_and_receives_fragmented_adjacent_frames() {
     let (stream, mut peer) = duplex(32);
     let (mut sink, _) = Framed::new(stream, FlpcCodec).split::<FlpcUnit>();
-    sink.send(RemoveSelf::new("Zo".into(), "pw".into()).into())
+    sink.send(RemoveSelf::new("Zoë".into(), "pä".into()).into())
         .await
         .unwrap();
     drop(sink);
@@ -34,10 +34,19 @@ async fn sends_literal_frame_and_receives_fragmented_adjacent_frames() {
         assert_eq!(
             framed.next().await.unwrap().unwrap(),
             FlpcUnit::Client(ClientUnit::RemoveSelf(RemoveSelf::new(
-                "Zo".into(),
-                "pw".into()
+                "Zoë".into(),
+                "pä".into()
             )))
         );
     }
     assert!(framed.next().await.is_none());
+}
+
+#[tokio::test]
+async fn reports_partial_frame_at_eof() {
+    let (stream, mut peer) = duplex(32);
+    let mut framed = Framed::new(stream, FlpcCodec);
+    peer.write_all(&FRAME[..FRAME.len() - 1]).await.unwrap();
+    peer.shutdown().await.unwrap();
+    assert!(framed.next().await.unwrap().is_err());
 }
