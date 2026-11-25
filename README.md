@@ -26,7 +26,9 @@ The optional `tokio` feature exposes the shared `FlpcCodec` for
 `tokio_util::codec::Framed`.
 Concrete units implement `Into<FlpcUnit>` for use with the codec.
 
-Each unit starts with a one-byte opcode. Its fields follow in the order shown below. All multibyte integers use big-endian byte order. IDs and targets are unsigned 16-bit integers. Timestamps and sync bounds are unsigned 64-bit integers.
+Each unit starts with a one-byte opcode. Its fields follow in the order shown
+below. All multibyte integers use big-endian byte order. IDs and targets are
+unsigned 16-bit integers. Timestamps are unsigned 64-bit integers.
 
 Each string has an unsigned length prefix followed by that many UTF-8 bytes. The field determines the prefix width. An empty string has a length of zero.
 
@@ -45,7 +47,7 @@ Each string has an unsigned length prefix followed by that many UTF-8 bytes. The
 | `03` | `Message` | message |
 | `04` | `PrivateMessage` | target, message |
 | `05` | `ChangeUsername` | username |
-| `06` | `RequestSync` | first, last |
+| `06` | `RequestSyncMessage` | timestamp, count (1 byte, 1–255) |
 | `07` | `RemoveSelf` | username, password |
 | `08` | `RequestSyncUsername` | id |
 | `09` | `RequestSyncPrivateMessage` | target, timestamp, count (1 byte, 1–255) |
@@ -73,13 +75,24 @@ Each string has an unsigned length prefix followed by that many UTF-8 bytes. The
 
 `WrongUnit` is a server response for an unexpected first unit from a client.
 
-The wire codec preserves outcome bytes, timestamps, and sync bounds as raw
-values. Peers need to agree on what outcome codes mean, the timestamp epoch
-and precision, and what sync bounds represent and whether they are inclusive.
+The wire codec preserves outcome bytes, result bytes, and packed timestamps
+as raw values. Peers agree on how to interpret them.
+
+`RequestSyncMessage` and `RequestSyncPrivateMessage` request the most recent
+`count` messages strictly before the supplied timestamp. Responses use
+`SyncMessage` and `SyncPrivateMessage`, respectively. `ServerSyncEnd` ends the
+batch and reports the actual number returned, including zero for an empty batch.
+
+**Wire compatibility.** Opcode `06` previously carried two 64-bit bounds.
+Peers must upgrade together to use the new timestamp and count layout.
 
 ### Framing
 
-TCP may split one unit across reads or deliver multiple units in one read. The Rust decoder reports one complete unit and its size, or asks for more bytes if a supported unit is incomplete. An unassigned opcode or invalid UTF-8 in a complete field is a decoding error. There is no outer length with which to skip an unrecognized unit.
+TCP may split one unit across reads or deliver multiple units in one read. The
+Rust decoder reports one complete unit and its size, or asks for more bytes
+if a supported unit is incomplete. An unassigned opcode, invalid UTF-8 in a
+complete field, or a zero sync request count is a decoding error. There is no
+outer length with which to skip an unrecognized unit.
 
 For example, registering with token `t`, username `é`, and password `pw` yields `01 01 74 02 C3 A9 02 70 77`. The username starts with `02` because `é` occupies two UTF-8 bytes.
 
