@@ -15,7 +15,7 @@ minimising header size as much as possible.
 
 The Rust crate currently encodes and decodes
 `Ping`, `Register`, `Login`, `Message`, `PrivateMessage`, `ChangeUsername`,
-`RequestSync`, `RemoveSelf`, `RequestSyncUsername`,
+`RequestSyncMessage`, `RemoveSelf`, `RequestSyncUsername`,
 `RequestSyncPrivateMessage`, `RemoveAdmin`, `MakeAdmin`, `Add`, `Remove`, and
 `Kick`, plus `ServerRegister`, `ServerLogin`, `ServerMessage`,
 `ServerPrivateMessage`, `UserRegistered`, `UserRemoved`, `UserJoined`,

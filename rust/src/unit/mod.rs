@@ -3,7 +3,8 @@
 //! The [wire codec](crate::wire) reads and writes one unit at a time.
 //! Constructors store the supplied values. Encoding checks that token,
 //! username, and password fields fit in 255 UTF-8 bytes and message fields
-//! fit in 65,535 UTF-8 bytes. Longer fields return
+//! fit in 65,535 UTF-8 bytes. Synchronization request counts must be nonzero.
+//! Longer strings return
 //! [`crate::wire::EncodeError::StringTooLong`].
 
 mod admin;

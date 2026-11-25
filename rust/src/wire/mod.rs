@@ -22,7 +22,8 @@ pub trait Encode {
     ///
     /// # Errors
     ///
-    /// Returns [`EncodeError::StringTooLong`] if a field exceeds its wire limit.
+    /// Returns [`EncodeError::StringTooLong`] if a field exceeds its wire limit,
+    /// or [`EncodeError::InvalidCount`] for a zero synchronization request count.
     fn encoded_len(&self) -> Result<usize, EncodeError>;
 
     /// Writes the unit at the start of `buf` and returns the number of bytes written.
@@ -31,14 +32,16 @@ pub trait Encode {
     ///
     /// # Errors
     ///
-    /// Returns an error if a field exceeds its wire limit or `buf` is too small.
+    /// Returns an error if a field exceeds its wire limit, `buf` is too small,
+    /// or a synchronization request count is zero.
     fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError>;
 
     /// Allocates a byte vector containing one complete unit.
     ///
     /// # Errors
     ///
-    /// Returns [`EncodeError::StringTooLong`] if a field exceeds its wire limit.
+    /// Returns an error if a field exceeds its wire limit or a synchronization
+    /// request count is zero.
     fn to_bytes(&self) -> Result<Vec<u8>, EncodeError> {
         let mut bytes = vec![0; self.encoded_len()?];
         self.encode_into(&mut bytes)?;

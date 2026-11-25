@@ -295,7 +295,29 @@ impl From<ChangeUsername> for FlpcUnit {
     }
 }
 
-/// Requests a batch of messages before a timestamp (opcode `0x06`).
+/// Requests a batch of messages whose timestamps are strictly before the
+/// supplied timestamp (opcode `0x06`). The timestamp is an unsigned 64-bit
+/// big-endian value and the count must be nonzero. A zero count returns
+/// [`crate::wire::EncodeError::InvalidCount`] when encoding and
+/// [`crate::wire::DecodeError::InvalidCount`] when decoding.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{ClientUnit, FlpcUnit, RequestSyncMessage},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = RequestSyncMessage::new(0x0102_0304_0506_0708, 255);
+/// let bytes = [0x06, 1, 2, 3, 4, 5, 6, 7, 8, 0xff];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(wrapped, FlpcUnit::Client(ClientUnit::RequestSyncMessage(
+///     RequestSyncMessage::new(0x0102_0304_0506_0708, 255),
+/// )));
+/// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RequestSyncMessage {
     timestamp: u64,

@@ -15,8 +15,9 @@ use crate::unit::{
 ///
 /// # Errors
 ///
-/// Returns [`DecodeError::UnknownOpcode`] for an unassigned opcode
-/// or [`DecodeError::InvalidUTF8`] for an invalid UTF-8 field.
+/// Returns [`DecodeError::UnknownOpcode`] for an unassigned opcode,
+/// [`DecodeError::InvalidUTF8`] for an invalid UTF-8 field, or
+/// [`DecodeError::InvalidCount`] for a zero synchronization request count.
 pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
     let Some((&opcode, mut remaining)) = buf.split_first() else {
         return Ok(None);
