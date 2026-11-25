@@ -3,52 +3,83 @@ use flpc::{
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
-const FRAME: &[u8] = b"\x06\x01\x02\x03\x04\x05\x06\x07\x08\xff";
+const FRAME: &[u8] = &[0x06, 1, 2, 3, 4, 5, 6, 7, 8, 255];
 
 fn unit() -> RequestSyncMessage {
     RequestSyncMessage::new(0x0102_0304_0506_0708, 255)
 }
 
 #[test]
-fn encodes_and_decodes_literal_bytes_with_client_conversion() {
-    let value = unit();
-    let mut dst = [0xaa; FRAME.len() + 1];
-    assert_eq!(value.encoded_len().unwrap(), FRAME.len());
-    assert_eq!(value.encode_into(&mut dst).unwrap(), FRAME.len());
+fn encodes_literal_frame_without_touching_tail() {
+    let unit = unit();
+    let mut dst = [0xaa; FRAME.len() + 2];
+
+    assert_eq!(unit.encoded_len().unwrap(), FRAME.len());
+    assert_eq!(unit.encode_into(&mut dst).unwrap(), FRAME.len());
     assert_eq!(&dst[..FRAME.len()], FRAME);
-    assert_eq!(&dst[FRAME.len()..], &[0xaa]);
-    assert_eq!(value.to_bytes().unwrap(), FRAME);
-    let wrapped: FlpcUnit = value.clone().into();
-    let expected = FlpcUnit::Client(ClientUnit::RequestSyncMessage(value));
-    assert_eq!(wrapped, expected);
-    assert_eq!(decode(FRAME).unwrap(), Some((expected, FRAME.len())));
+    assert_eq!(&dst[FRAME.len()..], &[0xaa; 2]);
+    assert_eq!(unit.to_bytes().unwrap(), FRAME);
+
+    let wrapped: FlpcUnit = unit.into();
+    assert_eq!(
+        wrapped,
+        FlpcUnit::Client(ClientUnit::RequestSyncMessage(self::unit()))
+    );
+    assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
+}
+
+#[test]
+fn decodes_one_frame_and_waits_for_all_fields() {
+    let expected = FlpcUnit::Client(ClientUnit::RequestSyncMessage(unit()));
+    assert_eq!(
+        decode(FRAME).unwrap(),
+        Some((expected.clone(), FRAME.len()))
+    );
     for end in 0..FRAME.len() {
         assert_eq!(decode(&FRAME[..end]).unwrap(), None, "prefix {end}");
     }
     assert_eq!(
-        decode(&[FRAME, FRAME].concat()).unwrap(),
-        Some((wrapped, FRAME.len()))
+        decode(&[FRAME, &[0x00]].concat()).unwrap(),
+        Some((expected, FRAME.len()))
     );
 }
 
 #[test]
-fn validates_counts_and_preserves_short_buffer() {
-    assert_eq!(
-        RequestSyncMessage::new(0, 1).to_bytes().unwrap(),
-        &[6, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-    );
+fn undersized_destination_is_unchanged() {
     let mut dst = [0xaa; FRAME.len() - 1];
     assert!(matches!(
         unit().encode_into(&mut dst),
         Err(EncodeError::BufferTooSmall)
     ));
     assert_eq!(dst, [0xaa; FRAME.len() - 1]);
+}
+
+#[test]
+fn validates_request_count_before_writing() {
+    let invalid = RequestSyncMessage::new(0x0102_0304_0506_0708, 0);
+    let mut dst = [0xaa; FRAME.len()];
     assert!(matches!(
-        RequestSyncMessage::new(1, 0).encoded_len(),
+        invalid.encoded_len(),
         Err(EncodeError::InvalidCount)
     ));
     assert!(matches!(
-        decode(&[6, 0, 0, 0, 0, 0, 0, 0, 1, 0]),
+        invalid.encode_into(&mut dst),
+        Err(EncodeError::InvalidCount)
+    ));
+    assert_eq!(dst, [0xaa; FRAME.len()]);
+    assert!(matches!(
+        decode(&[0x06, 1, 2, 3, 4, 5, 6, 7, 8, 0]),
         Err(DecodeError::InvalidCount)
     ));
+
+    let limit = RequestSyncMessage::new(0x0102_0304_0506_0708, 1);
+    let bytes = &[0x06, 1, 2, 3, 4, 5, 6, 7, 8, 1];
+    assert_eq!(limit.to_bytes().unwrap(), bytes);
+    assert_eq!(
+        decode(bytes).unwrap(),
+        Some((
+            FlpcUnit::Client(ClientUnit::RequestSyncMessage(limit)),
+            bytes.len()
+        ))
+    );
 }
