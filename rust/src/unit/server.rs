@@ -632,7 +632,23 @@ impl From<WrongUnit> for FlpcUnit {
     }
 }
 
-/// A raw result byte returned for a remove-self request (opcode `0x8C`).
+/// A raw result byte returned for a remove-self request (opcode `0x8C`). The
+/// codec preserves the byte without assigning meaning to its values.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{FlpcUnit, ServerRemoveSelf},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = ServerRemoveSelf::new(0xa5);
+/// let bytes = [0x8c, 0xa5];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerRemoveSelf {
     result: u8,
