@@ -672,7 +672,23 @@ impl From<ServerRemoveSelf> for FlpcUnit {
     }
 }
 
-/// Marks the end of a synchronization response and reports its item count (opcode `0x8D`).
+/// Marks the end of a synchronization response and reports its item count
+/// (opcode `0x8D`). A zero count is valid.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{FlpcUnit, ServerSyncEnd},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = ServerSyncEnd::new(1);
+/// let bytes = [0x8d, 1];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerSyncEnd {
     count: u8,
