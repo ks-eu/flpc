@@ -21,6 +21,7 @@ pub enum ServerUnit {
     SyncMessage(SyncMessage),
     SyncPrivateMessage(SyncPrivateMessage),
     WrongUnit(WrongUnit),
+    ServerRemoveSelf(ServerRemoveSelf),
 }
 
 /// Registration outcome from the server (opcode `0x80`).
@@ -628,5 +629,28 @@ impl WrongUnit {
 impl From<WrongUnit> for FlpcUnit {
     fn from(unit: WrongUnit) -> Self {
         Self::Server(ServerUnit::WrongUnit(unit))
+    }
+}
+
+/// A raw result byte returned for a remove-self request (opcode `0x8C`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServerRemoveSelf {
+    result: u8,
+}
+
+impl ServerRemoveSelf {
+    pub(crate) const OPCODE: u8 = 0x8C;
+
+    pub fn new(result: u8) -> Self {
+        Self { result }
+    }
+    pub fn result(&self) -> &u8 {
+        &self.result
+    }
+}
+
+impl From<ServerRemoveSelf> for FlpcUnit {
+    fn from(unit: ServerRemoveSelf) -> Self {
+        Self::Server(ServerUnit::ServerRemoveSelf(unit))
     }
 }

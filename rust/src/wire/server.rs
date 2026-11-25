@@ -6,9 +6,20 @@ use super::{
     },
 };
 use crate::unit::{
-    ChangedUsername, ServerLogin, ServerMessage, ServerPrivateMessage, ServerRegister, SyncMessage,
-    SyncPrivateMessage, UserJoined, UserLeft, UserRegistered, UserRemoved, WrongUnit,
+    ChangedUsername, ServerLogin, ServerMessage, ServerPrivateMessage, ServerRegister,
+    ServerRemoveSelf, SyncMessage, SyncPrivateMessage, UserJoined, UserLeft, UserRegistered,
+    UserRemoved, WrongUnit,
 };
+
+impl Encode for ServerRemoveSelf {
+    fn encoded_len(&self) -> Result<usize, EncodeError> {
+        Ok(2)
+    }
+
+    fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
+        encode_frame(buf, 2, Self::OPCODE, |dst| dst[0] = *self.result())
+    }
+}
 
 impl Encode for WrongUnit {
     fn encoded_len(&self) -> Result<usize, EncodeError> {
