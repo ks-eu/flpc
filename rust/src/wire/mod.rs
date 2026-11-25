@@ -71,7 +71,7 @@ fn concrete_unit(unit: &FlpcUnit) -> &dyn Encode {
             ClientUnit::Message(unit) => unit,
             ClientUnit::PrivateMessage(unit) => unit,
             ClientUnit::ChangeUsername(unit) => unit,
-            ClientUnit::RequestSync(unit) => unit,
+            ClientUnit::RequestSyncMessage(unit) => unit,
             ClientUnit::RemoveSelf(unit) => unit,
             ClientUnit::RequestSyncUsername(unit) => unit,
             ClientUnit::RequestSyncPrivateMessage(unit) => unit,

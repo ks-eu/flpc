@@ -2,7 +2,7 @@ use super::DecodeError;
 use crate::unit::{
     Add, AdminUnit, ChangeUsername, ChangedUsername, ClientUnit, FlpcUnit, Kick, Login, MakeAdmin,
     Message, Ping, PingUnit, PrivateMessage, Register, Remove, RemoveAdmin, RemoveSelf,
-    RequestSync, RequestSyncPrivateMessage, RequestSyncUsername, ServerLogin, ServerMessage,
+    RequestSyncMessage, RequestSyncPrivateMessage, RequestSyncUsername, ServerLogin, ServerMessage,
     ServerPrivateMessage, ServerRegister, ServerRemoveSelf, ServerSyncEnd, ServerSyncUsername,
     ServerUnit, SyncMessage, SyncPrivateMessage, UserJoined, UserLeft, UserNotOnline,
     UserRegistered, UserRemoved, WrongUnit,
@@ -82,17 +82,19 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             )))
         }
         // 0x06
-        RequestSync::OPCODE => {
-            let Some(first) = read_array(&mut remaining) else {
+        RequestSyncMessage::OPCODE => {
+            let Some(timestamp) = read_array(&mut remaining) else {
                 return Ok(None);
             };
-            let Some(last) = read_array(&mut remaining) else {
+            let Some([count]) = read_array(&mut remaining) else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Client(ClientUnit::RequestSync(RequestSync::new(
-                u64::from_be_bytes(first),
-                u64::from_be_bytes(last),
-            ))))
+            if count == 0 {
+                return Err(DecodeError::InvalidCount);
+            }
+            Some(FlpcUnit::Client(ClientUnit::RequestSyncMessage(
+                RequestSyncMessage::new(u64::from_be_bytes(timestamp), count),
+            )))
         }
         // 0x07
         RemoveSelf::OPCODE => {

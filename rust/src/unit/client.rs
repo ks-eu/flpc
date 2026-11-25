@@ -10,7 +10,7 @@ pub enum ClientUnit {
     Message(Message),
     PrivateMessage(PrivateMessage),
     ChangeUsername(ChangeUsername),
-    RequestSync(RequestSync),
+    RequestSyncMessage(RequestSyncMessage),
     RemoveSelf(RemoveSelf),
     RequestSyncUsername(RequestSyncUsername),
     RequestSyncPrivateMessage(RequestSyncPrivateMessage),
@@ -295,57 +295,32 @@ impl From<ChangeUsername> for FlpcUnit {
     }
 }
 
-/// A request for a range of synchronized messages (opcode `0x06`).
-///
-/// The `first` and `last` bounds are opaque unsigned 64-bit values encoded in
-/// that order as big-endian integers. Peers agree on what the bounds
-/// represent and whether they are inclusive.
-///
-/// # Examples
-///
-/// ```
-/// use flpc::{
-///     unit::{FlpcUnit, RequestSync},
-///     wire::{decode, Encode},
-/// };
-///
-/// let unit = RequestSync::new(1, 2);
-/// let bytes = [
-///     0x06, 0, 0, 0, 0, 0, 0, 0, 1,
-///     0, 0, 0, 0, 0, 0, 0, 2,
-/// ];
-/// assert_eq!(unit.to_bytes().unwrap(), bytes);
-/// let wrapped: FlpcUnit = unit.into();
-/// assert_eq!(
-///     decode(&bytes).unwrap(),
-///     Some((wrapped, bytes.len())),
-/// );
-/// ```
+/// Requests a batch of messages before a timestamp (opcode `0x06`).
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RequestSync {
-    first: u64,
-    last: u64,
+pub struct RequestSyncMessage {
+    timestamp: u64,
+    count: u8,
 }
 
-impl RequestSync {
+impl RequestSyncMessage {
     pub(crate) const OPCODE: u8 = 0x06;
 
-    pub fn new(first: u64, last: u64) -> Self {
-        Self { first, last }
+    pub fn new(timestamp: u64, count: u8) -> Self {
+        Self { timestamp, count }
     }
 
-    pub fn first(&self) -> &u64 {
-        &self.first
+    pub fn timestamp(&self) -> &u64 {
+        &self.timestamp
     }
 
-    pub fn last(&self) -> &u64 {
-        &self.last
+    pub fn count(&self) -> &u8 {
+        &self.count
     }
 }
 
-impl From<RequestSync> for FlpcUnit {
-    fn from(unit: RequestSync) -> Self {
-        Self::Client(ClientUnit::RequestSync(unit))
+impl From<RequestSyncMessage> for FlpcUnit {
+    fn from(unit: RequestSyncMessage) -> Self {
+        Self::Client(ClientUnit::RequestSyncMessage(unit))
     }
 }
 

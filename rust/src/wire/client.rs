@@ -7,7 +7,7 @@ use super::{
     },
 };
 use crate::unit::{
-    ChangeUsername, Login, Message, PrivateMessage, Register, RemoveSelf, RequestSync,
+    ChangeUsername, Login, Message, PrivateMessage, Register, RemoveSelf, RequestSyncMessage,
     RequestSyncPrivateMessage, RequestSyncUsername,
 };
 
@@ -55,16 +55,19 @@ impl Encode for RemoveSelf {
     }
 }
 
-impl Encode for RequestSync {
+impl Encode for RequestSyncMessage {
     fn encoded_len(&self) -> Result<usize, EncodeError> {
-        Ok(17)
+        if *self.count() == 0 {
+            return Err(EncodeError::InvalidCount);
+        }
+        Ok(10)
     }
 
     fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
         encode_frame(buf, self.encoded_len()?, Self::OPCODE, |dst| {
-            let (first, last) = dst.split_at_mut(8);
-            first.copy_from_slice(&self.first().to_be_bytes());
-            last.copy_from_slice(&self.last().to_be_bytes());
+            let (timestamp, count) = dst.split_at_mut(8);
+            timestamp.copy_from_slice(&self.timestamp().to_be_bytes());
+            count[0] = *self.count();
         })
     }
 }
