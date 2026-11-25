@@ -405,7 +405,26 @@ impl From<RemoveSelf> for FlpcUnit {
     }
 }
 
-/// A request for a user's current username during synchronization (opcode `0x08`).
+/// A client request for a user's current username during synchronization
+/// (opcode `0x08`). The user ID is an unsigned 16-bit big-endian integer.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{ClientUnit, FlpcUnit, RequestSyncUsername},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = RequestSyncUsername::new(0x1234);
+/// let bytes = [0x08, 0x12, 0x34];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(wrapped, FlpcUnit::Client(ClientUnit::RequestSyncUsername(
+///     RequestSyncUsername::new(0x1234),
+/// )));
+/// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RequestSyncUsername {
     id: u16,

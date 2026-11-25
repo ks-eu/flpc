@@ -15,11 +15,11 @@ minimising header size as much as possible.
 
 The Rust crate currently encodes and decodes
 `Ping`, `Register`, `Login`, `Message`, `PrivateMessage`, `ChangeUsername`,
-`RequestSync`, `RemoveSelf`, `RemoveAdmin`, `MakeAdmin`, `Add`, `Remove`, and
-`Kick`, plus
-`ServerRegister`, `ServerLogin`, `ServerMessage`, `ServerPrivateMessage`,
-`UserRegistered`, `UserRemoved`, `UserJoined`, `UserLeft`, `ChangedUsername`,
-`SyncMessage`, `SyncPrivateMessage`, and `WrongUnit`.
+`RequestSync`, `RemoveSelf`, `RequestSyncUsername`, `RemoveAdmin`,
+`MakeAdmin`, `Add`, `Remove`, and `Kick`, plus `ServerRegister`,
+`ServerLogin`, `ServerMessage`, `ServerPrivateMessage`, `UserRegistered`,
+`UserRemoved`, `UserJoined`, `UserLeft`, `ChangedUsername`, `SyncMessage`,
+`SyncPrivateMessage`, and `WrongUnit`.
 The optional `tokio` feature exposes the shared `FlpcCodec` for
 `tokio_util::codec::Framed`.
 Concrete units implement `Into<FlpcUnit>` for use with the codec.
