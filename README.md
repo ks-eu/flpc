@@ -65,6 +65,7 @@ Each string has an unsigned length prefix followed by that many UTF-8 bytes. The
 | `89` | `SyncMessage` | id, timestamp, message |
 | `8A` | `SyncPrivateMessage` | id, target, timestamp, message |
 | `8B` | `WrongUnit` | None |
+| `8C` | `ServerRemoveSelf` | result (1 byte) |
 
 `WrongUnit` is a server response for an unexpected first unit from a client.
 
