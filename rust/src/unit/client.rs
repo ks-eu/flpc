@@ -347,7 +347,26 @@ impl From<RequestSync> for FlpcUnit {
     }
 }
 
-/// A request to remove the authenticated user's account (opcode `0x07`).
+/// A client request to remove an account authenticated by the supplied
+/// username and password (opcode `0x07`). Both fields are UTF-8 strings with
+/// one-byte lengths that count UTF-8 bytes, so each can contain at most 255
+/// bytes.
+/// Debug output redacts the password. The credentials are sent as plaintext.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{FlpcUnit, RemoveSelf},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = RemoveSelf::new("Zoë".into(), "pä".into());
+/// let bytes = [0x07, 0x04, b'Z', b'o', 0xc3, 0xab, 0x03, b'p', 0xc3, 0xa4];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Clone, PartialEq, Eq)]
 pub struct RemoveSelf {
     username: String,

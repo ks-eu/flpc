@@ -15,7 +15,8 @@ minimising header size as much as possible.
 
 The Rust crate currently encodes and decodes
 `Ping`, `Register`, `Login`, `Message`, `PrivateMessage`, `ChangeUsername`,
-`RequestSync`, `RemoveAdmin`, `MakeAdmin`, `Add`, `Remove`, and `Kick`, plus
+`RequestSync`, `RemoveSelf`, `RemoveAdmin`, `MakeAdmin`, `Add`, `Remove`, and
+`Kick`, plus
 `ServerRegister`, `ServerLogin`, `ServerMessage`, `ServerPrivateMessage`,
 `UserRegistered`, `UserRemoved`, `UserJoined`, `UserLeft`, `ChangedUsername`,
 `SyncMessage`, `SyncPrivateMessage`, and `WrongUnit`.
@@ -79,6 +80,7 @@ Sending the message `é` yields `03 00 02 C3 A9`. The two-byte big-endian prefix
 
 ### Credentials
 
-`Register`, `Login`, and `Add` carry passwords as plaintext UTF-8. The
-registration token in `Register` is also plaintext. The Rust types display
-passwords and the registration token as `[redacted]` in `Debug` output.
+`Register`, `Login`, `RemoveSelf`, and `Add` carry passwords as plaintext
+UTF-8. The registration token in `Register` is also plaintext. The Rust
+types display passwords and the registration token as `[redacted]` in
+`Debug` output.
