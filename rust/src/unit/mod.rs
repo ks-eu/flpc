@@ -13,7 +13,7 @@ mod server;
 
 pub use admin::{Add, AdminUnit, Kick, MakeAdmin, Remove, RemoveAdmin};
 pub use client::{
-    ChangeUsername, ClientUnit, Login, Message, PrivateMessage, Register, RequestSync,
+    ChangeUsername, ClientUnit, Login, Message, PrivateMessage, Register, RemoveSelf, RequestSync,
 };
 pub use ping::{Ping, PingUnit};
 pub use server::{

@@ -1,9 +1,9 @@
 use super::DecodeError;
 use crate::unit::{
     Add, AdminUnit, ChangeUsername, ChangedUsername, ClientUnit, FlpcUnit, Kick, Login, MakeAdmin,
-    Message, Ping, PingUnit, PrivateMessage, Register, Remove, RemoveAdmin, RequestSync,
-    ServerLogin, ServerMessage, ServerPrivateMessage, ServerRegister, ServerUnit, SyncMessage,
-    SyncPrivateMessage, UserJoined, UserLeft, UserRegistered, UserRemoved, WrongUnit,
+    Message, Ping, PingUnit, PrivateMessage, Register, Remove, RemoveAdmin, RemoveSelf,
+    RequestSync, ServerLogin, ServerMessage, ServerPrivateMessage, ServerRegister, ServerUnit,
+    SyncMessage, SyncPrivateMessage, UserJoined, UserLeft, UserRegistered, UserRemoved, WrongUnit,
 };
 
 /// Decodes the first unit and returns it with the byte count, including its opcode.
@@ -90,6 +90,19 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             Some(FlpcUnit::Client(ClientUnit::RequestSync(RequestSync::new(
                 u64::from_be_bytes(first),
                 u64::from_be_bytes(last),
+            ))))
+        }
+        // 0x07
+        RemoveSelf::OPCODE => {
+            let Some(username) = read_short_string(&mut remaining)? else {
+                return Ok(None);
+            };
+            let Some(password) = read_short_string(&mut remaining)? else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Client(ClientUnit::RemoveSelf(RemoveSelf::new(
+                username.into(),
+                password.into(),
             ))))
         }
         // 0x7B

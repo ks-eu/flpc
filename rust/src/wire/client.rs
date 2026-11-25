@@ -6,7 +6,22 @@ use super::{
         encode_frame, long_string_len, short_strings_len, write_long_string, write_short_string,
     },
 };
-use crate::unit::{ChangeUsername, Login, Message, PrivateMessage, Register, RequestSync};
+use crate::unit::{
+    ChangeUsername, Login, Message, PrivateMessage, Register, RemoveSelf, RequestSync,
+};
+
+impl Encode for RemoveSelf {
+    fn encoded_len(&self) -> Result<usize, EncodeError> {
+        Ok(1 + short_strings_len(&[self.username(), self.password()])?)
+    }
+
+    fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
+        encode_frame(buf, self.encoded_len()?, Self::OPCODE, |mut dst| {
+            write_short_string(&mut dst, self.username());
+            write_short_string(&mut dst, self.password());
+        })
+    }
+}
 
 impl Encode for RequestSync {
     fn encoded_len(&self) -> Result<usize, EncodeError> {

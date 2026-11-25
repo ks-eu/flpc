@@ -11,6 +11,7 @@ pub enum ClientUnit {
     PrivateMessage(PrivateMessage),
     ChangeUsername(ChangeUsername),
     RequestSync(RequestSync),
+    RemoveSelf(RemoveSelf),
 }
 
 /// A client registration request (opcode `0x01`).
@@ -343,5 +344,43 @@ impl RequestSync {
 impl From<RequestSync> for FlpcUnit {
     fn from(unit: RequestSync) -> Self {
         Self::Client(ClientUnit::RequestSync(unit))
+    }
+}
+
+/// A request to remove the authenticated user's account (opcode `0x07`).
+#[derive(Clone, PartialEq, Eq)]
+pub struct RemoveSelf {
+    username: String,
+    password: String,
+}
+
+impl std::fmt::Debug for RemoveSelf {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("RemoveSelf")
+            .field("username", &self.username)
+            .field("password", &"[redacted]")
+            .finish()
+    }
+}
+
+impl RemoveSelf {
+    pub(crate) const OPCODE: u8 = 0x07;
+
+    pub fn new(username: String, password: String) -> Self {
+        Self { username, password }
+    }
+
+    pub fn username(&self) -> &String {
+        &self.username
+    }
+
+    pub fn password(&self) -> &String {
+        &self.password
+    }
+}
+
+impl From<RemoveSelf> for FlpcUnit {
+    fn from(unit: RemoveSelf) -> Self {
+        Self::Client(ClientUnit::RemoveSelf(unit))
     }
 }
