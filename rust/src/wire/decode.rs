@@ -3,7 +3,7 @@ use crate::unit::{
     Add, AdminUnit, ChangeUsername, ChangedUsername, ClientUnit, FlpcUnit, Kick, Login, MakeAdmin,
     Message, Ping, PingUnit, PrivateMessage, Register, Remove, RemoveAdmin, RemoveSelf,
     RequestSync, RequestSyncPrivateMessage, RequestSyncUsername, ServerLogin, ServerMessage,
-    ServerPrivateMessage, ServerRegister, ServerRemoveSelf, ServerUnit, SyncMessage,
+    ServerPrivateMessage, ServerRegister, ServerRemoveSelf, ServerSyncEnd, ServerUnit, SyncMessage,
     SyncPrivateMessage, UserJoined, UserLeft, UserRegistered, UserRemoved, WrongUnit,
 };
 
@@ -346,6 +346,15 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             };
             Some(FlpcUnit::Server(ServerUnit::ServerRemoveSelf(
                 ServerRemoveSelf::new(result),
+            )))
+        }
+        // 0x8D
+        ServerSyncEnd::OPCODE => {
+            let Some([count]) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Server(ServerUnit::ServerSyncEnd(
+                ServerSyncEnd::new(count),
             )))
         }
         _ => return Err(DecodeError::UnknownOpcode),

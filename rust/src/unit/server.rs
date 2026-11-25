@@ -22,6 +22,7 @@ pub enum ServerUnit {
     SyncPrivateMessage(SyncPrivateMessage),
     WrongUnit(WrongUnit),
     ServerRemoveSelf(ServerRemoveSelf),
+    ServerSyncEnd(ServerSyncEnd),
 }
 
 /// Registration outcome from the server (opcode `0x80`).
@@ -668,5 +669,28 @@ impl ServerRemoveSelf {
 impl From<ServerRemoveSelf> for FlpcUnit {
     fn from(unit: ServerRemoveSelf) -> Self {
         Self::Server(ServerUnit::ServerRemoveSelf(unit))
+    }
+}
+
+/// Marks the end of a synchronization response and reports its item count (opcode `0x8D`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServerSyncEnd {
+    count: u8,
+}
+
+impl ServerSyncEnd {
+    pub(crate) const OPCODE: u8 = 0x8D;
+
+    pub fn new(count: u8) -> Self {
+        Self { count }
+    }
+    pub fn count(&self) -> &u8 {
+        &self.count
+    }
+}
+
+impl From<ServerSyncEnd> for FlpcUnit {
+    fn from(unit: ServerSyncEnd) -> Self {
+        Self::Server(ServerUnit::ServerSyncEnd(unit))
     }
 }

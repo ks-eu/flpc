@@ -93,6 +93,7 @@ fn concrete_unit(unit: &FlpcUnit) -> &dyn Encode {
             ServerUnit::SyncPrivateMessage(unit) => unit,
             ServerUnit::WrongUnit(unit) => unit,
             ServerUnit::ServerRemoveSelf(unit) => unit,
+            ServerUnit::ServerSyncEnd(unit) => unit,
         },
     }
 }

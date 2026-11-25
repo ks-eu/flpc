@@ -19,8 +19,8 @@ pub use client::{
 pub use ping::{Ping, PingUnit};
 pub use server::{
     ChangedUsername, ServerLogin, ServerMessage, ServerPrivateMessage, ServerRegister,
-    ServerRemoveSelf, ServerUnit, SyncMessage, SyncPrivateMessage, UserJoined, UserLeft,
-    UserRegistered, UserRemoved, WrongUnit,
+    ServerRemoveSelf, ServerSyncEnd, ServerUnit, SyncMessage, SyncPrivateMessage, UserJoined,
+    UserLeft, UserRegistered, UserRemoved, WrongUnit,
 };
 
 /// A unit that can be encoded to or decoded from an FLPC byte stream.
