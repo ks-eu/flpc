@@ -67,6 +67,7 @@ Each string has an unsigned length prefix followed by that many UTF-8 bytes. The
 | `8B` | `WrongUnit` | None |
 | `8C` | `ServerRemoveSelf` | result (1 byte) |
 | `8D` | `ServerSyncEnd` | count (1 byte, 0–255) |
+| `8E` | `UserNotOnline` | None |
 
 `WrongUnit` is a server response for an unexpected first unit from a client.
 
