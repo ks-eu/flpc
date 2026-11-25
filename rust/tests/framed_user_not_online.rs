@@ -1,28 +1,46 @@
 #![cfg(feature = "tokio")]
+
 use flpc::{
     tokio::FlpcCodec,
-    unit::{FlpcUnit, ServerUnit, UserNotOnline},
+    unit::{FlpcUnit, Ping, PingUnit, ServerUnit, UserNotOnline},
 };
 use futures_util::{SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
+
 const FRAME: &[u8] = &[0x8e];
+const NEXT: &[u8] = &[0x00];
+
+fn unit() -> UserNotOnline {
+    UserNotOnline::new()
+}
+
 #[tokio::test]
-async fn raw_peer_roundtrip() {
-    let (s, mut p) = duplex(32);
-    let (mut sink, _) = Framed::new(s, FlpcCodec).split::<FlpcUnit>();
-    sink.send(UserNotOnline::new().into()).await.unwrap();
+async fn sends_literal_frame_to_raw_peer() {
+    let (stream, mut peer) = duplex(32);
+    let (mut sink, _) = Framed::new(stream, FlpcCodec).split::<FlpcUnit>();
+    sink.send(unit().into()).await.unwrap();
     drop(sink);
-    let mut got = Vec::new();
-    p.read_to_end(&mut got).await.unwrap();
-    assert_eq!(got, FRAME);
-    let (s, mut p) = duplex(32);
-    let mut f = Framed::new(s, FlpcCodec);
-    p.write_all(FRAME).await.unwrap();
-    p.shutdown().await.unwrap();
+
+    let mut bytes = Vec::new();
+    peer.read_to_end(&mut bytes).await.unwrap();
+    assert_eq!(bytes, FRAME);
+}
+
+#[tokio::test]
+async fn receives_adjacent_frames_then_clean_eof() {
+    let (stream, mut peer) = duplex(32);
+    let mut framed = Framed::new(stream, FlpcCodec);
+    peer.write_all(&[FRAME, NEXT].concat()).await.unwrap();
+    peer.shutdown().await.unwrap();
+
     assert_eq!(
-        f.next().await.unwrap().unwrap(),
-        FlpcUnit::Server(ServerUnit::UserNotOnline(UserNotOnline::new()))
+        framed.next().await.unwrap().unwrap(),
+        FlpcUnit::Server(ServerUnit::UserNotOnline(unit()))
     );
-    assert!(f.next().await.is_none());
+    assert_eq!(
+        framed.next().await.unwrap().unwrap(),
+        FlpcUnit::Ping(PingUnit::Ping(Ping::new()))
+    );
+    assert!(framed.next().await.is_none());
 }
