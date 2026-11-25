@@ -4,7 +4,8 @@ use crate::unit::{
     Message, Ping, PingUnit, PrivateMessage, Register, Remove, RemoveAdmin, RemoveSelf,
     RequestSync, RequestSyncPrivateMessage, RequestSyncUsername, ServerLogin, ServerMessage,
     ServerPrivateMessage, ServerRegister, ServerRemoveSelf, ServerSyncEnd, ServerUnit, SyncMessage,
-    SyncPrivateMessage, UserJoined, UserLeft, UserRegistered, UserRemoved, WrongUnit,
+    SyncPrivateMessage, UserJoined, UserLeft, UserNotOnline, UserRegistered, UserRemoved,
+    WrongUnit,
 };
 
 /// Decodes the first unit and returns it with the byte count, including its opcode.
@@ -357,6 +358,10 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 ServerSyncEnd::new(count),
             )))
         }
+        // 0x8E
+        UserNotOnline::OPCODE => Some(FlpcUnit::Server(ServerUnit::UserNotOnline(
+            UserNotOnline::new(),
+        ))),
         _ => return Err(DecodeError::UnknownOpcode),
     };
     Ok(unit.map(|unit| (unit, buf.len() - remaining.len())))

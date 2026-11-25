@@ -94,6 +94,7 @@ fn concrete_unit(unit: &FlpcUnit) -> &dyn Encode {
             ServerUnit::WrongUnit(unit) => unit,
             ServerUnit::ServerRemoveSelf(unit) => unit,
             ServerUnit::ServerSyncEnd(unit) => unit,
+            ServerUnit::UserNotOnline(unit) => unit,
         },
     }
 }

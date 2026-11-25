@@ -23,6 +23,7 @@ pub enum ServerUnit {
     WrongUnit(WrongUnit),
     ServerRemoveSelf(ServerRemoveSelf),
     ServerSyncEnd(ServerSyncEnd),
+    UserNotOnline(UserNotOnline),
 }
 
 /// Registration outcome from the server (opcode `0x80`).
@@ -708,5 +709,23 @@ impl ServerSyncEnd {
 impl From<ServerSyncEnd> for FlpcUnit {
     fn from(unit: ServerSyncEnd) -> Self {
         Self::Server(ServerUnit::ServerSyncEnd(unit))
+    }
+}
+
+/// Indicates that a requested user is not online (opcode `0x8E`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UserNotOnline;
+
+impl UserNotOnline {
+    pub(crate) const OPCODE: u8 = 0x8E;
+
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl From<UserNotOnline> for FlpcUnit {
+    fn from(unit: UserNotOnline) -> Self {
+        Self::Server(ServerUnit::UserNotOnline(unit))
     }
 }
