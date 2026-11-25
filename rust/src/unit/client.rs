@@ -13,6 +13,7 @@ pub enum ClientUnit {
     RequestSync(RequestSync),
     RemoveSelf(RemoveSelf),
     RequestSyncUsername(RequestSyncUsername),
+    RequestSyncPrivateMessage(RequestSyncPrivateMessage),
 }
 
 /// A client registration request (opcode `0x01`).
@@ -445,5 +446,41 @@ impl RequestSyncUsername {
 impl From<RequestSyncUsername> for FlpcUnit {
     fn from(unit: RequestSyncUsername) -> Self {
         Self::Client(ClientUnit::RequestSyncUsername(unit))
+    }
+}
+
+/// A request for a bounded batch of private messages addressed to a user (opcode `0x09`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RequestSyncPrivateMessage {
+    target: u16,
+    timestamp: u64,
+    count: u8,
+}
+
+impl RequestSyncPrivateMessage {
+    pub(crate) const OPCODE: u8 = 0x09;
+
+    pub fn new(target: u16, timestamp: u64, count: u8) -> Self {
+        Self {
+            target,
+            timestamp,
+            count,
+        }
+    }
+
+    pub fn target(&self) -> &u16 {
+        &self.target
+    }
+    pub fn timestamp(&self) -> &u64 {
+        &self.timestamp
+    }
+    pub fn count(&self) -> &u8 {
+        &self.count
+    }
+}
+
+impl From<RequestSyncPrivateMessage> for FlpcUnit {
+    fn from(unit: RequestSyncPrivateMessage) -> Self {
+        Self::Client(ClientUnit::RequestSyncPrivateMessage(unit))
     }
 }

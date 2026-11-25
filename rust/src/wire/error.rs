@@ -9,6 +9,8 @@ pub enum EncodeError {
     StringTooLong,
     /// The destination cannot hold the complete unit.
     BufferTooSmall,
+    /// A synchronization request count must be nonzero.
+    InvalidCount,
 }
 
 impl fmt::Display for EncodeError {
@@ -16,6 +18,7 @@ impl fmt::Display for EncodeError {
         f.write_str(match self {
             Self::StringTooLong => "string exceeds the protocol byte limit",
             Self::BufferTooSmall => "destination buffer is too small",
+            Self::InvalidCount => "synchronization request count must be nonzero",
         })
     }
 }
@@ -31,6 +34,8 @@ pub enum DecodeError {
     UnsupportedOpcode(u8),
     /// A complete string field contains invalid UTF-8.
     InvalidUTF8,
+    /// A synchronization request contains an invalid zero count.
+    InvalidCount,
 }
 
 impl fmt::Display for DecodeError {
@@ -41,6 +46,7 @@ impl fmt::Display for DecodeError {
                 write!(f, "FLPC opcode 0x{opcode:02X} is not implemented")
             }
             Self::InvalidUTF8 => f.write_str("string field contains invalid UTF-8"),
+            Self::InvalidCount => f.write_str("synchronization request count must be nonzero"),
         }
     }
 }

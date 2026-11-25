@@ -2,9 +2,9 @@ use super::DecodeError;
 use crate::unit::{
     Add, AdminUnit, ChangeUsername, ChangedUsername, ClientUnit, FlpcUnit, Kick, Login, MakeAdmin,
     Message, Ping, PingUnit, PrivateMessage, Register, Remove, RemoveAdmin, RemoveSelf,
-    RequestSync, RequestSyncUsername, ServerLogin, ServerMessage, ServerPrivateMessage,
-    ServerRegister, ServerUnit, SyncMessage, SyncPrivateMessage, UserJoined, UserLeft,
-    UserRegistered, UserRemoved, WrongUnit,
+    RequestSync, RequestSyncPrivateMessage, RequestSyncUsername, ServerLogin, ServerMessage,
+    ServerPrivateMessage, ServerRegister, ServerUnit, SyncMessage, SyncPrivateMessage, UserJoined,
+    UserLeft, UserRegistered, UserRemoved, WrongUnit,
 };
 
 /// Decodes the first unit and returns it with the byte count, including its opcode.
@@ -113,6 +113,28 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             };
             Some(FlpcUnit::Client(ClientUnit::RequestSyncUsername(
                 RequestSyncUsername::new(u16::from_be_bytes(id)),
+            )))
+        }
+        // 0x09
+        RequestSyncPrivateMessage::OPCODE => {
+            let Some(target) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            let Some(timestamp) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            let Some([count]) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            if count == 0 {
+                return Err(DecodeError::InvalidCount);
+            }
+            Some(FlpcUnit::Client(ClientUnit::RequestSyncPrivateMessage(
+                RequestSyncPrivateMessage::new(
+                    u16::from_be_bytes(target),
+                    u64::from_be_bytes(timestamp),
+                    count,
+                ),
             )))
         }
         // 0x7B
