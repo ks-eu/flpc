@@ -747,7 +747,24 @@ impl From<UserNotOnline> for FlpcUnit {
     }
 }
 
-/// Sends a user's ID and UTF-8 username during synchronization (opcode `0x8F`).
+/// Sends a user's ID and username during synchronization (opcode `0x8F`). The
+/// ID is an unsigned 16-bit big-endian integer. The username is UTF-8 with a
+/// one-byte length prefix counting UTF-8 bytes, up to 255 bytes.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{FlpcUnit, ServerSyncUsername},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = ServerSyncUsername::new(0x1234, "é".into());
+/// let bytes = [0x8f, 0x12, 0x34, 2, 0xc3, 0xa9];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerSyncUsername {
     id: u16,
