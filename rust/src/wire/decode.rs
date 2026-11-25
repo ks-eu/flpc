@@ -3,9 +3,9 @@ use crate::unit::{
     Add, AdminUnit, ChangeUsername, ChangedUsername, ClientUnit, FlpcUnit, Kick, Login, MakeAdmin,
     Message, Ping, PingUnit, PrivateMessage, Register, Remove, RemoveAdmin, RemoveSelf,
     RequestSync, RequestSyncPrivateMessage, RequestSyncUsername, ServerLogin, ServerMessage,
-    ServerPrivateMessage, ServerRegister, ServerRemoveSelf, ServerSyncEnd, ServerUnit, SyncMessage,
-    SyncPrivateMessage, UserJoined, UserLeft, UserNotOnline, UserRegistered, UserRemoved,
-    WrongUnit,
+    ServerPrivateMessage, ServerRegister, ServerRemoveSelf, ServerSyncEnd, ServerSyncUsername,
+    ServerUnit, SyncMessage, SyncPrivateMessage, UserJoined, UserLeft, UserNotOnline,
+    UserRegistered, UserRemoved, WrongUnit,
 };
 
 /// Decodes the first unit and returns it with the byte count, including its opcode.
@@ -362,6 +362,18 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
         UserNotOnline::OPCODE => Some(FlpcUnit::Server(ServerUnit::UserNotOnline(
             UserNotOnline::new(),
         ))),
+        // 0x8F
+        ServerSyncUsername::OPCODE => {
+            let Some(id) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            let Some(username) = read_short_string(&mut remaining)? else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::Server(ServerUnit::ServerSyncUsername(
+                ServerSyncUsername::new(u16::from_be_bytes(id), username.into()),
+            )))
+        }
         _ => return Err(DecodeError::UnknownOpcode),
     };
     Ok(unit.map(|unit| (unit, buf.len() - remaining.len())))

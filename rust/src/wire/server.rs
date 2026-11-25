@@ -7,8 +7,8 @@ use super::{
 };
 use crate::unit::{
     ChangedUsername, ServerLogin, ServerMessage, ServerPrivateMessage, ServerRegister,
-    ServerRemoveSelf, ServerSyncEnd, SyncMessage, SyncPrivateMessage, UserJoined, UserLeft,
-    UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
+    ServerRemoveSelf, ServerSyncEnd, ServerSyncUsername, SyncMessage, SyncPrivateMessage,
+    UserJoined, UserLeft, UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
 };
 
 impl Encode for ServerRemoveSelf {
@@ -38,6 +38,20 @@ impl Encode for UserNotOnline {
 
     fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
         encode_frame(buf, 1, Self::OPCODE, |_| {})
+    }
+}
+
+impl Encode for ServerSyncUsername {
+    fn encoded_len(&self) -> Result<usize, EncodeError> {
+        Ok(3 + short_strings_len(&[self.username()])?)
+    }
+
+    fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
+        encode_frame(buf, self.encoded_len()?, Self::OPCODE, |dst| {
+            let (id, mut dst) = dst.split_at_mut(2);
+            id.copy_from_slice(&self.id().to_be_bytes());
+            write_short_string(&mut dst, self.username());
+        })
     }
 }
 

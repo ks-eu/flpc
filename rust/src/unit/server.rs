@@ -24,6 +24,7 @@ pub enum ServerUnit {
     ServerRemoveSelf(ServerRemoveSelf),
     ServerSyncEnd(ServerSyncEnd),
     UserNotOnline(UserNotOnline),
+    ServerSyncUsername(ServerSyncUsername),
 }
 
 /// Registration outcome from the server (opcode `0x80`).
@@ -743,5 +744,32 @@ impl UserNotOnline {
 impl From<UserNotOnline> for FlpcUnit {
     fn from(unit: UserNotOnline) -> Self {
         Self::Server(ServerUnit::UserNotOnline(unit))
+    }
+}
+
+/// Sends a user's ID and UTF-8 username during synchronization (opcode `0x8F`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServerSyncUsername {
+    id: u16,
+    username: String,
+}
+
+impl ServerSyncUsername {
+    pub(crate) const OPCODE: u8 = 0x8F;
+
+    pub fn new(id: u16, username: String) -> Self {
+        Self { id, username }
+    }
+    pub fn id(&self) -> &u16 {
+        &self.id
+    }
+    pub fn username(&self) -> &String {
+        &self.username
+    }
+}
+
+impl From<ServerSyncUsername> for FlpcUnit {
+    fn from(unit: ServerSyncUsername) -> Self {
+        Self::Server(ServerUnit::ServerSyncUsername(unit))
     }
 }
