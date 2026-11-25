@@ -449,7 +449,30 @@ impl From<RequestSyncUsername> for FlpcUnit {
     }
 }
 
-/// A request for a bounded batch of private messages addressed to a user (opcode `0x09`).
+/// A client request for private messages addressed to a user (opcode `0x09`).
+/// The target ID is an unsigned 16-bit big-endian integer, followed by the
+/// timestamp of the newest message to include as an unsigned 64-bit big-endian
+/// integer and a nonzero message count. Zero counts return
+/// [`crate::wire::EncodeError::InvalidCount`] when encoding and
+/// [`crate::wire::DecodeError::InvalidCount`] when decoding.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{
+///     unit::{ClientUnit, FlpcUnit, RequestSyncPrivateMessage},
+///     wire::{decode, Encode},
+/// };
+///
+/// let unit = RequestSyncPrivateMessage::new(0x1234, 0x0102_0304_0506_0708, 1);
+/// let bytes = [0x09, 0x12, 0x34, 1, 2, 3, 4, 5, 6, 7, 8, 1];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(wrapped, FlpcUnit::Client(ClientUnit::RequestSyncPrivateMessage(
+///     RequestSyncPrivateMessage::new(0x1234, 0x0102_0304_0506_0708, 1),
+/// )));
+/// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RequestSyncPrivateMessage {
     target: u16,
