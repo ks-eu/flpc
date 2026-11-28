@@ -11,12 +11,12 @@ use tokio_util::codec::Framed;
 const FRAME: &[u8] = &[0xb0, 0x7e];
 
 #[tokio::test]
-async fn raw_peer_send_and_fragmented_receive() {
+async fn exchanges_literal_bytes_with_raw_peer() {
+    let unit = ServerMessageFail::new(0x7e);
+    let expected = FlpcUnit::ServerMessageFail(unit.clone());
     let (stream, mut peer) = duplex(64);
     let (mut sink, _) = Framed::new(stream, FlpcCodec).split::<FlpcUnit>();
-    sink.send((ServerMessageFail::new(0x7e)).into())
-        .await
-        .unwrap();
+    sink.send(unit.into()).await.unwrap();
     drop(sink);
     let mut sent = Vec::new();
     peer.read_to_end(&mut sent).await.unwrap();
@@ -24,15 +24,14 @@ async fn raw_peer_send_and_fragmented_receive() {
 
     let (stream, mut peer) = duplex(64);
     let mut framed = Framed::new(stream, FlpcCodec);
-    peer.write_all(&FRAME[..1]).await.unwrap();
+    let split = FRAME.len() - 1;
+    peer.write_all(&FRAME[..split]).await.unwrap();
     assert!(framed.next().now_or_never().is_none());
-    peer.write_all(&FRAME[1..]).await.unwrap();
-    peer.write_all(&[0x00]).await.unwrap();
+    peer.write_all(&[&FRAME[split..], &[0x00]].concat())
+        .await
+        .unwrap();
     peer.shutdown().await.unwrap();
-    assert_eq!(
-        framed.next().await.unwrap().unwrap(),
-        FlpcUnit::ServerMessageFail(ServerMessageFail::new(0x7e))
-    );
+    assert_eq!(framed.next().await.unwrap().unwrap(), expected);
     assert_eq!(
         framed.next().await.unwrap().unwrap(),
         FlpcUnit::Ping(flpc::unit::Ping::new())
