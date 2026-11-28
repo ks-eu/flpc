@@ -78,6 +78,21 @@ impl From<ServerRemove> for FlpcUnit {
     }
 }
 
+/// Reports the outcome of a kick request (opcode `0xE2`).
+///
+/// The outcome is preserved as a raw `u8`. Peers agree on its meaning.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{unit::{FlpcUnit, ServerKick}, wire::{decode, Encode}};
+///
+/// let unit = ServerKick::new(0x2a);
+/// let bytes: &[u8] = &[0xe2, 0x2a];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerKick {
     outcome: u8,
