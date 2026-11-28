@@ -105,5 +105,6 @@ fn concrete_unit(unit: &FlpcUnit) -> &dyn Encode {
         FlpcUnit::ServerChangedUsername(unit) => unit,
         FlpcUnit::SyncMessageFail(unit) => unit,
         FlpcUnit::SyncUsernameFail(unit) => unit,
+        FlpcUnit::ServerAdd(unit) => unit,
     }
 }
