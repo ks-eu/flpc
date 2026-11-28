@@ -77,3 +77,26 @@ impl From<ServerRemove> for FlpcUnit {
         Self::ServerRemove(unit)
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServerKick {
+    outcome: u8,
+}
+
+impl ServerKick {
+    pub(crate) const OPCODE: u8 = 0xE2;
+
+    pub fn new(outcome: u8) -> Self {
+        Self { outcome }
+    }
+
+    pub fn outcome(&self) -> &u8 {
+        &self.outcome
+    }
+}
+
+impl From<ServerKick> for FlpcUnit {
+    fn from(unit: ServerKick) -> Self {
+        Self::ServerKick(unit)
+    }
+}

@@ -27,7 +27,7 @@ pub use server::{
     ServerResponse, UserAdmin, UserAdminRemoved, UserJoined, UserLeft, UserNotOnline,
     UserRegistered, UserRemoved, WrongUnit,
 };
-pub use serveradmin::{ServerAdd, ServerRemove};
+pub use serveradmin::{ServerAdd, ServerKick, ServerRemove};
 pub use serversync::{
     SyncEnd, SyncMessage, SyncMessageFail, SyncPrivateMessage, SyncUsername, SyncUsernameFail,
 };
@@ -80,4 +80,5 @@ pub enum FlpcUnit {
     SyncUsernameFail(SyncUsernameFail),
     ServerAdd(ServerAdd),
     ServerRemove(ServerRemove),
+    ServerKick(ServerKick),
 }
