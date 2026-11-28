@@ -211,6 +211,21 @@ impl From<SyncUsername> for FlpcUnit {
     }
 }
 
+/// Reports why a message synchronization request failed (opcode `0xD0`).
+///
+/// The reason is preserved as a raw `u8`. Peers agree on its meaning.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{unit::{FlpcUnit, SyncMessageFail}, wire::{decode, Encode}};
+///
+/// let unit = SyncMessageFail::new(0x2a);
+/// let bytes: &[u8] = &[0xd0, 0x2a];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SyncMessageFail {
     reason: u8,
