@@ -595,6 +595,21 @@ impl From<ServerResponse> for FlpcUnit {
     }
 }
 
+/// An announcement that a user has administrator privileges (opcode `0x86`).
+///
+/// The user ID is an unsigned 16-bit integer in big-endian order.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{unit::{FlpcUnit, UserAdmin}, wire::{decode, Encode}};
+///
+/// let unit = UserAdmin::new(0x1234);
+/// let bytes: &[u8] = &[0x86, 0x12, 0x34];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UserAdmin {
     id: u16,
