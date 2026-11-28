@@ -632,3 +632,26 @@ impl From<UserAdmin> for FlpcUnit {
         Self::UserAdmin(unit)
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UserAdminRemoved {
+    id: u16,
+}
+
+impl UserAdminRemoved {
+    pub(crate) const OPCODE: u8 = 0x87;
+
+    pub fn new(id: u16) -> Self {
+        Self { id }
+    }
+
+    pub fn id(&self) -> &u16 {
+        &self.id
+    }
+}
+
+impl From<UserAdminRemoved> for FlpcUnit {
+    fn from(unit: UserAdminRemoved) -> Self {
+        Self::UserAdminRemoved(unit)
+    }
+}
