@@ -96,5 +96,6 @@ fn concrete_unit(unit: &FlpcUnit) -> &dyn Encode {
         FlpcUnit::UserNotOnline(unit) => unit,
         FlpcUnit::SyncUsername(unit) => unit,
         FlpcUnit::ChangePassword(unit) => unit,
+        FlpcUnit::ServerResponse(unit) => unit,
     }
 }

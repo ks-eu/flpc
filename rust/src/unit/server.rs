@@ -556,3 +556,26 @@ impl From<UserNotOnline> for FlpcUnit {
         Self::UserNotOnline(unit)
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServerResponse {
+    response: String,
+}
+
+impl ServerResponse {
+    pub(crate) const OPCODE: u8 = 0x80;
+
+    pub fn new(response: String) -> Self {
+        Self { response }
+    }
+
+    pub fn response(&self) -> &String {
+        &self.response
+    }
+}
+
+impl From<ServerResponse> for FlpcUnit {
+    fn from(unit: ServerResponse) -> Self {
+        Self::ServerResponse(unit)
+    }
+}
