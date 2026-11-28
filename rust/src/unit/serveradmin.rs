@@ -153,3 +153,26 @@ impl From<ServerMakeAdmin> for FlpcUnit {
         Self::ServerMakeAdmin(unit)
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServerRemoveAdmin {
+    outcome: u8,
+}
+
+impl ServerRemoveAdmin {
+    pub(crate) const OPCODE: u8 = 0xE4;
+
+    pub fn new(outcome: u8) -> Self {
+        Self { outcome }
+    }
+
+    pub fn outcome(&self) -> &u8 {
+        &self.outcome
+    }
+}
+
+impl From<ServerRemoveAdmin> for FlpcUnit {
+    fn from(unit: ServerRemoveAdmin) -> Self {
+        Self::ServerRemoveAdmin(unit)
+    }
+}

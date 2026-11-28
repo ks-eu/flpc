@@ -109,5 +109,6 @@ fn concrete_unit(unit: &FlpcUnit) -> &dyn Encode {
         FlpcUnit::ServerRemove(unit) => unit,
         FlpcUnit::ServerKick(unit) => unit,
         FlpcUnit::ServerMakeAdmin(unit) => unit,
+        FlpcUnit::ServerRemoveAdmin(unit) => unit,
     }
 }
