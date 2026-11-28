@@ -14,7 +14,8 @@ minimising header size as much as possible.
 ## Wire format
 
 The Rust rollout has added support for `ChangePassword`, `ServerResponse`,
-`UserAdmin`, `UserAdminRemoved`, `ServerChangedPassword`, `OnboardingEnd`.
+`UserAdmin`, `UserAdminRemoved`, `ServerChangedPassword`, `OnboardingEnd`,
+`ServerMessageFail`.
 See [the detailed wire specification](docs/spec.md) for
 each unit's payload layout and validation rules.
 

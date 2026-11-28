@@ -741,6 +741,21 @@ impl From<OnboardingEnd> for FlpcUnit {
     }
 }
 
+/// Reports why a server rejected a message request (opcode `0xB0`).
+///
+/// The reason is preserved as a raw `u8`. Peers agree on its meaning.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{unit::{FlpcUnit, ServerMessageFail}, wire::{decode, Encode}};
+///
+/// let unit = ServerMessageFail::new(0x2a);
+/// let bytes: &[u8] = &[0xb0, 0x2a];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerMessageFail {
     reason: u8,
