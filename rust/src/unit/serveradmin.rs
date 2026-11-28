@@ -154,6 +154,21 @@ impl From<ServerMakeAdmin> for FlpcUnit {
     }
 }
 
+/// Reports the outcome of a remove-administrator request (opcode `0xE4`).
+///
+/// The outcome is preserved as a raw `u8`. Peers agree on its meaning.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{unit::{FlpcUnit, ServerRemoveAdmin}, wire::{decode, Encode}};
+///
+/// let unit = ServerRemoveAdmin::new(0x2a);
+/// let bytes: &[u8] = &[0xe4, 0x2a];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerRemoveAdmin {
     outcome: u8,
