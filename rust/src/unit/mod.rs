@@ -10,19 +10,20 @@
 mod admin;
 mod client;
 mod ping;
+mod requestsync;
 mod server;
+mod serveradmin;
+mod serversync;
 
 pub use admin::{Add, Kick, MakeAdmin, Remove, RemoveAdmin};
-pub use client::{
-    ChangeUsername, Login, Message, PrivateMessage, Register, RemoveSelf, RequestSyncMessage,
-    RequestSyncPrivateMessage, RequestSyncUsername,
-};
+pub use client::{ChangeUsername, Login, Message, PrivateMessage, Register, RemoveSelf};
 pub use ping::Ping;
+pub use requestsync::{RequestSyncMessage, RequestSyncPrivateMessage, RequestSyncUsername};
 pub use server::{
     ChangedUsername, ServerLogin, ServerMessage, ServerPrivateMessage, ServerRegister,
-    ServerRemoveSelf, ServerSyncEnd, ServerSyncUsername, SyncMessage, SyncPrivateMessage,
-    UserJoined, UserLeft, UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
+    ServerRemoveSelf, UserJoined, UserLeft, UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
 };
+pub use serversync::{ServerSyncEnd, ServerSyncUsername, SyncMessage, SyncPrivateMessage};
 
 /// A unit that can be encoded to or decoded from an FLPC byte stream.
 ///

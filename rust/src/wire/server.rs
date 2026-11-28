@@ -7,8 +7,7 @@ use super::{
 };
 use crate::unit::{
     ChangedUsername, ServerLogin, ServerMessage, ServerPrivateMessage, ServerRegister,
-    ServerRemoveSelf, ServerSyncEnd, ServerSyncUsername, SyncMessage, SyncPrivateMessage,
-    UserJoined, UserLeft, UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
+    ServerRemoveSelf, UserJoined, UserLeft, UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
 };
 
 impl Encode for ServerRemoveSelf {
@@ -21,16 +20,6 @@ impl Encode for ServerRemoveSelf {
     }
 }
 
-impl Encode for ServerSyncEnd {
-    fn encoded_len(&self) -> Result<usize, EncodeError> {
-        Ok(2)
-    }
-
-    fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
-        encode_frame(buf, 2, Self::OPCODE, |dst| dst[0] = *self.count())
-    }
-}
-
 impl Encode for UserNotOnline {
     fn encoded_len(&self) -> Result<usize, EncodeError> {
         Ok(1)
@@ -38,20 +27,6 @@ impl Encode for UserNotOnline {
 
     fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
         encode_frame(buf, 1, Self::OPCODE, |_| {})
-    }
-}
-
-impl Encode for ServerSyncUsername {
-    fn encoded_len(&self) -> Result<usize, EncodeError> {
-        Ok(3 + short_strings_len(&[self.username()])?)
-    }
-
-    fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
-        encode_frame(buf, self.encoded_len()?, Self::OPCODE, |dst| {
-            let (id, mut dst) = dst.split_at_mut(2);
-            id.copy_from_slice(&self.id().to_be_bytes());
-            write_short_string(&mut dst, self.username());
-        })
     }
 }
 
@@ -183,40 +158,6 @@ impl Encode for ChangedUsername {
             let (id, mut dst) = dst.split_at_mut(2);
             id.copy_from_slice(&self.id().to_be_bytes());
             write_short_string(&mut dst, self.username());
-        })
-    }
-}
-
-impl Encode for SyncMessage {
-    fn encoded_len(&self) -> Result<usize, EncodeError> {
-        Ok(11 + long_string_len(self.message())?)
-    }
-
-    fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
-        encode_frame(buf, self.encoded_len()?, Self::OPCODE, |dst| {
-            let (id, dst) = dst.split_at_mut(2);
-            id.copy_from_slice(&self.id().to_be_bytes());
-            let (timestamp, dst) = dst.split_at_mut(8);
-            timestamp.copy_from_slice(&self.timestamp().to_be_bytes());
-            write_long_string(dst, self.message());
-        })
-    }
-}
-
-impl Encode for SyncPrivateMessage {
-    fn encoded_len(&self) -> Result<usize, EncodeError> {
-        Ok(13 + long_string_len(self.message())?)
-    }
-
-    fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
-        encode_frame(buf, self.encoded_len()?, Self::OPCODE, |dst| {
-            let (id, dst) = dst.split_at_mut(2);
-            id.copy_from_slice(&self.id().to_be_bytes());
-            let (target, dst) = dst.split_at_mut(2);
-            target.copy_from_slice(&self.target().to_be_bytes());
-            let (timestamp, dst) = dst.split_at_mut(8);
-            timestamp.copy_from_slice(&self.timestamp().to_be_bytes());
-            write_long_string(dst, self.message());
         })
     }
 }

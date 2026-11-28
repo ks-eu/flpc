@@ -9,7 +9,10 @@ mod decode;
 mod error;
 mod fields;
 mod ping;
+mod requestsync;
 mod server;
+mod serveradmin;
+mod serversync;
 
 pub use decode::decode;
 pub use error::{DecodeError, EncodeError};
