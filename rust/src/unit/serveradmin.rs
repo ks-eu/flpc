@@ -115,3 +115,26 @@ impl From<ServerKick> for FlpcUnit {
         Self::ServerKick(unit)
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServerMakeAdmin {
+    outcome: u8,
+}
+
+impl ServerMakeAdmin {
+    pub(crate) const OPCODE: u8 = 0xE3;
+
+    pub fn new(outcome: u8) -> Self {
+        Self { outcome }
+    }
+
+    pub fn outcome(&self) -> &u8 {
+        &self.outcome
+    }
+}
+
+impl From<ServerMakeAdmin> for FlpcUnit {
+    fn from(unit: ServerMakeAdmin) -> Self {
+        Self::ServerMakeAdmin(unit)
+    }
+}

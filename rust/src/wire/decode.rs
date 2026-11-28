@@ -3,11 +3,11 @@ use crate::unit::{
     Add, ChangePassword, ChangeUsername, ChangedUsername, FlpcUnit, Kick, Login, MakeAdmin,
     Message, OnboardingEnd, Ping, PrivateMessage, Register, Remove, RemoveAdmin, RemoveSelf,
     RequestSyncMessage, RequestSyncPrivateMessage, RequestSyncUsername, ServerAdd,
-    ServerChangedPassword, ServerChangedUsername, ServerKick, ServerLogin, ServerMessage,
-    ServerMessageFail, ServerPrivateMessage, ServerRegister, ServerRemove, ServerRemoveSelf,
-    ServerResponse, SyncEnd, SyncMessage, SyncMessageFail, SyncPrivateMessage, SyncUsername,
-    SyncUsernameFail, UserAdmin, UserAdminRemoved, UserJoined, UserLeft, UserNotOnline,
-    UserRegistered, UserRemoved, WrongUnit,
+    ServerChangedPassword, ServerChangedUsername, ServerKick, ServerLogin, ServerMakeAdmin,
+    ServerMessage, ServerMessageFail, ServerPrivateMessage, ServerRegister, ServerRemove,
+    ServerRemoveSelf, ServerResponse, SyncEnd, SyncMessage, SyncMessageFail, SyncPrivateMessage,
+    SyncUsername, SyncUsernameFail, UserAdmin, UserAdminRemoved, UserJoined, UserLeft,
+    UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
 };
 
 /// Decodes the first unit and returns it with the byte count, including its opcode.
@@ -458,6 +458,13 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 return Ok(None);
             };
             Some(FlpcUnit::ServerKick(ServerKick::new(outcome)))
+        }
+        // 0xE3
+        ServerMakeAdmin::OPCODE => {
+            let Some([outcome]) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::ServerMakeAdmin(ServerMakeAdmin::new(outcome)))
         }
         _ => return Err(DecodeError::UnknownOpcode),
     };
