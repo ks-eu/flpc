@@ -2,12 +2,6 @@
 
 use super::FlpcUnit;
 
-/// Ping units sent by either peer.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum PingUnit {
-    Ping(Ping),
-}
-
 /// A ping encoded as the single byte `0x00`.
 ///
 /// # Examples
@@ -40,6 +34,6 @@ impl Ping {
 
 impl From<Ping> for FlpcUnit {
     fn from(unit: Ping) -> Self {
-        Self::Ping(PingUnit::Ping(unit))
+        Self::Ping(unit)
     }
 }

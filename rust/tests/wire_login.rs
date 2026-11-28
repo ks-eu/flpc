@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{ClientUnit, FlpcUnit, Login, Ping, PingUnit},
+    unit::{FlpcUnit, Login, Ping},
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
@@ -12,7 +12,7 @@ fn unit() -> Login {
 }
 
 fn decoded(unit: Login) -> FlpcUnit {
-    FlpcUnit::Client(ClientUnit::Login(unit))
+    FlpcUnit::Login(unit)
 }
 
 #[test]
@@ -32,7 +32,7 @@ fn matches_the_wire_vector_and_consumes_only_one_unit() {
     );
     assert_eq!(
         decode(&adjacent[FRAME.len()..]).unwrap(),
-        Some((FlpcUnit::Ping(PingUnit::Ping(Ping::new())), 1))
+        Some((FlpcUnit::Ping(Ping::new()), 1))
     );
 
     let wrapped: FlpcUnit = Login::new("Zoë".into(), "pāss".into()).into();

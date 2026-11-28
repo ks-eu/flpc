@@ -2,7 +2,7 @@
 
 use flpc::{
     tokio::FlpcCodec,
-    unit::{FlpcUnit, Ping, PingUnit, ServerUnit, WrongUnit},
+    unit::{FlpcUnit, Ping, WrongUnit},
 };
 use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
@@ -32,7 +32,7 @@ async fn receives_wrong_unit_then_ping_and_clean_eof() {
 
     assert_eq!(
         framed.next().now_or_never().unwrap().unwrap().unwrap(),
-        FlpcUnit::Server(ServerUnit::WrongUnit(WrongUnit::new()))
+        FlpcUnit::WrongUnit(WrongUnit::new())
     );
 
     peer.write_all(&[0x00]).await.unwrap();
@@ -40,7 +40,7 @@ async fn receives_wrong_unit_then_ping_and_clean_eof() {
 
     assert_eq!(
         framed.next().await.unwrap().unwrap(),
-        FlpcUnit::Ping(PingUnit::Ping(Ping::new()))
+        FlpcUnit::Ping(Ping::new())
     );
     assert!(framed.next().await.is_none());
 }

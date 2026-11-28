@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{FlpcUnit, ServerUnit, WrongUnit},
+    unit::{FlpcUnit, WrongUnit},
     wire::{Encode, EncodeError, decode},
 };
 
@@ -28,7 +28,7 @@ fn encode_matches_opcode_and_preserves_tail() {
 
 #[test]
 fn decode_consumes_one_byte_before_the_next_unit() {
-    let expected = FlpcUnit::Server(ServerUnit::WrongUnit(WrongUnit::new()));
+    let expected = FlpcUnit::WrongUnit(WrongUnit::new());
 
     assert_eq!(decode(&[]).unwrap(), None);
     assert_eq!(decode(FRAME).unwrap(), Some((expected.clone(), 1)));

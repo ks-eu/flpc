@@ -2,7 +2,7 @@
 
 use flpc::{
     tokio::{CodecError, FlpcCodec},
-    unit::{AdminUnit, FlpcUnit, RemoveAdmin},
+    unit::{FlpcUnit, RemoveAdmin},
 };
 use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
@@ -12,7 +12,7 @@ use tokio_util::codec::Framed;
 const FRAME: &[u8] = b"\x7b\x12\x34";
 
 fn expected() -> FlpcUnit {
-    FlpcUnit::Admin(AdminUnit::RemoveAdmin(RemoveAdmin::new(0x1234)))
+    FlpcUnit::RemoveAdmin(RemoveAdmin::new(0x1234))
 }
 
 #[tokio::test]

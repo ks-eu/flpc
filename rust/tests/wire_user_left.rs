@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{FlpcUnit, ServerUnit, UserLeft},
+    unit::{FlpcUnit, UserLeft},
     wire::{Encode, EncodeError, decode},
 };
 
@@ -9,7 +9,7 @@ const FRAME: &[u8] = &[0x87, 0x12, 0x34];
 #[test]
 fn encoding_and_decoding_match_the_wire_vector() {
     let unit = UserLeft::new(0x1234);
-    let expected = FlpcUnit::Server(ServerUnit::UserLeft(UserLeft::new(0x1234)));
+    let expected = FlpcUnit::UserLeft(UserLeft::new(0x1234));
     let mut dst = [0xaa; FRAME.len() + 2];
     assert_eq!(unit.encoded_len().unwrap(), FRAME.len());
     assert_eq!(unit.encode_into(&mut dst).unwrap(), FRAME.len());

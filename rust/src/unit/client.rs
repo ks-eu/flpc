@@ -2,20 +2,6 @@
 
 use super::FlpcUnit;
 
-/// Client requests and messages sent to the server.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ClientUnit {
-    Register(Register),
-    Login(Login),
-    Message(Message),
-    PrivateMessage(PrivateMessage),
-    ChangeUsername(ChangeUsername),
-    RequestSyncMessage(RequestSyncMessage),
-    RemoveSelf(RemoveSelf),
-    RequestSyncUsername(RequestSyncUsername),
-    RequestSyncPrivateMessage(RequestSyncPrivateMessage),
-}
-
 /// A client registration request (opcode `0x01`).
 ///
 /// The wire format contains the token, username, and password in that order.
@@ -83,7 +69,7 @@ impl Register {
 
 impl From<Register> for FlpcUnit {
     fn from(unit: Register) -> Self {
-        Self::Client(ClientUnit::Register(unit))
+        Self::Register(unit)
     }
 }
 
@@ -145,7 +131,7 @@ impl Login {
 
 impl From<Login> for FlpcUnit {
     fn from(unit: Login) -> Self {
-        Self::Client(ClientUnit::Login(unit))
+        Self::Login(unit)
     }
 }
 
@@ -193,7 +179,7 @@ impl Message {
 
 impl From<Message> for FlpcUnit {
     fn from(unit: Message) -> Self {
-        Self::Client(ClientUnit::Message(unit))
+        Self::Message(unit)
     }
 }
 
@@ -245,7 +231,7 @@ impl PrivateMessage {
 
 impl From<PrivateMessage> for FlpcUnit {
     fn from(unit: PrivateMessage) -> Self {
-        Self::Client(ClientUnit::PrivateMessage(unit))
+        Self::PrivateMessage(unit)
     }
 }
 
@@ -291,7 +277,7 @@ impl ChangeUsername {
 
 impl From<ChangeUsername> for FlpcUnit {
     fn from(unit: ChangeUsername) -> Self {
-        Self::Client(ClientUnit::ChangeUsername(unit))
+        Self::ChangeUsername(unit)
     }
 }
 
@@ -305,7 +291,7 @@ impl From<ChangeUsername> for FlpcUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{ClientUnit, FlpcUnit, RequestSyncMessage},
+///     unit::{FlpcUnit, RequestSyncMessage},
 ///     wire::{decode, Encode},
 /// };
 ///
@@ -313,9 +299,9 @@ impl From<ChangeUsername> for FlpcUnit {
 /// let bytes = [0x06, 1, 2, 3, 4, 5, 6, 7, 8, 0xff];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
-/// assert_eq!(wrapped, FlpcUnit::Client(ClientUnit::RequestSyncMessage(
+/// assert_eq!(wrapped, FlpcUnit::RequestSyncMessage(
 ///     RequestSyncMessage::new(0x0102_0304_0506_0708, 255),
-/// )));
+/// ));
 /// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -342,7 +328,7 @@ impl RequestSyncMessage {
 
 impl From<RequestSyncMessage> for FlpcUnit {
     fn from(unit: RequestSyncMessage) -> Self {
-        Self::Client(ClientUnit::RequestSyncMessage(unit))
+        Self::RequestSyncMessage(unit)
     }
 }
 
@@ -399,7 +385,7 @@ impl RemoveSelf {
 
 impl From<RemoveSelf> for FlpcUnit {
     fn from(unit: RemoveSelf) -> Self {
-        Self::Client(ClientUnit::RemoveSelf(unit))
+        Self::RemoveSelf(unit)
     }
 }
 
@@ -410,7 +396,7 @@ impl From<RemoveSelf> for FlpcUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{ClientUnit, FlpcUnit, RequestSyncUsername},
+///     unit::{FlpcUnit, RequestSyncUsername},
 ///     wire::{decode, Encode},
 /// };
 ///
@@ -418,9 +404,9 @@ impl From<RemoveSelf> for FlpcUnit {
 /// let bytes = [0x08, 0x12, 0x34];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
-/// assert_eq!(wrapped, FlpcUnit::Client(ClientUnit::RequestSyncUsername(
+/// assert_eq!(wrapped, FlpcUnit::RequestSyncUsername(
 ///     RequestSyncUsername::new(0x1234),
-/// )));
+/// ));
 /// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -442,7 +428,7 @@ impl RequestSyncUsername {
 
 impl From<RequestSyncUsername> for FlpcUnit {
     fn from(unit: RequestSyncUsername) -> Self {
-        Self::Client(ClientUnit::RequestSyncUsername(unit))
+        Self::RequestSyncUsername(unit)
     }
 }
 
@@ -457,7 +443,7 @@ impl From<RequestSyncUsername> for FlpcUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{ClientUnit, FlpcUnit, RequestSyncPrivateMessage},
+///     unit::{FlpcUnit, RequestSyncPrivateMessage},
 ///     wire::{decode, Encode},
 /// };
 ///
@@ -465,9 +451,9 @@ impl From<RequestSyncUsername> for FlpcUnit {
 /// let bytes = [0x09, 0x12, 0x34, 1, 2, 3, 4, 5, 6, 7, 8, 1];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
-/// assert_eq!(wrapped, FlpcUnit::Client(ClientUnit::RequestSyncPrivateMessage(
+/// assert_eq!(wrapped, FlpcUnit::RequestSyncPrivateMessage(
 ///     RequestSyncPrivateMessage::new(0x1234, 0x0102_0304_0506_0708, 1),
-/// )));
+/// ));
 /// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -501,6 +487,6 @@ impl RequestSyncPrivateMessage {
 
 impl From<RequestSyncPrivateMessage> for FlpcUnit {
     fn from(unit: RequestSyncPrivateMessage) -> Self {
-        Self::Client(ClientUnit::RequestSyncPrivateMessage(unit))
+        Self::RequestSyncPrivateMessage(unit)
     }
 }

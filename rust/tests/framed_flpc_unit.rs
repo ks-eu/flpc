@@ -2,7 +2,7 @@
 
 use flpc::{
     tokio::FlpcCodec,
-    unit::{FlpcUnit, ServerRegister, ServerUnit},
+    unit::{FlpcUnit, ServerRegister},
 };
 use futures_util::{SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
@@ -27,6 +27,6 @@ async fn split_flpc_sink_sends_and_receives_server_register() {
     peer.write_all(FRAME).await.unwrap();
     assert_eq!(
         stream_half.next().await.unwrap().unwrap(),
-        FlpcUnit::Server(ServerUnit::ServerRegister(ServerRegister::new(0)))
+        FlpcUnit::ServerRegister(ServerRegister::new(0))
     );
 }

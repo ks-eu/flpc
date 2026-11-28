@@ -2,7 +2,7 @@
 
 use flpc::{
     tokio::{CodecError, FlpcCodec},
-    unit::{ClientUnit, FlpcUnit, Ping, PingUnit, RequestSyncUsername},
+    unit::{FlpcUnit, Ping, RequestSyncUsername},
 };
 use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
@@ -41,11 +41,11 @@ async fn receives_adjacent_frames_then_clean_eof() {
 
     assert_eq!(
         framed.next().await.unwrap().unwrap(),
-        FlpcUnit::Client(ClientUnit::RequestSyncUsername(unit()))
+        FlpcUnit::RequestSyncUsername(unit())
     );
     assert_eq!(
         framed.next().await.unwrap().unwrap(),
-        FlpcUnit::Ping(PingUnit::Ping(Ping::new()))
+        FlpcUnit::Ping(Ping::new())
     );
     assert!(framed.next().await.is_none());
 }

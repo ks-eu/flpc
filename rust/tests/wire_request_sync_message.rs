@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{ClientUnit, FlpcUnit, RequestSyncMessage},
+    unit::{FlpcUnit, RequestSyncMessage},
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
@@ -21,16 +21,13 @@ fn encodes_literal_frame_without_touching_tail() {
     assert_eq!(unit.to_bytes().unwrap(), FRAME);
 
     let wrapped: FlpcUnit = unit.into();
-    assert_eq!(
-        wrapped,
-        FlpcUnit::Client(ClientUnit::RequestSyncMessage(self::unit()))
-    );
+    assert_eq!(wrapped, FlpcUnit::RequestSyncMessage(self::unit()));
     assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
 
 #[test]
 fn decodes_one_frame_and_waits_for_all_fields() {
-    let expected = FlpcUnit::Client(ClientUnit::RequestSyncMessage(unit()));
+    let expected = FlpcUnit::RequestSyncMessage(unit());
     assert_eq!(
         decode(FRAME).unwrap(),
         Some((expected.clone(), FRAME.len()))
@@ -77,9 +74,6 @@ fn validates_request_count_before_writing() {
     assert_eq!(limit.to_bytes().unwrap(), bytes);
     assert_eq!(
         decode(bytes).unwrap(),
-        Some((
-            FlpcUnit::Client(ClientUnit::RequestSyncMessage(limit)),
-            bytes.len()
-        ))
+        Some((FlpcUnit::RequestSyncMessage(limit), bytes.len()))
     );
 }

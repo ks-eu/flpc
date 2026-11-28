@@ -6,13 +6,13 @@
 //! # Quickstart
 //!
 //! Encode a concrete unit with [`wire::Encode`]. [`wire::decode()`] returns
-//! the first decoded unit as a nested [`unit::FlpcUnit`] and the number of
+//! the first decoded unit as a [`unit::FlpcUnit`] and the number of
 //! bytes it consumed. Keep the full input when it returns `Ok(None)` so you
 //! can retry with more bytes.
 //!
 //! ```
 //! use flpc::{
-//!     unit::{ClientUnit, FlpcUnit, Message, Ping},
+//!     unit::{FlpcUnit, Message, Ping},
 //!     wire::{Encode, decode},
 //! };
 //!
@@ -21,7 +21,7 @@
 //!
 //! let (unit, consumed) = decode(&input)?.expect("expected a complete message");
 //! match unit {
-//!     FlpcUnit::Client(ClientUnit::Message(message)) => assert_eq!(message.message(), "é"),
+//!     FlpcUnit::Message(message) => assert_eq!(message.message(), "é"),
 //!     _ => panic!("expected a client message"),
 //! }
 //! assert!(matches!(

@@ -2,31 +2,6 @@
 
 use super::FlpcUnit;
 
-/// Responses, notifications, and messages sent by the server.
-///
-/// The codec preserves timestamps as unsigned 64-bit values and outcomes as
-/// single bytes. Peers agree on the timestamp epoch and precision and on the
-/// meaning of outcome codes.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ServerUnit {
-    ServerRegister(ServerRegister),
-    ServerLogin(ServerLogin),
-    ServerMessage(ServerMessage),
-    ServerPrivateMessage(ServerPrivateMessage),
-    UserRegistered(UserRegistered),
-    UserRemoved(UserRemoved),
-    UserJoined(UserJoined),
-    UserLeft(UserLeft),
-    ChangedUsername(ChangedUsername),
-    SyncMessage(SyncMessage),
-    SyncPrivateMessage(SyncPrivateMessage),
-    WrongUnit(WrongUnit),
-    ServerRemoveSelf(ServerRemoveSelf),
-    ServerSyncEnd(ServerSyncEnd),
-    UserNotOnline(UserNotOnline),
-    ServerSyncUsername(ServerSyncUsername),
-}
-
 /// Registration outcome from the server (opcode `0x80`).
 ///
 /// The codec preserves the outcome byte. Peers agree on what each value means.
@@ -35,7 +10,7 @@ pub enum ServerUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{FlpcUnit, ServerUnit, ServerRegister},
+///     unit::{FlpcUnit, ServerRegister},
 ///     wire::{decode, Encode},
 /// };
 ///
@@ -45,7 +20,7 @@ pub enum ServerUnit {
 /// assert_eq!(
 ///     decode(bytes).unwrap(),
 ///     Some((
-///         FlpcUnit::Server(ServerUnit::ServerRegister(unit)),
+///         FlpcUnit::ServerRegister(unit),
 ///         bytes.len(),
 ///     )),
 /// );
@@ -69,7 +44,7 @@ impl ServerRegister {
 
 impl From<ServerRegister> for FlpcUnit {
     fn from(unit: ServerRegister) -> Self {
-        Self::Server(ServerUnit::ServerRegister(unit))
+        Self::ServerRegister(unit)
     }
 }
 
@@ -113,7 +88,7 @@ impl ServerLogin {
 
 impl From<ServerLogin> for FlpcUnit {
     fn from(unit: ServerLogin) -> Self {
-        Self::Server(ServerUnit::ServerLogin(unit))
+        Self::ServerLogin(unit)
     }
 }
 
@@ -173,7 +148,7 @@ impl ServerMessage {
 
 impl From<ServerMessage> for FlpcUnit {
     fn from(unit: ServerMessage) -> Self {
-        Self::Server(ServerUnit::ServerMessage(unit))
+        Self::ServerMessage(unit)
     }
 }
 
@@ -239,7 +214,7 @@ impl ServerPrivateMessage {
 
 impl From<ServerPrivateMessage> for FlpcUnit {
     fn from(unit: ServerPrivateMessage) -> Self {
-        Self::Server(ServerUnit::ServerPrivateMessage(unit))
+        Self::ServerPrivateMessage(unit)
     }
 }
 
@@ -288,7 +263,7 @@ impl UserRegistered {
 
 impl From<UserRegistered> for FlpcUnit {
     fn from(unit: UserRegistered) -> Self {
-        Self::Server(ServerUnit::UserRegistered(unit))
+        Self::UserRegistered(unit)
     }
 }
 
@@ -332,7 +307,7 @@ impl UserRemoved {
 
 impl From<UserRemoved> for FlpcUnit {
     fn from(unit: UserRemoved) -> Self {
-        Self::Server(ServerUnit::UserRemoved(unit))
+        Self::UserRemoved(unit)
     }
 }
 
@@ -376,7 +351,7 @@ impl UserJoined {
 
 impl From<UserJoined> for FlpcUnit {
     fn from(unit: UserJoined) -> Self {
-        Self::Server(ServerUnit::UserJoined(unit))
+        Self::UserJoined(unit)
     }
 }
 
@@ -420,7 +395,7 @@ impl UserLeft {
 
 impl From<UserLeft> for FlpcUnit {
     fn from(unit: UserLeft) -> Self {
-        Self::Server(ServerUnit::UserLeft(unit))
+        Self::UserLeft(unit)
     }
 }
 
@@ -469,7 +444,7 @@ impl ChangedUsername {
 
 impl From<ChangedUsername> for FlpcUnit {
     fn from(unit: ChangedUsername) -> Self {
-        Self::Server(ServerUnit::ChangedUsername(unit))
+        Self::ChangedUsername(unit)
     }
 }
 
@@ -529,7 +504,7 @@ impl SyncMessage {
 
 impl From<SyncMessage> for FlpcUnit {
     fn from(unit: SyncMessage) -> Self {
-        Self::Server(ServerUnit::SyncMessage(unit))
+        Self::SyncMessage(unit)
     }
 }
 
@@ -595,7 +570,7 @@ impl SyncPrivateMessage {
 
 impl From<SyncPrivateMessage> for FlpcUnit {
     fn from(unit: SyncPrivateMessage) -> Self {
-        Self::Server(ServerUnit::SyncPrivateMessage(unit))
+        Self::SyncPrivateMessage(unit)
     }
 }
 
@@ -631,7 +606,7 @@ impl WrongUnit {
 
 impl From<WrongUnit> for FlpcUnit {
     fn from(unit: WrongUnit) -> Self {
-        Self::Server(ServerUnit::WrongUnit(unit))
+        Self::WrongUnit(unit)
     }
 }
 
@@ -670,7 +645,7 @@ impl ServerRemoveSelf {
 
 impl From<ServerRemoveSelf> for FlpcUnit {
     fn from(unit: ServerRemoveSelf) -> Self {
-        Self::Server(ServerUnit::ServerRemoveSelf(unit))
+        Self::ServerRemoveSelf(unit)
     }
 }
 
@@ -709,7 +684,7 @@ impl ServerSyncEnd {
 
 impl From<ServerSyncEnd> for FlpcUnit {
     fn from(unit: ServerSyncEnd) -> Self {
-        Self::Server(ServerUnit::ServerSyncEnd(unit))
+        Self::ServerSyncEnd(unit)
     }
 }
 
@@ -743,7 +718,7 @@ impl UserNotOnline {
 
 impl From<UserNotOnline> for FlpcUnit {
     fn from(unit: UserNotOnline) -> Self {
-        Self::Server(ServerUnit::UserNotOnline(unit))
+        Self::UserNotOnline(unit)
     }
 }
 
@@ -787,6 +762,6 @@ impl ServerSyncUsername {
 
 impl From<ServerSyncUsername> for FlpcUnit {
     fn from(unit: ServerSyncUsername) -> Self {
-        Self::Server(ServerUnit::ServerSyncUsername(unit))
+        Self::ServerSyncUsername(unit)
     }
 }

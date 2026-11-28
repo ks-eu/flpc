@@ -14,7 +14,7 @@ mod server;
 pub use decode::decode;
 pub use error::{DecodeError, EncodeError};
 
-use crate::unit::{AdminUnit, ClientUnit, FlpcUnit, PingUnit, ServerUnit};
+use crate::unit::FlpcUnit;
 
 /// Encodes one FLPC unit, including its opcode.
 pub trait Encode {
@@ -61,44 +61,36 @@ impl Encode for FlpcUnit {
 
 fn concrete_unit(unit: &FlpcUnit) -> &dyn Encode {
     match unit {
-        FlpcUnit::Admin(unit) => match unit {
-            AdminUnit::Kick(unit) => unit,
-            AdminUnit::Remove(unit) => unit,
-            AdminUnit::Add(unit) => unit,
-            AdminUnit::MakeAdmin(unit) => unit,
-            AdminUnit::RemoveAdmin(unit) => unit,
-        },
-        FlpcUnit::Client(unit) => match unit {
-            ClientUnit::Register(unit) => unit,
-            ClientUnit::Login(unit) => unit,
-            ClientUnit::Message(unit) => unit,
-            ClientUnit::PrivateMessage(unit) => unit,
-            ClientUnit::ChangeUsername(unit) => unit,
-            ClientUnit::RequestSyncMessage(unit) => unit,
-            ClientUnit::RemoveSelf(unit) => unit,
-            ClientUnit::RequestSyncUsername(unit) => unit,
-            ClientUnit::RequestSyncPrivateMessage(unit) => unit,
-        },
-        FlpcUnit::Ping(unit) => match unit {
-            PingUnit::Ping(unit) => unit,
-        },
-        FlpcUnit::Server(unit) => match unit {
-            ServerUnit::ServerRegister(unit) => unit,
-            ServerUnit::ServerLogin(unit) => unit,
-            ServerUnit::ServerMessage(unit) => unit,
-            ServerUnit::ServerPrivateMessage(unit) => unit,
-            ServerUnit::UserRegistered(unit) => unit,
-            ServerUnit::UserRemoved(unit) => unit,
-            ServerUnit::UserJoined(unit) => unit,
-            ServerUnit::UserLeft(unit) => unit,
-            ServerUnit::ChangedUsername(unit) => unit,
-            ServerUnit::SyncMessage(unit) => unit,
-            ServerUnit::SyncPrivateMessage(unit) => unit,
-            ServerUnit::WrongUnit(unit) => unit,
-            ServerUnit::ServerRemoveSelf(unit) => unit,
-            ServerUnit::ServerSyncEnd(unit) => unit,
-            ServerUnit::UserNotOnline(unit) => unit,
-            ServerUnit::ServerSyncUsername(unit) => unit,
-        },
+        FlpcUnit::Kick(unit) => unit,
+        FlpcUnit::Remove(unit) => unit,
+        FlpcUnit::Add(unit) => unit,
+        FlpcUnit::MakeAdmin(unit) => unit,
+        FlpcUnit::RemoveAdmin(unit) => unit,
+        FlpcUnit::Register(unit) => unit,
+        FlpcUnit::Login(unit) => unit,
+        FlpcUnit::Message(unit) => unit,
+        FlpcUnit::PrivateMessage(unit) => unit,
+        FlpcUnit::ChangeUsername(unit) => unit,
+        FlpcUnit::RequestSyncMessage(unit) => unit,
+        FlpcUnit::RemoveSelf(unit) => unit,
+        FlpcUnit::RequestSyncUsername(unit) => unit,
+        FlpcUnit::RequestSyncPrivateMessage(unit) => unit,
+        FlpcUnit::Ping(unit) => unit,
+        FlpcUnit::ServerRegister(unit) => unit,
+        FlpcUnit::ServerLogin(unit) => unit,
+        FlpcUnit::ServerMessage(unit) => unit,
+        FlpcUnit::ServerPrivateMessage(unit) => unit,
+        FlpcUnit::UserRegistered(unit) => unit,
+        FlpcUnit::UserRemoved(unit) => unit,
+        FlpcUnit::UserJoined(unit) => unit,
+        FlpcUnit::UserLeft(unit) => unit,
+        FlpcUnit::ChangedUsername(unit) => unit,
+        FlpcUnit::SyncMessage(unit) => unit,
+        FlpcUnit::SyncPrivateMessage(unit) => unit,
+        FlpcUnit::WrongUnit(unit) => unit,
+        FlpcUnit::ServerRemoveSelf(unit) => unit,
+        FlpcUnit::ServerSyncEnd(unit) => unit,
+        FlpcUnit::UserNotOnline(unit) => unit,
+        FlpcUnit::ServerSyncUsername(unit) => unit,
     }
 }

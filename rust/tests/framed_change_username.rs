@@ -2,7 +2,7 @@
 
 use flpc::{
     tokio::{CodecError, FlpcCodec},
-    unit::{ChangeUsername, ClientUnit, FlpcUnit},
+    unit::{ChangeUsername, FlpcUnit},
 };
 use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
@@ -34,7 +34,7 @@ async fn receives_complete_frame_then_clean_eof() {
 
     assert_eq!(
         framed.next().await.unwrap().unwrap(),
-        FlpcUnit::Client(ClientUnit::ChangeUsername(ChangeUsername::new("é".into())))
+        FlpcUnit::ChangeUsername(ChangeUsername::new("é".into()))
     );
     assert!(framed.next().await.is_none());
 }
@@ -52,7 +52,7 @@ async fn receives_fragmented_frame_and_truncated_frame_at_eof() {
 
     assert_eq!(
         framed.next().await.unwrap().unwrap(),
-        FlpcUnit::Client(ClientUnit::ChangeUsername(ChangeUsername::new("é".into())))
+        FlpcUnit::ChangeUsername(ChangeUsername::new("é".into()))
     );
     assert!(matches!(framed.next().await, Some(Err(CodecError::Io(_)))));
 }

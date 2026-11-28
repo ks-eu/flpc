@@ -32,7 +32,7 @@ pub use error::CodecError;
 /// ```
 /// use flpc::{
 ///     tokio::FlpcCodec,
-///     unit::{FlpcUnit, ServerRegister, ServerUnit},
+///     unit::{FlpcUnit, ServerRegister},
 /// };
 /// use futures_util::{SinkExt, StreamExt};
 /// use tokio::io::duplex;
@@ -48,7 +48,7 @@ pub use error::CodecError;
 ///     let unit = receiver.next().await.expect("expected a message")?;
 ///     assert_eq!(
 ///         unit,
-///         FlpcUnit::Server(ServerUnit::ServerRegister(ServerRegister::new(0)))
+///         FlpcUnit::ServerRegister(ServerRegister::new(0))
 ///     );
 ///     Ok(())
 /// }

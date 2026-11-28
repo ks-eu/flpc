@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{ClientUnit, FlpcUnit, Register},
+    unit::{FlpcUnit, Register},
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
@@ -11,7 +11,7 @@ fn register(token: &str, username: &str, password: &str) -> Register {
 }
 
 fn decoded(unit: Register) -> FlpcUnit {
-    FlpcUnit::Client(ClientUnit::Register(unit))
+    FlpcUnit::Register(unit)
 }
 
 #[test]

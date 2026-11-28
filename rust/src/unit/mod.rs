@@ -12,31 +12,52 @@ mod client;
 mod ping;
 mod server;
 
-pub use admin::{Add, AdminUnit, Kick, MakeAdmin, Remove, RemoveAdmin};
+pub use admin::{Add, Kick, MakeAdmin, Remove, RemoveAdmin};
 pub use client::{
-    ChangeUsername, ClientUnit, Login, Message, PrivateMessage, Register, RemoveSelf,
-    RequestSyncMessage, RequestSyncPrivateMessage, RequestSyncUsername,
+    ChangeUsername, Login, Message, PrivateMessage, Register, RemoveSelf, RequestSyncMessage,
+    RequestSyncPrivateMessage, RequestSyncUsername,
 };
-pub use ping::{Ping, PingUnit};
+pub use ping::Ping;
 pub use server::{
     ChangedUsername, ServerLogin, ServerMessage, ServerPrivateMessage, ServerRegister,
-    ServerRemoveSelf, ServerSyncEnd, ServerSyncUsername, ServerUnit, SyncMessage,
-    SyncPrivateMessage, UserJoined, UserLeft, UserNotOnline, UserRegistered, UserRemoved,
-    WrongUnit,
+    ServerRemoveSelf, ServerSyncEnd, ServerSyncUsername, SyncMessage, SyncPrivateMessage,
+    UserJoined, UserLeft, UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
 };
 
 /// A unit that can be encoded to or decoded from an FLPC byte stream.
 ///
-/// The outer variant identifies the unit family. The inner variant contains
-/// the concrete unit for the opcode.
+/// Each variant contains the concrete unit for one opcode.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FlpcUnit {
-    /// An administrative request.
-    Admin(AdminUnit),
-    /// A regular client request or message.
-    Client(ClientUnit),
-    /// A ping from either peer.
-    Ping(PingUnit),
-    /// A server response, notification, or message.
-    Server(ServerUnit),
+    Kick(Kick),
+    Remove(Remove),
+    Add(Add),
+    MakeAdmin(MakeAdmin),
+    RemoveAdmin(RemoveAdmin),
+    Register(Register),
+    Login(Login),
+    Message(Message),
+    PrivateMessage(PrivateMessage),
+    ChangeUsername(ChangeUsername),
+    RequestSyncMessage(RequestSyncMessage),
+    RemoveSelf(RemoveSelf),
+    RequestSyncUsername(RequestSyncUsername),
+    RequestSyncPrivateMessage(RequestSyncPrivateMessage),
+    Ping(Ping),
+    ServerRegister(ServerRegister),
+    ServerLogin(ServerLogin),
+    ServerMessage(ServerMessage),
+    ServerPrivateMessage(ServerPrivateMessage),
+    UserRegistered(UserRegistered),
+    UserRemoved(UserRemoved),
+    UserJoined(UserJoined),
+    UserLeft(UserLeft),
+    ChangedUsername(ChangedUsername),
+    SyncMessage(SyncMessage),
+    SyncPrivateMessage(SyncPrivateMessage),
+    WrongUnit(WrongUnit),
+    ServerRemoveSelf(ServerRemoveSelf),
+    ServerSyncEnd(ServerSyncEnd),
+    UserNotOnline(UserNotOnline),
+    ServerSyncUsername(ServerSyncUsername),
 }

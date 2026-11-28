@@ -2,7 +2,7 @@
 
 use flpc::{
     tokio::{CodecError, FlpcCodec},
-    unit::{ClientUnit, FlpcUnit, Login, Ping, PingUnit},
+    unit::{FlpcUnit, Login, Ping},
 };
 use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
@@ -18,7 +18,7 @@ fn unit() -> Login {
 
 fn expected() -> FlpcUnit {
     let unit = unit();
-    FlpcUnit::Client(ClientUnit::Login(unit))
+    FlpcUnit::Login(unit)
 }
 
 #[tokio::test]
@@ -46,7 +46,7 @@ async fn receives_fragmented_unit_before_ping_and_clean_eof() {
     assert_eq!(framed.next().await.unwrap().unwrap(), expected());
     assert_eq!(
         framed.next().await.unwrap().unwrap(),
-        FlpcUnit::Ping(PingUnit::Ping(Ping::new()))
+        FlpcUnit::Ping(Ping::new())
     );
     assert!(framed.next().await.is_none());
 }

@@ -2,7 +2,7 @@
 
 use flpc::{
     tokio::{CodecError, FlpcCodec},
-    unit::{ClientUnit, FlpcUnit, Message, Ping, PingUnit},
+    unit::{FlpcUnit, Message, Ping},
 };
 use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
@@ -11,7 +11,7 @@ use tokio_util::codec::Framed;
 const FRAME: &[u8] = b"\x03\x00\x05hello";
 
 fn message(value: &str) -> FlpcUnit {
-    FlpcUnit::Client(ClientUnit::Message(Message::new(value.into())))
+    FlpcUnit::Message(Message::new(value.into()))
 }
 
 #[tokio::test]
@@ -45,7 +45,7 @@ async fn receives_fragmented_prefix_and_utf8_before_ping_and_clean_eof() {
     assert_eq!(framed.next().await.unwrap().unwrap(), message("Zoë"));
     assert_eq!(
         framed.next().await.unwrap().unwrap(),
-        FlpcUnit::Ping(PingUnit::Ping(Ping::new()))
+        FlpcUnit::Ping(Ping::new())
     );
     assert!(framed.next().await.is_none());
 }

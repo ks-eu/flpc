@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{FlpcUnit, ServerRemoveSelf, ServerUnit},
+    unit::{FlpcUnit, ServerRemoveSelf},
     wire::{Encode, EncodeError, decode},
 };
 
@@ -21,16 +21,13 @@ fn encodes_literal_frame_without_touching_tail() {
     assert_eq!(unit.to_bytes().unwrap(), FRAME);
 
     let wrapped: FlpcUnit = unit.into();
-    assert_eq!(
-        wrapped,
-        FlpcUnit::Server(ServerUnit::ServerRemoveSelf(self::unit()))
-    );
+    assert_eq!(wrapped, FlpcUnit::ServerRemoveSelf(self::unit()));
     assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
 
 #[test]
 fn decodes_one_frame_and_waits_for_all_fields() {
-    let expected = FlpcUnit::Server(ServerUnit::ServerRemoveSelf(unit()));
+    let expected = FlpcUnit::ServerRemoveSelf(unit());
     assert_eq!(
         decode(FRAME).unwrap(),
         Some((expected.clone(), FRAME.len()))

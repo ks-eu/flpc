@@ -1,15 +1,5 @@
 use super::FlpcUnit;
 
-/// Administrative requests sent by a client to the server.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum AdminUnit {
-    Kick(Kick),
-    Remove(Remove),
-    Add(Add),
-    MakeAdmin(MakeAdmin),
-    RemoveAdmin(RemoveAdmin),
-}
-
 /// A request to kick a user (opcode `0x7F`).
 ///
 /// The user ID is an unsigned 16-bit integer encoded in big-endian byte order.
@@ -50,7 +40,7 @@ impl Kick {
 
 impl From<Kick> for FlpcUnit {
     fn from(unit: Kick) -> Self {
-        Self::Admin(AdminUnit::Kick(unit))
+        Self::Kick(unit)
     }
 }
 
@@ -94,7 +84,7 @@ impl Remove {
 
 impl From<Remove> for FlpcUnit {
     fn from(unit: Remove) -> Self {
-        Self::Admin(AdminUnit::Remove(unit))
+        Self::Remove(unit)
     }
 }
 
@@ -153,7 +143,7 @@ impl Add {
 
 impl From<Add> for FlpcUnit {
     fn from(unit: Add) -> Self {
-        Self::Admin(AdminUnit::Add(unit))
+        Self::Add(unit)
     }
 }
 
@@ -197,7 +187,7 @@ impl MakeAdmin {
 
 impl From<MakeAdmin> for FlpcUnit {
     fn from(unit: MakeAdmin) -> Self {
-        Self::Admin(AdminUnit::MakeAdmin(unit))
+        Self::MakeAdmin(unit)
     }
 }
 
@@ -241,6 +231,6 @@ impl RemoveAdmin {
 
 impl From<RemoveAdmin> for FlpcUnit {
     fn from(unit: RemoveAdmin) -> Self {
-        Self::Admin(AdminUnit::RemoveAdmin(unit))
+        Self::RemoveAdmin(unit)
     }
 }

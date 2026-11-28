@@ -2,7 +2,7 @@
 
 use flpc::{
     tokio::FlpcCodec,
-    unit::{Add, AdminUnit, FlpcUnit},
+    unit::{Add, FlpcUnit},
 };
 use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
@@ -12,7 +12,7 @@ use tokio_util::codec::Framed;
 const FRAME: &[u8] = b"\x7d\x04Zo\xc3\xab\x01p";
 
 fn expected() -> FlpcUnit {
-    FlpcUnit::Admin(AdminUnit::Add(Add::new("Zoë".into(), "p".into())))
+    FlpcUnit::Add(Add::new("Zoë".into(), "p".into()))
 }
 
 #[tokio::test]
@@ -44,7 +44,7 @@ async fn receives_fragmented_frame() {
     assert_eq!(framed.next().await.unwrap().unwrap(), expected());
     assert_eq!(
         framed.next().await.unwrap().unwrap(),
-        FlpcUnit::Admin(AdminUnit::Add(Add::new("u".into(), "p".into())))
+        FlpcUnit::Add(Add::new("u".into(), "p".into()))
     );
     assert!(framed.next().await.is_none());
 }

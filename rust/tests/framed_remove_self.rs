@@ -2,7 +2,7 @@
 
 use flpc::{
     tokio::FlpcCodec,
-    unit::{ClientUnit, FlpcUnit, RemoveSelf},
+    unit::{FlpcUnit, RemoveSelf},
 };
 use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
@@ -33,10 +33,7 @@ async fn sends_literal_frame_and_receives_fragmented_adjacent_frames() {
     for _ in 0..2 {
         assert_eq!(
             framed.next().await.unwrap().unwrap(),
-            FlpcUnit::Client(ClientUnit::RemoveSelf(RemoveSelf::new(
-                "Zoë".into(),
-                "pä".into()
-            )))
+            FlpcUnit::RemoveSelf(RemoveSelf::new("Zoë".into(), "pä".into()))
         );
     }
     assert!(framed.next().await.is_none());

@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{FlpcUnit, ServerSyncUsername, ServerUnit},
+    unit::{FlpcUnit, ServerSyncUsername},
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
@@ -21,16 +21,13 @@ fn encodes_literal_frame_without_touching_tail() {
     assert_eq!(unit.to_bytes().unwrap(), FRAME);
 
     let wrapped: FlpcUnit = unit.into();
-    assert_eq!(
-        wrapped,
-        FlpcUnit::Server(ServerUnit::ServerSyncUsername(self::unit()))
-    );
+    assert_eq!(wrapped, FlpcUnit::ServerSyncUsername(self::unit()));
     assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
 
 #[test]
 fn decodes_one_frame_and_waits_for_all_fields() {
-    let expected = FlpcUnit::Server(ServerUnit::ServerSyncUsername(unit()));
+    let expected = FlpcUnit::ServerSyncUsername(unit());
     assert_eq!(
         decode(FRAME).unwrap(),
         Some((expected.clone(), FRAME.len()))
@@ -63,10 +60,7 @@ fn username_limits_are_measured_in_utf8_bytes() {
         assert_eq!(unit.to_bytes().unwrap(), bytes);
         assert_eq!(
             decode(&bytes).unwrap(),
-            Some((
-                FlpcUnit::Server(ServerUnit::ServerSyncUsername(unit)),
-                bytes.len()
-            ))
+            Some((FlpcUnit::ServerSyncUsername(unit), bytes.len()))
         );
     }
 

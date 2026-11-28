@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{Add, AdminUnit, FlpcUnit},
+    unit::{Add, FlpcUnit},
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
@@ -7,7 +7,7 @@ use flpc::{
 const FRAME: &[u8] = b"\x7d\x04Zo\xc3\xab\x01p";
 
 fn expected() -> FlpcUnit {
-    FlpcUnit::Admin(AdminUnit::Add(Add::new("Zoë".into(), "p".into())))
+    FlpcUnit::Add(Add::new("Zoë".into(), "p".into()))
 }
 
 #[test]
@@ -36,10 +36,7 @@ fn decode_waits_for_both_fields_and_consumes_one_frame() {
     assert_eq!(decode(&adjacent).unwrap(), Some((expected(), FRAME.len())));
     assert_eq!(
         decode(&adjacent[FRAME.len()..]).unwrap(),
-        Some((
-            FlpcUnit::Admin(AdminUnit::Add(Add::new("u".into(), "p".into()))),
-            5,
-        ))
+        Some((FlpcUnit::Add(Add::new("u".into(), "p".into())), 5,))
     );
 }
 
@@ -60,7 +57,7 @@ fn empty_and_255_byte_fields_round_trip() {
         assert_eq!(unit.to_bytes().unwrap(), bytes);
         assert_eq!(
             decode(bytes).unwrap(),
-            Some((FlpcUnit::Admin(AdminUnit::Add(unit)), bytes.len()))
+            Some((FlpcUnit::Add(unit), bytes.len()))
         );
     }
 }

@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{ClientUnit, FlpcUnit, RemoveSelf},
+    unit::{FlpcUnit, RemoveSelf},
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
@@ -10,7 +10,7 @@ fn unit(username: &str, password: &str) -> RemoveSelf {
 }
 
 fn wrapped(username: &str, password: &str) -> FlpcUnit {
-    FlpcUnit::Client(ClientUnit::RemoveSelf(unit(username, password)))
+    FlpcUnit::RemoveSelf(unit(username, password))
 }
 
 #[test]

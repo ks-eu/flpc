@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{AdminUnit, FlpcUnit, RemoveAdmin},
+    unit::{FlpcUnit, RemoveAdmin},
     wire::{Encode, EncodeError, decode},
 };
 
@@ -31,10 +31,7 @@ fn decode_waits_for_id_and_consumes_one_frame() {
     let adjacent = [FRAME, &[0x7b, 0, 0]].concat();
     assert_eq!(
         decode(&adjacent).unwrap(),
-        Some((
-            FlpcUnit::Admin(AdminUnit::RemoveAdmin(RemoveAdmin::new(0x1234))),
-            FRAME.len(),
-        ))
+        Some((FlpcUnit::RemoveAdmin(RemoveAdmin::new(0x1234)), FRAME.len(),))
     );
 }
 
@@ -45,7 +42,7 @@ fn round_trips_id_boundaries() {
         assert_eq!(unit.to_bytes().unwrap(), bytes);
         assert_eq!(
             decode(bytes).unwrap(),
-            Some((FlpcUnit::Admin(AdminUnit::RemoveAdmin(unit)), bytes.len(),))
+            Some((FlpcUnit::RemoveAdmin(unit), bytes.len(),))
         );
     }
 }

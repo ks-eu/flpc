@@ -2,7 +2,7 @@
 
 use flpc::{
     tokio::{CodecError, FlpcCodec},
-    unit::{ClientUnit, FlpcUnit, PrivateMessage},
+    unit::{FlpcUnit, PrivateMessage},
 };
 use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
@@ -11,10 +11,7 @@ use tokio_util::codec::Framed;
 const FRAME: &[u8] = b"\x04\x12\x34\x00\x02\xc3\xa9";
 
 fn expected(target: u16, message: &str) -> FlpcUnit {
-    FlpcUnit::Client(ClientUnit::PrivateMessage(PrivateMessage::new(
-        target,
-        message.into(),
-    )))
+    FlpcUnit::PrivateMessage(PrivateMessage::new(target, message.into()))
 }
 
 #[tokio::test]

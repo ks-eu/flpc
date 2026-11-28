@@ -2,7 +2,7 @@
 
 use flpc::{
     tokio::FlpcCodec,
-    unit::{ClientUnit, FlpcUnit, Ping, PingUnit, Register},
+    unit::{FlpcUnit, Ping, Register},
 };
 use futures_util::{SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
@@ -12,7 +12,7 @@ const PING: &[u8] = &[0x00];
 const REGISTER: &[u8] = b"\x01\x01t\x02\xc3\xa9\x02pw";
 
 fn unit() -> FlpcUnit {
-    FlpcUnit::Ping(PingUnit::Ping(Ping::new()))
+    FlpcUnit::Ping(Ping::new())
 }
 
 #[tokio::test]
@@ -43,11 +43,7 @@ async fn receives_adjacent_pings_then_a_differently_sized_frame() {
     assert_eq!(framed.next().await.unwrap().unwrap(), unit());
     assert_eq!(
         framed.next().await.unwrap().unwrap(),
-        FlpcUnit::Client(ClientUnit::Register(Register::new(
-            "t".into(),
-            "é".into(),
-            "pw".into(),
-        )))
+        FlpcUnit::Register(Register::new("t".into(), "é".into(), "pw".into(),))
     );
     assert!(framed.next().await.is_none());
 }

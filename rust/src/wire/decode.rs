@@ -1,11 +1,11 @@
 use super::DecodeError;
 use crate::unit::{
-    Add, AdminUnit, ChangeUsername, ChangedUsername, ClientUnit, FlpcUnit, Kick, Login, MakeAdmin,
-    Message, Ping, PingUnit, PrivateMessage, Register, Remove, RemoveAdmin, RemoveSelf,
-    RequestSyncMessage, RequestSyncPrivateMessage, RequestSyncUsername, ServerLogin, ServerMessage,
+    Add, ChangeUsername, ChangedUsername, FlpcUnit, Kick, Login, MakeAdmin, Message, Ping,
+    PrivateMessage, Register, Remove, RemoveAdmin, RemoveSelf, RequestSyncMessage,
+    RequestSyncPrivateMessage, RequestSyncUsername, ServerLogin, ServerMessage,
     ServerPrivateMessage, ServerRegister, ServerRemoveSelf, ServerSyncEnd, ServerSyncUsername,
-    ServerUnit, SyncMessage, SyncPrivateMessage, UserJoined, UserLeft, UserNotOnline,
-    UserRegistered, UserRemoved, WrongUnit,
+    SyncMessage, SyncPrivateMessage, UserJoined, UserLeft, UserNotOnline, UserRegistered,
+    UserRemoved, WrongUnit,
 };
 
 /// Decodes the first unit and returns it with the byte count, including its opcode.
@@ -25,7 +25,7 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
 
     let unit = match opcode {
         // 0x00
-        Ping::OPCODE => Some(FlpcUnit::Ping(PingUnit::Ping(Ping::new()))),
+        Ping::OPCODE => Some(FlpcUnit::Ping(Ping::new())),
         // 0x01
         Register::OPCODE => {
             let mut fields = [""; 3];
@@ -37,7 +37,7 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             }
             let [token, username, password] = fields;
             let unit = Register::new(token.into(), username.into(), password.into());
-            Some(FlpcUnit::Client(ClientUnit::Register(unit)))
+            Some(FlpcUnit::Register(unit))
         }
         // 0x02
         Login::OPCODE => {
@@ -47,19 +47,17 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             let Some(password) = read_short_string(&mut remaining)? else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Client(ClientUnit::Login(Login::new(
+            Some(FlpcUnit::Login(Login::new(
                 username.into(),
                 password.into(),
-            ))))
+            )))
         }
         // 0x03
         Message::OPCODE => {
             let Some(message) = read_long_string(&mut remaining)? else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Client(ClientUnit::Message(Message::new(
-                message.into(),
-            ))))
+            Some(FlpcUnit::Message(Message::new(message.into())))
         }
         // 0x04
         PrivateMessage::OPCODE => {
@@ -69,8 +67,9 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             let Some(message) = read_long_string(&mut remaining)? else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Client(ClientUnit::PrivateMessage(
-                PrivateMessage::new(u16::from_be_bytes(target), message.into()),
+            Some(FlpcUnit::PrivateMessage(PrivateMessage::new(
+                u16::from_be_bytes(target),
+                message.into(),
             )))
         }
         // 0x05
@@ -78,8 +77,8 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             let Some(username) = read_short_string(&mut remaining)? else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Client(ClientUnit::ChangeUsername(
-                ChangeUsername::new(username.into()),
+            Some(FlpcUnit::ChangeUsername(ChangeUsername::new(
+                username.into(),
             )))
         }
         // 0x06
@@ -93,8 +92,9 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             if count == 0 {
                 return Err(DecodeError::InvalidCount);
             }
-            Some(FlpcUnit::Client(ClientUnit::RequestSyncMessage(
-                RequestSyncMessage::new(u64::from_be_bytes(timestamp), count),
+            Some(FlpcUnit::RequestSyncMessage(RequestSyncMessage::new(
+                u64::from_be_bytes(timestamp),
+                count,
             )))
         }
         // 0x07
@@ -105,18 +105,18 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             let Some(password) = read_short_string(&mut remaining)? else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Client(ClientUnit::RemoveSelf(RemoveSelf::new(
+            Some(FlpcUnit::RemoveSelf(RemoveSelf::new(
                 username.into(),
                 password.into(),
-            ))))
+            )))
         }
         // 0x08
         RequestSyncUsername::OPCODE => {
             let Some(id) = read_array(&mut remaining) else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Client(ClientUnit::RequestSyncUsername(
-                RequestSyncUsername::new(u16::from_be_bytes(id)),
+            Some(FlpcUnit::RequestSyncUsername(RequestSyncUsername::new(
+                u16::from_be_bytes(id),
             )))
         }
         // 0x09
@@ -133,21 +133,21 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             if count == 0 {
                 return Err(DecodeError::InvalidCount);
             }
-            Some(FlpcUnit::Client(ClientUnit::RequestSyncPrivateMessage(
+            Some(FlpcUnit::RequestSyncPrivateMessage(
                 RequestSyncPrivateMessage::new(
                     u16::from_be_bytes(target),
                     u64::from_be_bytes(timestamp),
                     count,
                 ),
-            )))
+            ))
         }
         // 0x7B
         RemoveAdmin::OPCODE => {
             let Some(id) = read_array(&mut remaining) else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Admin(AdminUnit::RemoveAdmin(RemoveAdmin::new(
-                u16::from_be_bytes(id),
+            Some(FlpcUnit::RemoveAdmin(RemoveAdmin::new(u16::from_be_bytes(
+                id,
             ))))
         }
         // 0x7C
@@ -155,9 +155,7 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             let Some(id) = read_array(&mut remaining) else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Admin(AdminUnit::MakeAdmin(MakeAdmin::new(
-                u16::from_be_bytes(id),
-            ))))
+            Some(FlpcUnit::MakeAdmin(MakeAdmin::new(u16::from_be_bytes(id))))
         }
         // 0x7D
         Add::OPCODE => {
@@ -167,46 +165,35 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             let Some(password) = read_short_string(&mut remaining)? else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Admin(AdminUnit::Add(Add::new(
-                username.into(),
-                password.into(),
-            ))))
+            Some(FlpcUnit::Add(Add::new(username.into(), password.into())))
         }
         // 0x7E
         Remove::OPCODE => {
             let Some(id) = read_array(&mut remaining) else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Admin(AdminUnit::Remove(Remove::new(
-                u16::from_be_bytes(id),
-            ))))
+            Some(FlpcUnit::Remove(Remove::new(u16::from_be_bytes(id))))
         }
         // 0x7F
         Kick::OPCODE => {
             let Some(id) = read_array(&mut remaining) else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Admin(AdminUnit::Kick(Kick::new(
-                u16::from_be_bytes(id),
-            ))))
+            Some(FlpcUnit::Kick(Kick::new(u16::from_be_bytes(id))))
         }
         // 0x80
         ServerRegister::OPCODE => {
             let Some([outcome]) = read_array(&mut remaining) else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Server(ServerUnit::ServerRegister(
-                ServerRegister::new(outcome),
-            )))
+            Some(FlpcUnit::ServerRegister(ServerRegister::new(outcome)))
         }
         // 0x81
         ServerLogin::OPCODE => {
             let Some([outcome]) = read_array(&mut remaining) else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Server(ServerUnit::ServerLogin(ServerLogin::new(
-                outcome,
-            ))))
+            Some(FlpcUnit::ServerLogin(ServerLogin::new(outcome)))
         }
         // 0x82
         ServerMessage::OPCODE => {
@@ -219,12 +206,10 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             let Some(message) = read_long_string(&mut remaining)? else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Server(ServerUnit::ServerMessage(
-                ServerMessage::new(
-                    u16::from_be_bytes(id),
-                    u64::from_be_bytes(timestamp),
-                    message.into(),
-                ),
+            Some(FlpcUnit::ServerMessage(ServerMessage::new(
+                u16::from_be_bytes(id),
+                u64::from_be_bytes(timestamp),
+                message.into(),
             )))
         }
         // 0x83
@@ -241,13 +226,11 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             let Some(message) = read_long_string(&mut remaining)? else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Server(ServerUnit::ServerPrivateMessage(
-                ServerPrivateMessage::new(
-                    u16::from_be_bytes(id),
-                    u16::from_be_bytes(target),
-                    u64::from_be_bytes(timestamp),
-                    message.into(),
-                ),
+            Some(FlpcUnit::ServerPrivateMessage(ServerPrivateMessage::new(
+                u16::from_be_bytes(id),
+                u16::from_be_bytes(target),
+                u64::from_be_bytes(timestamp),
+                message.into(),
             )))
         }
         // 0x84
@@ -258,8 +241,9 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             let Some(username) = read_short_string(&mut remaining)? else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Server(ServerUnit::UserRegistered(
-                UserRegistered::new(u16::from_be_bytes(id), username.into()),
+            Some(FlpcUnit::UserRegistered(UserRegistered::new(
+                u16::from_be_bytes(id),
+                username.into(),
             )))
         }
         // 0x85
@@ -267,8 +251,8 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             let Some(id) = read_array(&mut remaining) else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Server(ServerUnit::UserRemoved(UserRemoved::new(
-                u16::from_be_bytes(id),
+            Some(FlpcUnit::UserRemoved(UserRemoved::new(u16::from_be_bytes(
+                id,
             ))))
         }
         // 0x86
@@ -276,8 +260,8 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             let Some(id) = read_array(&mut remaining) else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Server(ServerUnit::UserJoined(UserJoined::new(
-                u16::from_be_bytes(id),
+            Some(FlpcUnit::UserJoined(UserJoined::new(u16::from_be_bytes(
+                id,
             ))))
         }
         // 0x87
@@ -285,9 +269,7 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             let Some(id) = read_array(&mut remaining) else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Server(ServerUnit::UserLeft(UserLeft::new(
-                u16::from_be_bytes(id),
-            ))))
+            Some(FlpcUnit::UserLeft(UserLeft::new(u16::from_be_bytes(id))))
         }
         // 0x88
         ChangedUsername::OPCODE => {
@@ -297,8 +279,9 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             let Some(username) = read_short_string(&mut remaining)? else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Server(ServerUnit::ChangedUsername(
-                ChangedUsername::new(u16::from_be_bytes(id), username.into()),
+            Some(FlpcUnit::ChangedUsername(ChangedUsername::new(
+                u16::from_be_bytes(id),
+                username.into(),
             )))
         }
         // 0x89
@@ -312,11 +295,11 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             let Some(message) = read_long_string(&mut remaining)? else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Server(ServerUnit::SyncMessage(SyncMessage::new(
+            Some(FlpcUnit::SyncMessage(SyncMessage::new(
                 u16::from_be_bytes(id),
                 u64::from_be_bytes(timestamp),
                 message.into(),
-            ))))
+            )))
         }
         // 0x8A
         SyncPrivateMessage::OPCODE => {
@@ -332,39 +315,31 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             let Some(message) = read_long_string(&mut remaining)? else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Server(ServerUnit::SyncPrivateMessage(
-                SyncPrivateMessage::new(
-                    u16::from_be_bytes(id),
-                    u16::from_be_bytes(target),
-                    u64::from_be_bytes(timestamp),
-                    message.into(),
-                ),
+            Some(FlpcUnit::SyncPrivateMessage(SyncPrivateMessage::new(
+                u16::from_be_bytes(id),
+                u16::from_be_bytes(target),
+                u64::from_be_bytes(timestamp),
+                message.into(),
             )))
         }
         // 0x8B
-        WrongUnit::OPCODE => Some(FlpcUnit::Server(ServerUnit::WrongUnit(WrongUnit::new()))),
+        WrongUnit::OPCODE => Some(FlpcUnit::WrongUnit(WrongUnit::new())),
         // 0x8C
         ServerRemoveSelf::OPCODE => {
             let Some([result]) = read_array(&mut remaining) else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Server(ServerUnit::ServerRemoveSelf(
-                ServerRemoveSelf::new(result),
-            )))
+            Some(FlpcUnit::ServerRemoveSelf(ServerRemoveSelf::new(result)))
         }
         // 0x8D
         ServerSyncEnd::OPCODE => {
             let Some([count]) = read_array(&mut remaining) else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Server(ServerUnit::ServerSyncEnd(
-                ServerSyncEnd::new(count),
-            )))
+            Some(FlpcUnit::ServerSyncEnd(ServerSyncEnd::new(count)))
         }
         // 0x8E
-        UserNotOnline::OPCODE => Some(FlpcUnit::Server(ServerUnit::UserNotOnline(
-            UserNotOnline::new(),
-        ))),
+        UserNotOnline::OPCODE => Some(FlpcUnit::UserNotOnline(UserNotOnline::new())),
         // 0x8F
         ServerSyncUsername::OPCODE => {
             let Some(id) = read_array(&mut remaining) else {
@@ -373,8 +348,9 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             let Some(username) = read_short_string(&mut remaining)? else {
                 return Ok(None);
             };
-            Some(FlpcUnit::Server(ServerUnit::ServerSyncUsername(
-                ServerSyncUsername::new(u16::from_be_bytes(id), username.into()),
+            Some(FlpcUnit::ServerSyncUsername(ServerSyncUsername::new(
+                u16::from_be_bytes(id),
+                username.into(),
             )))
         }
         _ => return Err(DecodeError::UnknownOpcode),

@@ -1,9 +1,6 @@
 use std::fmt::Debug;
 
-use flpc::{
-    unit::{AdminUnit, ClientUnit, FlpcUnit},
-    wire::decode,
-};
+use flpc::{unit::FlpcUnit, wire::decode};
 
 fn assert_debug_redacts(unit: &impl Debug, fields: &[(&str, &str)]) {
     for output in [format!("{unit:?}"), format!("{unit:#?}")] {
@@ -20,7 +17,7 @@ fn decoded_register_redacts_token_and_password() {
     let (unit, _) = decode(b"\x01\x0dexample-token\x05alice\x10example-password")
         .unwrap()
         .unwrap();
-    let FlpcUnit::Client(ClientUnit::Register(register)) = &unit else {
+    let FlpcUnit::Register(register) = &unit else {
         panic!("expected a Register unit");
     };
 
@@ -34,7 +31,7 @@ fn decoded_login_redacts_password() {
     let (unit, _) = decode(b"\x02\x05alice\x10example-password")
         .unwrap()
         .unwrap();
-    let FlpcUnit::Client(ClientUnit::Login(login)) = &unit else {
+    let FlpcUnit::Login(login) = &unit else {
         panic!("expected a Login unit");
     };
 
@@ -48,7 +45,7 @@ fn decoded_add_redacts_password() {
     let (unit, _) = decode(b"\x7d\x05alice\x10example-password")
         .unwrap()
         .unwrap();
-    let FlpcUnit::Admin(AdminUnit::Add(add)) = &unit else {
+    let FlpcUnit::Add(add) = &unit else {
         panic!("expected an Add unit");
     };
 

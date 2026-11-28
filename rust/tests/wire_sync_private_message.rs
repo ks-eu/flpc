@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{FlpcUnit, ServerUnit, SyncPrivateMessage},
+    unit::{FlpcUnit, SyncPrivateMessage},
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
@@ -11,12 +11,12 @@ const FRAME: &[u8] = &[
 #[test]
 fn encoding_and_decoding_match_the_wire_vector() {
     let unit = SyncPrivateMessage::new(0x1234, 0x5678, 0x0102030405060708, "é".into());
-    let expected = FlpcUnit::Server(ServerUnit::SyncPrivateMessage(SyncPrivateMessage::new(
+    let expected = FlpcUnit::SyncPrivateMessage(SyncPrivateMessage::new(
         0x1234,
         0x5678,
         0x0102030405060708,
         "é".into(),
-    )));
+    ));
     let mut dst = [0xaa; FRAME.len() + 2];
     assert_eq!(unit.encoded_len().unwrap(), FRAME.len());
     assert_eq!(unit.encode_into(&mut dst).unwrap(), FRAME.len());

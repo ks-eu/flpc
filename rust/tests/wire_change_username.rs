@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{ChangeUsername, ClientUnit, FlpcUnit},
+    unit::{ChangeUsername, FlpcUnit},
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
@@ -7,7 +7,7 @@ use flpc::{
 const FRAME: &[u8] = b"\x05\x02\xc3\xa9";
 
 fn expected() -> FlpcUnit {
-    FlpcUnit::Client(ClientUnit::ChangeUsername(ChangeUsername::new("é".into())))
+    FlpcUnit::ChangeUsername(ChangeUsername::new("é".into()))
 }
 
 #[test]
@@ -59,10 +59,7 @@ fn empty_and_255_byte_usernames_round_trip() {
         assert_eq!(unit.to_bytes().unwrap(), bytes);
         assert_eq!(
             decode(bytes).unwrap(),
-            Some((
-                FlpcUnit::Client(ClientUnit::ChangeUsername(unit)),
-                bytes.len(),
-            ))
+            Some((FlpcUnit::ChangeUsername(unit), bytes.len(),))
         );
     }
 }

@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{ClientUnit, FlpcUnit, Message, Ping, PingUnit},
+    unit::{FlpcUnit, Message, Ping},
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
@@ -10,7 +10,7 @@ fn message(value: &str) -> Message {
 }
 
 fn decoded(value: &str) -> FlpcUnit {
-    FlpcUnit::Client(ClientUnit::Message(message(value)))
+    FlpcUnit::Message(message(value))
 }
 
 #[test]
@@ -35,7 +35,7 @@ fn encodes_independent_bytes_and_decodes_one_unit() {
     );
     assert_eq!(
         decode(&adjacent[FRAME.len()..]).unwrap(),
-        Some((FlpcUnit::Ping(PingUnit::Ping(Ping::new())), 1))
+        Some((FlpcUnit::Ping(Ping::new()), 1))
     );
 
     let wrapped: FlpcUnit = Message::new("hello".into()).into();

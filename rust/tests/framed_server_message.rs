@@ -2,7 +2,7 @@
 
 use flpc::{
     tokio::FlpcCodec,
-    unit::{FlpcUnit, ServerMessage, ServerUnit},
+    unit::{FlpcUnit, ServerMessage},
 };
 use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
@@ -30,10 +30,6 @@ async fn framed_sends_and_receives_independent_wire_bytes() {
     peer.write_all(&FRAME[FRAME.len() - 1..]).await.unwrap();
     assert_eq!(
         framed.next().await.unwrap().unwrap(),
-        FlpcUnit::Server(ServerUnit::ServerMessage(ServerMessage::new(
-            0x1234,
-            0x0102030405060708,
-            "é".into()
-        )))
+        FlpcUnit::ServerMessage(ServerMessage::new(0x1234, 0x0102030405060708, "é".into()))
     );
 }

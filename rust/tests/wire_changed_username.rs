@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{ChangedUsername, FlpcUnit, ServerUnit},
+    unit::{ChangedUsername, FlpcUnit},
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
@@ -9,10 +9,7 @@ const FRAME: &[u8] = &[0x88, 0x12, 0x34, 2, 0xC3, 0xA9];
 #[test]
 fn encoding_and_decoding_match_the_wire_vector() {
     let unit = ChangedUsername::new(0x1234, "é".into());
-    let expected = FlpcUnit::Server(ServerUnit::ChangedUsername(ChangedUsername::new(
-        0x1234,
-        "é".into(),
-    )));
+    let expected = FlpcUnit::ChangedUsername(ChangedUsername::new(0x1234, "é".into()));
     let mut dst = [0xaa; FRAME.len() + 2];
     assert_eq!(unit.encoded_len().unwrap(), FRAME.len());
     assert_eq!(unit.encode_into(&mut dst).unwrap(), FRAME.len());

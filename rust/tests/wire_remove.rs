@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{AdminUnit, FlpcUnit, Ping, PingUnit, Remove},
+    unit::{FlpcUnit, Ping, Remove},
     wire::{Encode, EncodeError, decode},
 };
 
@@ -31,14 +31,11 @@ fn decode_waits_for_id_and_consumes_one_frame() {
     let adjacent = [FRAME, &[0x00]].concat();
     assert_eq!(
         decode(&adjacent).unwrap(),
-        Some((
-            FlpcUnit::Admin(AdminUnit::Remove(Remove::new(0x89ab))),
-            FRAME.len(),
-        ))
+        Some((FlpcUnit::Remove(Remove::new(0x89ab)), FRAME.len(),))
     );
     assert_eq!(
         decode(&adjacent[FRAME.len()..]).unwrap(),
-        Some((FlpcUnit::Ping(PingUnit::Ping(Ping::new())), 1))
+        Some((FlpcUnit::Ping(Ping::new()), 1))
     );
 }
 

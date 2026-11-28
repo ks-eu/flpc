@@ -2,7 +2,7 @@
 
 use flpc::{
     tokio::{CodecError, FlpcCodec},
-    unit::{ClientUnit, FlpcUnit, Register},
+    unit::{FlpcUnit, Register},
 };
 use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
@@ -34,11 +34,7 @@ async fn reports_clean_eof_after_the_last_complete_frame() {
 
     assert_eq!(
         framed.next().await.unwrap().unwrap(),
-        FlpcUnit::Client(ClientUnit::Register(Register::new(
-            "t".into(),
-            "é".into(),
-            "pw".into(),
-        )))
+        FlpcUnit::Register(Register::new("t".into(), "é".into(), "pw".into(),))
     );
     assert!(framed.next().await.is_none());
 }
@@ -62,7 +58,7 @@ async fn receives_fragmented_frame_then_truncated_frame_at_eof() {
     ] {
         assert_eq!(
             framed.next().await.unwrap().unwrap(),
-            FlpcUnit::Client(ClientUnit::Register(expected))
+            FlpcUnit::Register(expected)
         );
     }
     assert!(matches!(framed.next().await, Some(Err(CodecError::Io(_)))));

@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{FlpcUnit, ServerRegister, ServerUnit},
+    unit::{FlpcUnit, ServerRegister},
     wire::{Encode, EncodeError},
 };
 
@@ -9,10 +9,7 @@ const FRAME: &[u8] = &[0x80, 0x00];
 #[test]
 fn server_register_converts_and_encodes_as_flpc_unit() {
     let unit: FlpcUnit = ServerRegister::new(0).into();
-    assert_eq!(
-        unit,
-        FlpcUnit::Server(ServerUnit::ServerRegister(ServerRegister::new(0)))
-    );
+    assert_eq!(unit, FlpcUnit::ServerRegister(ServerRegister::new(0)));
 
     let mut dst = [0xaa; FRAME.len() + 1];
 

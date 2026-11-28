@@ -1,5 +1,5 @@
 use flpc::{
-    unit::{ClientUnit, FlpcUnit, Ping, PingUnit, Register},
+    unit::{FlpcUnit, Ping, Register},
     wire::{Encode, EncodeError, decode},
 };
 
@@ -7,7 +7,7 @@ const PING: &[u8] = &[0x00];
 const REGISTER: &[u8] = b"\x01\x01t\x02\xc3\xa9\x02pw";
 
 fn decoded() -> FlpcUnit {
-    FlpcUnit::Ping(PingUnit::Ping(Ping::new()))
+    FlpcUnit::Ping(Ping::new())
 }
 
 #[test]
@@ -43,11 +43,7 @@ fn decode_consumes_one_byte_before_a_differently_sized_unit() {
     assert_eq!(
         decode(&stream[2 * PING.len()..]).unwrap(),
         Some((
-            FlpcUnit::Client(ClientUnit::Register(Register::new(
-                "t".into(),
-                "é".into(),
-                "pw".into(),
-            ))),
+            FlpcUnit::Register(Register::new("t".into(), "é".into(), "pw".into(),)),
             REGISTER.len(),
         ))
     );
