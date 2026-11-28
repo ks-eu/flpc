@@ -249,6 +249,21 @@ impl From<SyncMessageFail> for FlpcUnit {
     }
 }
 
+/// Reports why a username synchronization request failed (opcode `0xD1`).
+///
+/// The reason is preserved as a raw `u8`. Peers agree on its meaning.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{unit::{FlpcUnit, SyncUsernameFail}, wire::{decode, Encode}};
+///
+/// let unit = SyncUsernameFail::new(0x2a);
+/// let bytes: &[u8] = &[0xd1, 0x2a];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SyncUsernameFail {
     reason: u8,
