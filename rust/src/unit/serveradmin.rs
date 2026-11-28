@@ -116,6 +116,21 @@ impl From<ServerKick> for FlpcUnit {
     }
 }
 
+/// Reports the outcome of a grant-administrator request (opcode `0xE3`).
+///
+/// The outcome is preserved as a raw `u8`. Peers agree on its meaning.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{unit::{FlpcUnit, ServerMakeAdmin}, wire::{decode, Encode}};
+///
+/// let unit = ServerMakeAdmin::new(0x2a);
+/// let bytes: &[u8] = &[0xe3, 0x2a];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerMakeAdmin {
     outcome: u8,
