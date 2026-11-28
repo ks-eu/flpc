@@ -709,6 +709,21 @@ impl From<ServerChangedPassword> for FlpcUnit {
     }
 }
 
+/// Marks the end of onboarding (opcode `0x95`).
+///
+/// This unit has no payload.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{unit::{FlpcUnit, OnboardingEnd}, wire::{decode, Encode}};
+///
+/// let unit = OnboardingEnd::new();
+/// let bytes: &[u8] = &[0x95];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OnboardingEnd;
 
