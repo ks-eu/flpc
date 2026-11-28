@@ -3,10 +3,10 @@ use crate::unit::{
     Add, ChangePassword, ChangeUsername, ChangedUsername, FlpcUnit, Kick, Login, MakeAdmin,
     Message, OnboardingEnd, Ping, PrivateMessage, Register, Remove, RemoveAdmin, RemoveSelf,
     RequestSyncMessage, RequestSyncPrivateMessage, RequestSyncUsername, ServerChangedPassword,
-    ServerLogin, ServerMessage, ServerMessageFail, ServerPrivateMessage, ServerRegister,
-    ServerRemoveSelf, ServerResponse, SyncEnd, SyncMessage, SyncPrivateMessage, SyncUsername,
-    UserAdmin, UserAdminRemoved, UserJoined, UserLeft, UserNotOnline, UserRegistered, UserRemoved,
-    WrongUnit,
+    ServerChangedUsername, ServerLogin, ServerMessage, ServerMessageFail, ServerPrivateMessage,
+    ServerRegister, ServerRemoveSelf, ServerResponse, SyncEnd, SyncMessage, SyncPrivateMessage,
+    SyncUsername, UserAdmin, UserAdminRemoved, UserJoined, UserLeft, UserNotOnline, UserRegistered,
+    UserRemoved, WrongUnit,
 };
 
 /// Decodes the first unit and returns it with the byte count, including its opcode.
@@ -413,6 +413,15 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 return Ok(None);
             };
             Some(FlpcUnit::ServerMessageFail(ServerMessageFail::new(reason)))
+        }
+        // 0xB1
+        ServerChangedUsername::OPCODE => {
+            let Some([outcome]) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::ServerChangedUsername(ServerChangedUsername::new(
+                outcome,
+            )))
         }
         _ => return Err(DecodeError::UnknownOpcode),
     };

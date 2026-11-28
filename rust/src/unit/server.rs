@@ -778,3 +778,26 @@ impl From<ServerMessageFail> for FlpcUnit {
         Self::ServerMessageFail(unit)
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServerChangedUsername {
+    outcome: u8,
+}
+
+impl ServerChangedUsername {
+    pub(crate) const OPCODE: u8 = 0xB1;
+
+    pub fn new(outcome: u8) -> Self {
+        Self { outcome }
+    }
+
+    pub fn outcome(&self) -> &u8 {
+        &self.outcome
+    }
+}
+
+impl From<ServerChangedUsername> for FlpcUnit {
+    fn from(unit: ServerChangedUsername) -> Self {
+        Self::ServerChangedUsername(unit)
+    }
+}
