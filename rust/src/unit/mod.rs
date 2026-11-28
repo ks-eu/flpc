@@ -27,7 +27,7 @@ pub use server::{
     ServerResponse, UserAdmin, UserAdminRemoved, UserJoined, UserLeft, UserNotOnline,
     UserRegistered, UserRemoved, WrongUnit,
 };
-pub use serversync::{SyncEnd, SyncMessage, SyncPrivateMessage, SyncUsername};
+pub use serversync::{SyncEnd, SyncMessage, SyncMessageFail, SyncPrivateMessage, SyncUsername};
 
 /// A unit that can be encoded to or decoded from an FLPC byte stream.
 ///
@@ -73,4 +73,5 @@ pub enum FlpcUnit {
     OnboardingEnd(OnboardingEnd),
     ServerMessageFail(ServerMessageFail),
     ServerChangedUsername(ServerChangedUsername),
+    SyncMessageFail(SyncMessageFail),
 }

@@ -210,3 +210,26 @@ impl From<SyncUsername> for FlpcUnit {
         Self::SyncUsername(unit)
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SyncMessageFail {
+    reason: u8,
+}
+
+impl SyncMessageFail {
+    pub(crate) const OPCODE: u8 = 0xD0;
+
+    pub fn new(reason: u8) -> Self {
+        Self { reason }
+    }
+
+    pub fn reason(&self) -> &u8 {
+        &self.reason
+    }
+}
+
+impl From<SyncMessageFail> for FlpcUnit {
+    fn from(unit: SyncMessageFail) -> Self {
+        Self::SyncMessageFail(unit)
+    }
+}
