@@ -135,22 +135,22 @@ impl From<SyncPrivateMessage> for FlpcUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{FlpcUnit, ServerSyncEnd},
+///     unit::{FlpcUnit, SyncEnd},
 ///     wire::{decode, Encode},
 /// };
 ///
-/// let unit = ServerSyncEnd::new(1);
+/// let unit = SyncEnd::new(1);
 /// let bytes = [0xc3, 1];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ServerSyncEnd {
+pub struct SyncEnd {
     count: u8,
 }
 
-impl ServerSyncEnd {
+impl SyncEnd {
     pub(crate) const OPCODE: u8 = 0xC3;
 
     pub fn new(count: u8) -> Self {
@@ -161,9 +161,9 @@ impl ServerSyncEnd {
     }
 }
 
-impl From<ServerSyncEnd> for FlpcUnit {
-    fn from(unit: ServerSyncEnd) -> Self {
-        Self::ServerSyncEnd(unit)
+impl From<SyncEnd> for FlpcUnit {
+    fn from(unit: SyncEnd) -> Self {
+        Self::SyncEnd(unit)
     }
 }
 
@@ -175,23 +175,23 @@ impl From<ServerSyncEnd> for FlpcUnit {
 ///
 /// ```
 /// use flpc::{
-///     unit::{FlpcUnit, ServerSyncUsername},
+///     unit::{FlpcUnit, SyncUsername},
 ///     wire::{decode, Encode},
 /// };
 ///
-/// let unit = ServerSyncUsername::new(0x1234, "é".into());
+/// let unit = SyncUsername::new(0x1234, "é".into());
 /// let bytes = [0xc2, 0x12, 0x34, 2, 0xc3, 0xa9];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ServerSyncUsername {
+pub struct SyncUsername {
     id: u16,
     username: String,
 }
 
-impl ServerSyncUsername {
+impl SyncUsername {
     pub(crate) const OPCODE: u8 = 0xC2;
 
     pub fn new(id: u16, username: String) -> Self {
@@ -205,8 +205,8 @@ impl ServerSyncUsername {
     }
 }
 
-impl From<ServerSyncUsername> for FlpcUnit {
-    fn from(unit: ServerSyncUsername) -> Self {
-        Self::ServerSyncUsername(unit)
+impl From<SyncUsername> for FlpcUnit {
+    fn from(unit: SyncUsername) -> Self {
+        Self::SyncUsername(unit)
     }
 }

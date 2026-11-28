@@ -92,8 +92,8 @@ fn concrete_unit(unit: &FlpcUnit) -> &dyn Encode {
         FlpcUnit::SyncPrivateMessage(unit) => unit,
         FlpcUnit::WrongUnit(unit) => unit,
         FlpcUnit::ServerRemoveSelf(unit) => unit,
-        FlpcUnit::ServerSyncEnd(unit) => unit,
+        FlpcUnit::SyncEnd(unit) => unit,
         FlpcUnit::UserNotOnline(unit) => unit,
-        FlpcUnit::ServerSyncUsername(unit) => unit,
+        FlpcUnit::SyncUsername(unit) => unit,
     }
 }

@@ -3,8 +3,8 @@ use crate::unit::{
     Add, ChangeUsername, ChangedUsername, FlpcUnit, Kick, Login, MakeAdmin, Message, Ping,
     PrivateMessage, Register, Remove, RemoveAdmin, RemoveSelf, RequestSyncMessage,
     RequestSyncPrivateMessage, RequestSyncUsername, ServerLogin, ServerMessage,
-    ServerPrivateMessage, ServerRegister, ServerRemoveSelf, ServerSyncEnd, ServerSyncUsername,
-    SyncMessage, SyncPrivateMessage, UserJoined, UserLeft, UserNotOnline, UserRegistered,
+    ServerPrivateMessage, ServerRegister, ServerRemoveSelf, SyncEnd, SyncMessage,
+    SyncPrivateMessage, SyncUsername, UserJoined, UserLeft, UserNotOnline, UserRegistered,
     UserRemoved, WrongUnit,
 };
 
@@ -332,23 +332,23 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             Some(FlpcUnit::ServerRemoveSelf(ServerRemoveSelf::new(result)))
         }
         // 0xC3
-        ServerSyncEnd::OPCODE => {
+        SyncEnd::OPCODE => {
             let Some([count]) = read_array(&mut remaining) else {
                 return Ok(None);
             };
-            Some(FlpcUnit::ServerSyncEnd(ServerSyncEnd::new(count)))
+            Some(FlpcUnit::SyncEnd(SyncEnd::new(count)))
         }
         // 0xB2
         UserNotOnline::OPCODE => Some(FlpcUnit::UserNotOnline(UserNotOnline::new())),
         // 0xC2
-        ServerSyncUsername::OPCODE => {
+        SyncUsername::OPCODE => {
             let Some(id) = read_array(&mut remaining) else {
                 return Ok(None);
             };
             let Some(username) = read_short_string(&mut remaining)? else {
                 return Ok(None);
             };
-            Some(FlpcUnit::ServerSyncUsername(ServerSyncUsername::new(
+            Some(FlpcUnit::SyncUsername(SyncUsername::new(
                 u16::from_be_bytes(id),
                 username.into(),
             )))

@@ -1,12 +1,12 @@
 use flpc::{
-    unit::{FlpcUnit, ServerSyncEnd},
+    unit::{FlpcUnit, SyncEnd},
     wire::{Encode, EncodeError, decode},
 };
 
 const FRAME: &[u8] = &[0xc3, 1];
 
-fn unit() -> ServerSyncEnd {
-    ServerSyncEnd::new(1)
+fn unit() -> SyncEnd {
+    SyncEnd::new(1)
 }
 
 #[test]
@@ -21,13 +21,13 @@ fn encodes_literal_frame_without_touching_tail() {
     assert_eq!(unit.to_bytes().unwrap(), FRAME);
 
     let wrapped: FlpcUnit = unit.into();
-    assert_eq!(wrapped, FlpcUnit::ServerSyncEnd(self::unit()));
+    assert_eq!(wrapped, FlpcUnit::SyncEnd(self::unit()));
     assert_eq!(wrapped.to_bytes().unwrap(), FRAME);
 }
 
 #[test]
 fn decodes_one_frame_and_waits_for_all_fields() {
-    let expected = FlpcUnit::ServerSyncEnd(unit());
+    let expected = FlpcUnit::SyncEnd(unit());
     assert_eq!(
         decode(FRAME).unwrap(),
         Some((expected.clone(), FRAME.len()))
@@ -54,12 +54,12 @@ fn undersized_destination_is_unchanged() {
 #[test]
 fn zero_count_ends_an_empty_batch() {
     for count in [0, 255] {
-        let unit = ServerSyncEnd::new(count);
+        let unit = SyncEnd::new(count);
         let bytes = [0xc3, count];
         assert_eq!(unit.to_bytes().unwrap(), bytes);
         assert_eq!(
             decode(&bytes).unwrap(),
-            Some((FlpcUnit::ServerSyncEnd(unit), bytes.len()))
+            Some((FlpcUnit::SyncEnd(unit), bytes.len()))
         );
     }
 }

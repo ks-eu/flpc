@@ -6,9 +6,9 @@ use super::{
         encode_frame, long_string_len, short_strings_len, write_long_string, write_short_string,
     },
 };
-use crate::unit::{ServerSyncEnd, ServerSyncUsername, SyncMessage, SyncPrivateMessage};
+use crate::unit::{SyncEnd, SyncMessage, SyncPrivateMessage, SyncUsername};
 
-impl Encode for ServerSyncEnd {
+impl Encode for SyncEnd {
     fn encoded_len(&self) -> Result<usize, EncodeError> {
         Ok(2)
     }
@@ -18,7 +18,7 @@ impl Encode for ServerSyncEnd {
     }
 }
 
-impl Encode for ServerSyncUsername {
+impl Encode for SyncUsername {
     fn encoded_len(&self) -> Result<usize, EncodeError> {
         Ok(3 + short_strings_len(&[self.username()])?)
     }

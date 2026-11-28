@@ -2,7 +2,7 @@
 
 use flpc::{
     tokio::{CodecError, FlpcCodec},
-    unit::{FlpcUnit, Ping, ServerSyncEnd},
+    unit::{FlpcUnit, Ping, SyncEnd},
 };
 use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
@@ -11,8 +11,8 @@ use tokio_util::codec::Framed;
 const FRAME: &[u8] = &[0xc3, 0];
 const NEXT: &[u8] = &[0x00];
 
-fn unit() -> ServerSyncEnd {
-    ServerSyncEnd::new(0)
+fn unit() -> SyncEnd {
+    SyncEnd::new(0)
 }
 
 #[tokio::test]
@@ -41,7 +41,7 @@ async fn receives_adjacent_frames_then_clean_eof() {
 
     assert_eq!(
         framed.next().await.unwrap().unwrap(),
-        FlpcUnit::ServerSyncEnd(unit())
+        FlpcUnit::SyncEnd(unit())
     );
     assert_eq!(
         framed.next().await.unwrap().unwrap(),

@@ -23,7 +23,7 @@ pub use server::{
     ChangedUsername, ServerLogin, ServerMessage, ServerPrivateMessage, ServerRegister,
     ServerRemoveSelf, UserJoined, UserLeft, UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
 };
-pub use serversync::{ServerSyncEnd, ServerSyncUsername, SyncMessage, SyncPrivateMessage};
+pub use serversync::{SyncEnd, SyncMessage, SyncPrivateMessage, SyncUsername};
 
 /// A unit that can be encoded to or decoded from an FLPC byte stream.
 ///
@@ -58,7 +58,7 @@ pub enum FlpcUnit {
     SyncPrivateMessage(SyncPrivateMessage),
     WrongUnit(WrongUnit),
     ServerRemoveSelf(ServerRemoveSelf),
-    ServerSyncEnd(ServerSyncEnd),
+    SyncEnd(SyncEnd),
     UserNotOnline(UserNotOnline),
-    ServerSyncUsername(ServerSyncUsername),
+    SyncUsername(SyncUsername),
 }
