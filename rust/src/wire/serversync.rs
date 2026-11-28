@@ -6,7 +6,9 @@ use super::{
         encode_frame, long_string_len, short_strings_len, write_long_string, write_short_string,
     },
 };
-use crate::unit::{SyncEnd, SyncMessage, SyncMessageFail, SyncPrivateMessage, SyncUsername};
+use crate::unit::{
+    SyncEnd, SyncMessage, SyncMessageFail, SyncPrivateMessage, SyncUsername, SyncUsernameFail,
+};
 
 impl Encode for SyncEnd {
     fn encoded_len(&self) -> Result<usize, EncodeError> {
@@ -67,6 +69,15 @@ impl Encode for SyncPrivateMessage {
 }
 
 impl Encode for SyncMessageFail {
+    fn encoded_len(&self) -> Result<usize, EncodeError> {
+        Ok(2)
+    }
+    fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
+        encode_frame(buf, 2, Self::OPCODE, |dst| dst[0] = *self.reason())
+    }
+}
+
+impl Encode for SyncUsernameFail {
     fn encoded_len(&self) -> Result<usize, EncodeError> {
         Ok(2)
     }

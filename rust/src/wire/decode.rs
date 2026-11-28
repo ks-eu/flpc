@@ -5,8 +5,8 @@ use crate::unit::{
     RequestSyncMessage, RequestSyncPrivateMessage, RequestSyncUsername, ServerChangedPassword,
     ServerChangedUsername, ServerLogin, ServerMessage, ServerMessageFail, ServerPrivateMessage,
     ServerRegister, ServerRemoveSelf, ServerResponse, SyncEnd, SyncMessage, SyncMessageFail,
-    SyncPrivateMessage, SyncUsername, UserAdmin, UserAdminRemoved, UserJoined, UserLeft,
-    UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
+    SyncPrivateMessage, SyncUsername, SyncUsernameFail, UserAdmin, UserAdminRemoved, UserJoined,
+    UserLeft, UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
 };
 
 /// Decodes the first unit and returns it with the byte count, including its opcode.
@@ -429,6 +429,13 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 return Ok(None);
             };
             Some(FlpcUnit::SyncMessageFail(SyncMessageFail::new(reason)))
+        }
+        // 0xD1
+        SyncUsernameFail::OPCODE => {
+            let Some([reason]) = read_array(&mut remaining) else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::SyncUsernameFail(SyncUsernameFail::new(reason)))
         }
         _ => return Err(DecodeError::UnknownOpcode),
     };
