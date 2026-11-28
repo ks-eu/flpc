@@ -594,3 +594,26 @@ impl From<ServerResponse> for FlpcUnit {
         Self::ServerResponse(unit)
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UserAdmin {
+    id: u16,
+}
+
+impl UserAdmin {
+    pub(crate) const OPCODE: u8 = 0x86;
+
+    pub fn new(id: u16) -> Self {
+        Self { id }
+    }
+
+    pub fn id(&self) -> &u16 {
+        &self.id
+    }
+}
+
+impl From<UserAdmin> for FlpcUnit {
+    fn from(unit: UserAdmin) -> Self {
+        Self::UserAdmin(unit)
+    }
+}
