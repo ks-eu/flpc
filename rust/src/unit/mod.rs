@@ -16,7 +16,9 @@ mod serveradmin;
 mod serversync;
 
 pub use admin::{Add, Kick, MakeAdmin, Remove, RemoveAdmin};
-pub use client::{ChangeUsername, Login, Message, PrivateMessage, Register, RemoveSelf};
+pub use client::{
+    ChangePassword, ChangeUsername, Login, Message, PrivateMessage, Register, RemoveSelf,
+};
 pub use ping::Ping;
 pub use requestsync::{RequestSyncMessage, RequestSyncPrivateMessage, RequestSyncUsername};
 pub use server::{
@@ -61,4 +63,5 @@ pub enum FlpcUnit {
     SyncEnd(SyncEnd),
     UserNotOnline(UserNotOnline),
     SyncUsername(SyncUsername),
+    ChangePassword(ChangePassword),
 }

@@ -1,7 +1,7 @@
 use super::DecodeError;
 use crate::unit::{
-    Add, ChangeUsername, ChangedUsername, FlpcUnit, Kick, Login, MakeAdmin, Message, Ping,
-    PrivateMessage, Register, Remove, RemoveAdmin, RemoveSelf, RequestSyncMessage,
+    Add, ChangePassword, ChangeUsername, ChangedUsername, FlpcUnit, Kick, Login, MakeAdmin,
+    Message, Ping, PrivateMessage, Register, Remove, RemoveAdmin, RemoveSelf, RequestSyncMessage,
     RequestSyncPrivateMessage, RequestSyncUsername, ServerLogin, ServerMessage,
     ServerPrivateMessage, ServerRegister, ServerRemoveSelf, SyncEnd, SyncMessage,
     SyncPrivateMessage, SyncUsername, UserJoined, UserLeft, UserNotOnline, UserRegistered,
@@ -351,6 +351,23 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
             Some(FlpcUnit::SyncUsername(SyncUsername::new(
                 u16::from_be_bytes(id),
                 username.into(),
+            )))
+        }
+        // 0x04
+        ChangePassword::OPCODE => {
+            let Some(username) = read_short_string(&mut remaining)? else {
+                return Ok(None);
+            };
+            let Some(password) = read_short_string(&mut remaining)? else {
+                return Ok(None);
+            };
+            let Some(new_password) = read_short_string(&mut remaining)? else {
+                return Ok(None);
+            };
+            Some(FlpcUnit::ChangePassword(ChangePassword::new(
+                username.into(),
+                password.into(),
+                new_password.into(),
             )))
         }
         _ => return Err(DecodeError::UnknownOpcode),

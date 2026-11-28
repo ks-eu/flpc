@@ -337,3 +337,50 @@ impl From<RemoveSelf> for FlpcUnit {
         Self::RemoveSelf(unit)
     }
 }
+
+#[derive(Clone, PartialEq, Eq)]
+pub struct ChangePassword {
+    username: String,
+    password: String,
+    new_password: String,
+}
+
+impl std::fmt::Debug for ChangePassword {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ChangePassword")
+            .field("username", &self.username)
+            .field("password", &"[redacted]")
+            .field("new_password", &"[redacted]")
+            .finish()
+    }
+}
+
+impl ChangePassword {
+    pub(crate) const OPCODE: u8 = 0x04;
+
+    pub fn new(username: String, password: String, new_password: String) -> Self {
+        Self {
+            username,
+            password,
+            new_password,
+        }
+    }
+
+    pub fn username(&self) -> &String {
+        &self.username
+    }
+
+    pub fn password(&self) -> &String {
+        &self.password
+    }
+
+    pub fn new_password(&self) -> &String {
+        &self.new_password
+    }
+}
+
+impl From<ChangePassword> for FlpcUnit {
+    fn from(unit: ChangePassword) -> Self {
+        Self::ChangePassword(unit)
+    }
+}

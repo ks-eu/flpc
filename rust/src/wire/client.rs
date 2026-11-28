@@ -6,7 +6,9 @@ use super::{
         encode_frame, long_string_len, short_strings_len, write_long_string, write_short_string,
     },
 };
-use crate::unit::{ChangeUsername, Login, Message, PrivateMessage, Register, RemoveSelf};
+use crate::unit::{
+    ChangePassword, ChangeUsername, Login, Message, PrivateMessage, Register, RemoveSelf,
+};
 
 impl Encode for RemoveSelf {
     fn encoded_len(&self) -> Result<usize, EncodeError> {
@@ -82,6 +84,19 @@ impl Encode for PrivateMessage {
             let (target, dst) = dst.split_at_mut(2);
             target.copy_from_slice(&self.target().to_be_bytes());
             write_long_string(dst, self.message());
+        })
+    }
+}
+
+impl Encode for ChangePassword {
+    fn encoded_len(&self) -> Result<usize, EncodeError> {
+        Ok(1 + short_strings_len(&[self.username(), self.password(), self.new_password()])?)
+    }
+    fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
+        encode_frame(buf, self.encoded_len()?, Self::OPCODE, |mut dst| {
+            write_short_string(&mut dst, self.username());
+            write_short_string(&mut dst, self.password());
+            write_short_string(&mut dst, self.new_password());
         })
     }
 }
