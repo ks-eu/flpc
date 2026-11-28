@@ -8,7 +8,7 @@ use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-const FRAME: &[u8] = &[0x8c, 0xa5];
+const FRAME: &[u8] = &[0x91, 0xa5];
 const NEXT: &[u8] = &[0x00];
 
 fn unit() -> ServerRemoveSelf {

@@ -19,7 +19,7 @@ impl Encode for TestFrame {
 
     fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
         let dst = buf.get_mut(..3).ok_or(EncodeError::BufferTooSmall)?;
-        dst.copy_from_slice(&[0x03, 0x00, 0x00]);
+        dst.copy_from_slice(&[0x10, 0x00, 0x00]);
         Ok(dst.len())
     }
 }
@@ -34,7 +34,7 @@ async fn framed_sends_the_unit_bytes() {
     let mut actual = [0; 3];
     peer.read_exact(&mut actual).await.unwrap();
 
-    assert_eq!(actual, [0x03, 0x00, 0x00]);
+    assert_eq!(actual, [0x10, 0x00, 0x00]);
 }
 
 #[tokio::test]
@@ -57,5 +57,5 @@ fn encode_appends_without_overwriting_buffered_frames() {
 
     FlpcCodec.encode(TestFrame, &mut dst).unwrap();
 
-    assert_eq!(&dst[..], &[0xaa, 0x03, 0x00, 0x00]);
+    assert_eq!(&dst[..], &[0xaa, 0x10, 0x00, 0x00]);
 }

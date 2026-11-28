@@ -8,8 +8,8 @@ use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-// Independent opcode 7E bytes for big-endian ID 0x89AB.
-const FRAME: &[u8] = b"\x7e\x89\xab";
+// Independent opcode 61 bytes for big-endian ID 0x89AB.
+const FRAME: &[u8] = b"\x61\x89\xab";
 
 fn expected() -> FlpcUnit {
     FlpcUnit::Remove(Remove::new(0x89ab))

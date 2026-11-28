@@ -8,8 +8,8 @@ use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-// Independently specified opcode 05 frame for username "é".
-const FRAME: &[u8] = b"\x05\x02\xc3\xa9";
+// Independently specified opcode 12 frame for username "é".
+const FRAME: &[u8] = b"\x12\x02\xc3\xa9";
 
 #[tokio::test]
 async fn sends_wire_bytes_to_raw_peer() {
@@ -47,7 +47,7 @@ async fn receives_fragmented_frame_and_truncated_frame_at_eof() {
     peer.write_all(&FRAME[..3]).await.unwrap();
     assert!(framed.next().now_or_never().is_none());
     peer.write_all(&FRAME[3..]).await.unwrap();
-    peer.write_all(&[0x05, 2, b'x']).await.unwrap();
+    peer.write_all(&[0x12, 2, b'x']).await.unwrap();
     peer.shutdown().await.unwrap();
 
     assert_eq!(

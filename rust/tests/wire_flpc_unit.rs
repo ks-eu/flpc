@@ -3,8 +3,8 @@ use flpc::{
     wire::{Encode, EncodeError},
 };
 
-// Independent bytes from README opcode 0x80 field layout.
-const FRAME: &[u8] = &[0x80, 0x00];
+// Independent bytes from README opcode 0x90 field layout.
+const FRAME: &[u8] = &[0x90, 0x00];
 
 #[test]
 fn server_register_converts_and_encodes_as_flpc_unit() {

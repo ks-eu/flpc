@@ -3,7 +3,7 @@ use flpc::{
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
-const FRAME: &[u8] = b"\x07\x04Zo\xc3\xab\x03p\xc3\xa4";
+const FRAME: &[u8] = b"\x02\x04Zo\xc3\xab\x03p\xc3\xa4";
 
 fn unit(username: &str, password: &str) -> RemoveSelf {
     RemoveSelf::new(username.into(), password.into())
@@ -36,14 +36,14 @@ fn decode_handles_truncation_adjacency_and_utf8_errors() {
         decode(&[FRAME, FRAME].concat()).unwrap(),
         Some((wrapped("Zoë", "pä"), FRAME.len()))
     );
-    for bytes in [&[7, 1, 0xff, 0][..], &[7, 0, 1, 0xff]] {
+    for bytes in [&[0x02, 1, 0xff, 0][..], &[0x02, 0, 1, 0xff]] {
         assert!(matches!(decode(bytes), Err(DecodeError::InvalidUTF8)));
     }
 }
 
 #[test]
 fn short_string_limits_and_encode_errors_preserve_buffer() {
-    assert_eq!(unit("", "").to_bytes().unwrap(), &[0x07, 0, 0]);
+    assert_eq!(unit("", "").to_bytes().unwrap(), &[0x02, 0, 0]);
     for value in [unit(&"x".repeat(255), "p"), unit("u", &"x".repeat(255))] {
         assert!(value.to_bytes().is_ok());
     }

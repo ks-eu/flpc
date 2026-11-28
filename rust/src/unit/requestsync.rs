@@ -3,7 +3,7 @@
 use super::FlpcUnit;
 
 /// Requests a batch of messages whose timestamps are strictly before the
-/// supplied timestamp (opcode `0x06`). The timestamp is an unsigned 64-bit
+/// supplied timestamp (opcode `0x20`). The timestamp is an unsigned 64-bit
 /// big-endian value and the count must be nonzero. A zero count returns
 /// [`crate::wire::EncodeError::InvalidCount`] when encoding and
 /// [`crate::wire::DecodeError::InvalidCount`] when decoding.
@@ -17,7 +17,7 @@ use super::FlpcUnit;
 /// };
 ///
 /// let unit = RequestSyncMessage::new(0x0102_0304_0506_0708, 255);
-/// let bytes = [0x06, 1, 2, 3, 4, 5, 6, 7, 8, 0xff];
+/// let bytes = [0x20, 1, 2, 3, 4, 5, 6, 7, 8, 0xff];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(wrapped, FlpcUnit::RequestSyncMessage(
@@ -32,7 +32,7 @@ pub struct RequestSyncMessage {
 }
 
 impl RequestSyncMessage {
-    pub(crate) const OPCODE: u8 = 0x06;
+    pub(crate) const OPCODE: u8 = 0x20;
 
     pub fn new(timestamp: u64, count: u8) -> Self {
         Self { timestamp, count }
@@ -54,7 +54,7 @@ impl From<RequestSyncMessage> for FlpcUnit {
 }
 
 /// A client request for a user's current username during synchronization
-/// (opcode `0x08`). The user ID is an unsigned 16-bit big-endian integer.
+/// (opcode `0x22`). The user ID is an unsigned 16-bit big-endian integer.
 ///
 /// # Examples
 ///
@@ -65,7 +65,7 @@ impl From<RequestSyncMessage> for FlpcUnit {
 /// };
 ///
 /// let unit = RequestSyncUsername::new(0x1234);
-/// let bytes = [0x08, 0x12, 0x34];
+/// let bytes = [0x22, 0x12, 0x34];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(wrapped, FlpcUnit::RequestSyncUsername(
@@ -79,7 +79,7 @@ pub struct RequestSyncUsername {
 }
 
 impl RequestSyncUsername {
-    pub(crate) const OPCODE: u8 = 0x08;
+    pub(crate) const OPCODE: u8 = 0x22;
 
     pub fn new(id: u16) -> Self {
         Self { id }
@@ -96,7 +96,7 @@ impl From<RequestSyncUsername> for FlpcUnit {
     }
 }
 
-/// A client request for private messages addressed to a user (opcode `0x09`).
+/// A client request for private messages addressed to a user (opcode `0x21`).
 /// The target ID is an unsigned 16-bit big-endian integer, followed by the
 /// timestamp of the newest message to include as an unsigned 64-bit big-endian
 /// integer and a nonzero message count. Zero counts return
@@ -112,7 +112,7 @@ impl From<RequestSyncUsername> for FlpcUnit {
 /// };
 ///
 /// let unit = RequestSyncPrivateMessage::new(0x1234, 0x0102_0304_0506_0708, 1);
-/// let bytes = [0x09, 0x12, 0x34, 1, 2, 3, 4, 5, 6, 7, 8, 1];
+/// let bytes = [0x21, 0x12, 0x34, 1, 2, 3, 4, 5, 6, 7, 8, 1];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(wrapped, FlpcUnit::RequestSyncPrivateMessage(
@@ -128,7 +128,7 @@ pub struct RequestSyncPrivateMessage {
 }
 
 impl RequestSyncPrivateMessage {
-    pub(crate) const OPCODE: u8 = 0x09;
+    pub(crate) const OPCODE: u8 = 0x21;
 
     pub fn new(target: u16, timestamp: u64, count: u8) -> Self {
         Self {

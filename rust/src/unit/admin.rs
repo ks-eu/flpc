@@ -1,6 +1,6 @@
 use super::FlpcUnit;
 
-/// A request to kick a user (opcode `0x7F`).
+/// A request to kick a user (opcode `0x62`).
 ///
 /// The user ID is an unsigned 16-bit integer encoded in big-endian byte order.
 ///
@@ -13,7 +13,7 @@ use super::FlpcUnit;
 /// };
 ///
 /// let unit = Kick::new(0x1234);
-/// let bytes = [0x7f, 0x12, 0x34];
+/// let bytes = [0x62, 0x12, 0x34];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -27,7 +27,7 @@ pub struct Kick {
 }
 
 impl Kick {
-    pub(crate) const OPCODE: u8 = 0x7F;
+    pub(crate) const OPCODE: u8 = 0x62;
 
     pub fn new(id: u16) -> Self {
         Self { id }
@@ -44,7 +44,7 @@ impl From<Kick> for FlpcUnit {
     }
 }
 
-/// A request to remove a user (opcode `0x7E`).
+/// A request to remove a user (opcode `0x61`).
 ///
 /// The user ID is an unsigned 16-bit integer encoded in big-endian byte order.
 ///
@@ -57,7 +57,7 @@ impl From<Kick> for FlpcUnit {
 /// };
 ///
 /// let unit = Remove::new(0x1234);
-/// let bytes = [0x7e, 0x12, 0x34];
+/// let bytes = [0x61, 0x12, 0x34];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -71,7 +71,7 @@ pub struct Remove {
 }
 
 impl Remove {
-    pub(crate) const OPCODE: u8 = 0x7E;
+    pub(crate) const OPCODE: u8 = 0x61;
 
     pub fn new(id: u16) -> Self {
         Self { id }
@@ -88,7 +88,7 @@ impl From<Remove> for FlpcUnit {
     }
 }
 
-/// A request to add a user (opcode `0x7D`).
+/// A request to add a user (opcode `0x60`).
 ///
 /// The username and password are UTF-8 strings, each preceded by a one-byte
 /// length counting UTF-8 bytes. Each field may contain at most 255 bytes.
@@ -102,7 +102,7 @@ impl From<Remove> for FlpcUnit {
 /// };
 ///
 /// let unit = Add::new("Zoë".into(), "p".into());
-/// let bytes = [0x7d, 0x04, 0x5a, 0x6f, 0xc3, 0xab, 0x01, b'p'];
+/// let bytes = [0x60, 0x04, 0x5a, 0x6f, 0xc3, 0xab, 0x01, b'p'];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -126,7 +126,7 @@ impl std::fmt::Debug for Add {
 }
 
 impl Add {
-    pub(crate) const OPCODE: u8 = 0x7D;
+    pub(crate) const OPCODE: u8 = 0x60;
 
     pub fn new(username: String, password: String) -> Self {
         Self { username, password }
@@ -147,7 +147,7 @@ impl From<Add> for FlpcUnit {
     }
 }
 
-/// A request to grant a user's administrator privileges (opcode `0x7C`).
+/// A request to grant a user's administrator privileges (opcode `0x63`).
 ///
 /// The user ID is an unsigned 16-bit integer encoded in big-endian byte order.
 ///
@@ -160,7 +160,7 @@ impl From<Add> for FlpcUnit {
 /// };
 ///
 /// let unit = MakeAdmin::new(0x1234);
-/// let bytes = [0x7c, 0x12, 0x34];
+/// let bytes = [0x63, 0x12, 0x34];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -174,7 +174,7 @@ pub struct MakeAdmin {
 }
 
 impl MakeAdmin {
-    pub(crate) const OPCODE: u8 = 0x7C;
+    pub(crate) const OPCODE: u8 = 0x63;
 
     pub fn new(id: u16) -> Self {
         Self { id }
@@ -191,7 +191,7 @@ impl From<MakeAdmin> for FlpcUnit {
     }
 }
 
-/// A request to remove a user's administrator privileges (opcode `0x7B`).
+/// A request to remove a user's administrator privileges (opcode `0x64`).
 ///
 /// The user ID is an unsigned 16-bit integer encoded in big-endian byte order.
 ///
@@ -204,7 +204,7 @@ impl From<MakeAdmin> for FlpcUnit {
 /// };
 ///
 /// let unit = RemoveAdmin::new(0x1234);
-/// let bytes = [0x7b, 0x12, 0x34];
+/// let bytes = [0x64, 0x12, 0x34];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -218,7 +218,7 @@ pub struct RemoveAdmin {
 }
 
 impl RemoveAdmin {
-    pub(crate) const OPCODE: u8 = 0x7B;
+    pub(crate) const OPCODE: u8 = 0x64;
 
     pub fn new(id: u16) -> Self {
         Self { id }

@@ -8,9 +8,9 @@ use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-// Independent bytes from README opcode 0x83 field layout.
+// Independent bytes from README opcode 0xA1 field layout.
 const FRAME: &[u8] = &[
-    0x83, 0x12, 0x34, 0x56, 0x78, 1, 2, 3, 4, 5, 6, 7, 8, 0, 2, 0xC3, 0xA9,
+    0xA1, 0x12, 0x34, 0x56, 0x78, 1, 2, 3, 4, 5, 6, 7, 8, 0, 2, 0xC3, 0xA9,
 ];
 
 #[tokio::test]

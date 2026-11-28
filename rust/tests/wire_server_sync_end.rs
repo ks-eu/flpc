@@ -3,7 +3,7 @@ use flpc::{
     wire::{Encode, EncodeError, decode},
 };
 
-const FRAME: &[u8] = &[0x8d, 1];
+const FRAME: &[u8] = &[0xc3, 1];
 
 fn unit() -> ServerSyncEnd {
     ServerSyncEnd::new(1)
@@ -55,7 +55,7 @@ fn undersized_destination_is_unchanged() {
 fn zero_count_ends_an_empty_batch() {
     for count in [0, 255] {
         let unit = ServerSyncEnd::new(count);
-        let bytes = [0x8d, count];
+        let bytes = [0xc3, count];
         assert_eq!(unit.to_bytes().unwrap(), bytes);
         assert_eq!(
             decode(&bytes).unwrap(),

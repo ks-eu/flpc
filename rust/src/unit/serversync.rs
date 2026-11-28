@@ -2,7 +2,7 @@
 
 use super::FlpcUnit;
 
-/// A chat message returned during synchronization (opcode `0x89`).
+/// A chat message returned during synchronization (opcode `0xC0`).
 ///
 /// The sender ID and timestamp are big-endian. The UTF-8 message has a
 /// two-byte big-endian length prefix.
@@ -16,7 +16,7 @@ use super::FlpcUnit;
 /// };
 ///
 /// let unit = SyncMessage::new(7, 42, "hi".into());
-/// let bytes: &[u8] = &[0x89, 0, 7, 0, 0, 0, 0, 0, 0, 0, 42, 0, 2, b'h', b'i'];
+/// let bytes: &[u8] = &[0xC0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 42, 0, 2, b'h', b'i'];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -32,7 +32,7 @@ pub struct SyncMessage {
 }
 
 impl SyncMessage {
-    pub(crate) const OPCODE: u8 = 0x89;
+    pub(crate) const OPCODE: u8 = 0xC0;
 
     pub fn new(id: u16, timestamp: u64, message: String) -> Self {
         Self {
@@ -62,7 +62,7 @@ impl From<SyncMessage> for FlpcUnit {
     }
 }
 
-/// A private chat message returned during synchronization (opcode `0x8A`).
+/// A private chat message returned during synchronization (opcode `0xC1`).
 ///
 /// The sender ID, target ID, and timestamp are big-endian. The UTF-8 message
 /// has a two-byte big-endian length prefix.
@@ -76,7 +76,7 @@ impl From<SyncMessage> for FlpcUnit {
 /// };
 ///
 /// let unit = SyncPrivateMessage::new(7, 8, 42, "hi".into());
-/// let bytes: &[u8] = &[0x8A, 0, 7, 0, 8, 0, 0, 0, 0, 0, 0, 0, 42, 0, 2, b'h', b'i'];
+/// let bytes: &[u8] = &[0xC1, 0, 7, 0, 8, 0, 0, 0, 0, 0, 0, 0, 42, 0, 2, b'h', b'i'];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -93,7 +93,7 @@ pub struct SyncPrivateMessage {
 }
 
 impl SyncPrivateMessage {
-    pub(crate) const OPCODE: u8 = 0x8A;
+    pub(crate) const OPCODE: u8 = 0xC1;
 
     pub fn new(id: u16, target: u16, timestamp: u64, message: String) -> Self {
         Self {
@@ -129,7 +129,7 @@ impl From<SyncPrivateMessage> for FlpcUnit {
 }
 
 /// Marks the end of a synchronization response and reports its item count
-/// (opcode `0x8D`). A zero count is valid.
+/// (opcode `0xC3`). A zero count is valid.
 ///
 /// # Examples
 ///
@@ -140,7 +140,7 @@ impl From<SyncPrivateMessage> for FlpcUnit {
 /// };
 ///
 /// let unit = ServerSyncEnd::new(1);
-/// let bytes = [0x8d, 1];
+/// let bytes = [0xc3, 1];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
@@ -151,7 +151,7 @@ pub struct ServerSyncEnd {
 }
 
 impl ServerSyncEnd {
-    pub(crate) const OPCODE: u8 = 0x8D;
+    pub(crate) const OPCODE: u8 = 0xC3;
 
     pub fn new(count: u8) -> Self {
         Self { count }
@@ -167,7 +167,7 @@ impl From<ServerSyncEnd> for FlpcUnit {
     }
 }
 
-/// Sends a user's ID and username during synchronization (opcode `0x8F`). The
+/// Sends a user's ID and username during synchronization (opcode `0xC2`). The
 /// ID is an unsigned 16-bit big-endian integer. The username is UTF-8 with a
 /// one-byte length prefix counting UTF-8 bytes, up to 255 bytes.
 ///
@@ -180,7 +180,7 @@ impl From<ServerSyncEnd> for FlpcUnit {
 /// };
 ///
 /// let unit = ServerSyncUsername::new(0x1234, "é".into());
-/// let bytes = [0x8f, 0x12, 0x34, 2, 0xc3, 0xa9];
+/// let bytes = [0xc2, 0x12, 0x34, 2, 0xc3, 0xa9];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
@@ -192,7 +192,7 @@ pub struct ServerSyncUsername {
 }
 
 impl ServerSyncUsername {
-    pub(crate) const OPCODE: u8 = 0x8F;
+    pub(crate) const OPCODE: u8 = 0xC2;
 
     pub fn new(id: u16, username: String) -> Self {
         Self { id, username }

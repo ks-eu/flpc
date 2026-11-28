@@ -8,8 +8,8 @@ use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-// Independent opcode 7F bytes for big-endian ID 0xCDEF.
-const FRAME: &[u8] = b"\x7f\xcd\xef";
+// Independent opcode 62 bytes for big-endian ID 0xCDEF.
+const FRAME: &[u8] = b"\x62\xcd\xef";
 
 fn expected() -> FlpcUnit {
     FlpcUnit::Kick(Kick::new(0xcdef))
@@ -34,7 +34,7 @@ async fn receives_fragmented_frame() {
 
     peer.write_all(&FRAME[..2]).await.unwrap();
     assert!(framed.next().now_or_never().is_none());
-    peer.write_all(&[&FRAME[2..], &[0x7f, 0x01, 0x23]].concat())
+    peer.write_all(&[&FRAME[2..], &[0x62, 0x01, 0x23]].concat())
         .await
         .unwrap();
     peer.shutdown().await.unwrap();

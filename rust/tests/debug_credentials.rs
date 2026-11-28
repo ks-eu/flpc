@@ -28,7 +28,7 @@ fn decoded_register_redacts_token_and_password() {
 
 #[test]
 fn decoded_login_redacts_password() {
-    let (unit, _) = decode(b"\x02\x05alice\x10example-password")
+    let (unit, _) = decode(b"\x03\x05alice\x10example-password")
         .unwrap()
         .unwrap();
     let FlpcUnit::Login(login) = &unit else {
@@ -42,7 +42,7 @@ fn decoded_login_redacts_password() {
 
 #[test]
 fn decoded_add_redacts_password() {
-    let (unit, _) = decode(b"\x7d\x05alice\x10example-password")
+    let (unit, _) = decode(b"\x60\x05alice\x10example-password")
         .unwrap()
         .unwrap();
     let FlpcUnit::Add(add) = &unit else {

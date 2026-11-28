@@ -3,8 +3,8 @@ use flpc::{
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
-// Opcode 7D carries username "Zoë" and password "p" as short UTF-8 fields.
-const FRAME: &[u8] = b"\x7d\x04Zo\xc3\xab\x01p";
+// Opcode 60 carries username "Zoë" and password "p" as short UTF-8 fields.
+const FRAME: &[u8] = b"\x60\x04Zo\xc3\xab\x01p";
 
 fn expected() -> FlpcUnit {
     FlpcUnit::Add(Add::new("Zoë".into(), "p".into()))
@@ -32,7 +32,7 @@ fn decode_waits_for_both_fields_and_consumes_one_frame() {
         assert_eq!(decode(&FRAME[..end]).unwrap(), None, "prefix {end}");
     }
 
-    let adjacent = [FRAME, &[0x7d, 1, b'u', 1, b'p']].concat();
+    let adjacent = [FRAME, &[0x60, 1, b'u', 1, b'p']].concat();
     assert_eq!(decode(&adjacent).unwrap(), Some((expected(), FRAME.len())));
     assert_eq!(
         decode(&adjacent[FRAME.len()..]).unwrap(),
@@ -44,14 +44,14 @@ fn decode_waits_for_both_fields_and_consumes_one_frame() {
 fn empty_and_255_byte_fields_round_trip() {
     let full = "x".repeat(255);
     for (unit, bytes) in [
-        (Add::new(String::new(), String::new()), &[0x7d, 0, 0][..]),
+        (Add::new(String::new(), String::new()), &[0x60, 0, 0][..]),
         (
             Add::new(full.clone(), String::new()),
-            &[&[0x7d, 0xff][..], full.as_bytes(), &[0]].concat(),
+            &[&[0x60, 0xff][..], full.as_bytes(), &[0]].concat(),
         ),
         (
             Add::new(String::new(), full.clone()),
-            &[&[0x7d, 0, 0xff][..], full.as_bytes()].concat(),
+            &[&[0x60, 0, 0xff][..], full.as_bytes()].concat(),
         ),
     ] {
         assert_eq!(unit.to_bytes().unwrap(), bytes);
@@ -95,11 +95,11 @@ fn either_oversized_field_is_rejected_before_writing() {
 #[test]
 fn invalid_utf8_in_either_field_is_a_decode_error() {
     assert!(matches!(
-        decode(&[0x7d, 1, 0xff]),
+        decode(&[0x60, 1, 0xff]),
         Err(DecodeError::InvalidUTF8)
     ));
     assert!(matches!(
-        decode(&[0x7d, 0, 1, 0xff]),
+        decode(&[0x60, 0, 1, 0xff]),
         Err(DecodeError::InvalidUTF8)
     ));
 }

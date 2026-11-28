@@ -8,7 +8,7 @@ use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-const FRAME: &[u8] = b"\x07\x04Zo\xc3\xab\x03p\xc3\xa4";
+const FRAME: &[u8] = b"\x02\x04Zo\xc3\xab\x03p\xc3\xa4";
 
 #[tokio::test]
 async fn sends_literal_frame_and_receives_fragmented_adjacent_frames() {

@@ -3,8 +3,8 @@ use flpc::{
     wire::{Encode, EncodeError, decode},
 };
 
-// Independent bytes from README opcode 0x81 field layout.
-const FRAME: &[u8] = &[0x81, 0x5A];
+// Independent bytes from README opcode 0x92 field layout.
+const FRAME: &[u8] = &[0x92, 0x5A];
 
 #[test]
 fn encoding_and_decoding_match_the_wire_vector() {

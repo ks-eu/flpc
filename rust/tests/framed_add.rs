@@ -8,8 +8,8 @@ use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-// Independent opcode 7D bytes for username "Zoë" and password "p".
-const FRAME: &[u8] = b"\x7d\x04Zo\xc3\xab\x01p";
+// Independent opcode 60 bytes for username "Zoë" and password "p".
+const FRAME: &[u8] = b"\x60\x04Zo\xc3\xab\x01p";
 
 fn expected() -> FlpcUnit {
     FlpcUnit::Add(Add::new("Zoë".into(), "p".into()))
@@ -36,7 +36,7 @@ async fn receives_fragmented_frame() {
 
     peer.write_all(&FRAME[..5]).await.unwrap();
     assert!(framed.next().now_or_never().is_none());
-    peer.write_all(&[&FRAME[5..], &[0x7d, 1, b'u', 1, b'p']].concat())
+    peer.write_all(&[&FRAME[5..], &[0x60, 1, b'u', 1, b'p']].concat())
         .await
         .unwrap();
     peer.shutdown().await.unwrap();

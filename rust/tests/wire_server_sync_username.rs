@@ -3,7 +3,7 @@ use flpc::{
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
-const FRAME: &[u8] = &[0x8f, 0x12, 0x34, 2, 0xc3, 0xa9];
+const FRAME: &[u8] = &[0xc2, 0x12, 0x34, 2, 0xc3, 0xa9];
 
 fn unit() -> ServerSyncUsername {
     ServerSyncUsername::new(0x1234, "é".into())
@@ -56,7 +56,7 @@ fn username_limits_are_measured_in_utf8_bytes() {
     let max = format!("{}x", "é".repeat(127));
     for (username, prefix) in [("", 0), (max.as_str(), 255)] {
         let unit = ServerSyncUsername::new(0x1234, username.into());
-        let bytes = [&[0x8f, 0x12, 0x34, prefix], username.as_bytes()].concat();
+        let bytes = [&[0xc2, 0x12, 0x34, prefix], username.as_bytes()].concat();
         assert_eq!(unit.to_bytes().unwrap(), bytes);
         assert_eq!(
             decode(&bytes).unwrap(),
@@ -72,7 +72,7 @@ fn username_limits_are_measured_in_utf8_bytes() {
     ));
     assert_eq!(dst, [0xaa; 260]);
     assert!(matches!(
-        decode(&[0x8f, 0x12, 0x34, 1, 0xff]),
+        decode(&[0xc2, 0x12, 0x34, 1, 0xff]),
         Err(DecodeError::InvalidUTF8)
     ));
 }

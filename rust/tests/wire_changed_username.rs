@@ -3,8 +3,8 @@ use flpc::{
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
-// Independent bytes from README opcode 0x88 field layout.
-const FRAME: &[u8] = &[0x88, 0x12, 0x34, 2, 0xC3, 0xA9];
+// Independent bytes from README opcode 0x85 field layout.
+const FRAME: &[u8] = &[0x85, 0x12, 0x34, 2, 0xC3, 0xA9];
 
 #[test]
 fn encoding_and_decoding_match_the_wire_vector() {
@@ -60,7 +60,7 @@ fn username_accepts_255_bytes_and_rejects_256() {
 #[test]
 fn invalid_utf8_username_is_rejected() {
     assert!(matches!(
-        decode(&[0x88, 0, 1, 1, 0xff]),
+        decode(&[0x85, 0, 1, 1, 0xff]),
         Err(DecodeError::InvalidUTF8)
     ));
 }

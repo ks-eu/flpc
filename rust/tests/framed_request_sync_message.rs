@@ -9,8 +9,8 @@ use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-const FRAME: &[u8] = &[0x06, 1, 2, 3, 4, 5, 6, 7, 8, 255];
-const NEXT: &[u8] = &[6, 255, 255, 255, 255, 255, 255, 255, 255, 1];
+const FRAME: &[u8] = &[0x20, 1, 2, 3, 4, 5, 6, 7, 8, 255];
+const NEXT: &[u8] = &[0x20, 255, 255, 255, 255, 255, 255, 255, 255, 1];
 
 fn unit() -> RequestSyncMessage {
     RequestSyncMessage::new(0x0102_0304_0506_0708, 255)
@@ -64,7 +64,7 @@ async fn reports_truncated_frame_at_eof() {
 async fn rejects_zero_request_count() {
     let (stream, mut peer) = duplex(32);
     let mut framed = Framed::new(stream, FlpcCodec);
-    peer.write_all(&[0x06, 1, 2, 3, 4, 5, 6, 7, 8, 0])
+    peer.write_all(&[0x20, 1, 2, 3, 4, 5, 6, 7, 8, 0])
         .await
         .unwrap();
     peer.shutdown().await.unwrap();

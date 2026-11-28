@@ -3,7 +3,7 @@ use flpc::{
     wire::{Encode, EncodeError, decode},
 };
 
-const FRAME: &[u8] = &[0x8B];
+const FRAME: &[u8] = &[0x94];
 
 #[test]
 fn encode_matches_opcode_and_preserves_tail() {
@@ -12,9 +12,9 @@ fn encode_matches_opcode_and_preserves_tail() {
 
     assert_eq!(unit.encoded_len().unwrap(), FRAME.len());
     assert_eq!(unit.encode_into(&mut dst).unwrap(), FRAME.len());
-    assert_eq!(&dst[..1], &[0x8B]);
+    assert_eq!(&dst[..1], &[0x94]);
     assert_eq!(&dst[1..], &[0xaa, 0xaa]);
-    assert_eq!(unit.to_bytes().unwrap(), &[0x8B]);
+    assert_eq!(unit.to_bytes().unwrap(), &[0x94]);
 
     assert!(matches!(
         unit.encode_into(&mut []),
@@ -32,5 +32,5 @@ fn decode_consumes_one_byte_before_the_next_unit() {
 
     assert_eq!(decode(&[]).unwrap(), None);
     assert_eq!(decode(FRAME).unwrap(), Some((expected.clone(), 1)));
-    assert_eq!(decode(&[0x8B, 0x00]).unwrap(), Some((expected, 1)));
+    assert_eq!(decode(&[0x94, 0x00]).unwrap(), Some((expected, 1)));
 }

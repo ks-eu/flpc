@@ -3,7 +3,7 @@ use flpc::{
     wire::{Encode, EncodeError, decode},
 };
 
-const FRAME: &[u8] = &[0x8c, 0xa5];
+const FRAME: &[u8] = &[0x91, 0xa5];
 
 fn unit() -> ServerRemoveSelf {
     ServerRemoveSelf::new(0xa5)

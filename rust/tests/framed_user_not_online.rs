@@ -8,7 +8,7 @@ use futures_util::{SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-const FRAME: &[u8] = &[0x8e];
+const FRAME: &[u8] = &[0xb2];
 const NEXT: &[u8] = &[0x00];
 
 fn unit() -> UserNotOnline {

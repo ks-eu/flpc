@@ -8,8 +8,8 @@ use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-// Independent bytes from README opcode 0x86 field layout.
-const FRAME: &[u8] = &[0x86, 0x12, 0x34];
+// Independent bytes from README opcode 0x83 field layout.
+const FRAME: &[u8] = &[0x83, 0x12, 0x34];
 
 #[tokio::test]
 async fn framed_sends_and_receives_independent_wire_bytes() {

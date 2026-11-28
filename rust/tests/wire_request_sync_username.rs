@@ -3,7 +3,7 @@ use flpc::{
     wire::{Encode, EncodeError, decode},
 };
 
-const FRAME: &[u8] = &[0x08, 0x12, 0x34];
+const FRAME: &[u8] = &[0x22, 0x12, 0x34];
 
 fn unit() -> RequestSyncUsername {
     RequestSyncUsername::new(0x1234)

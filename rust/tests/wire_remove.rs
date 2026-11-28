@@ -3,8 +3,8 @@ use flpc::{
     wire::{Encode, EncodeError, decode},
 };
 
-// Opcode 7E carries unsigned big-endian ID 0x89AB.
-const FRAME: &[u8] = b"\x7e\x89\xab";
+// Opcode 61 carries unsigned big-endian ID 0x89AB.
+const FRAME: &[u8] = b"\x61\x89\xab";
 
 #[test]
 fn encode_matches_independent_bytes_and_preserves_tail() {

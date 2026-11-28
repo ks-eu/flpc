@@ -8,7 +8,7 @@ use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-const FRAME: &[u8] = &[0x08, 0x12, 0x34];
+const FRAME: &[u8] = &[0x22, 0x12, 0x34];
 const NEXT: &[u8] = &[0x00];
 
 fn unit() -> RequestSyncUsername {

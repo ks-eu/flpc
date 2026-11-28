@@ -3,7 +3,7 @@ use flpc::{
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
-const FRAME: &[u8] = b"\x04\x12\x34\x00\x02\xc3\xa9";
+const FRAME: &[u8] = b"\x11\x12\x34\x00\x02\xc3\xa9";
 
 fn private_message(target: u16, message: &str) -> PrivateMessage {
     PrivateMessage::new(target, message.into())
@@ -52,12 +52,12 @@ fn waits_for_target_length_and_payload_bytes() {
 
 #[test]
 fn supports_empty_and_maximum_messages() {
-    let empty = [0x04, 0x00, 0x01, 0x00, 0x00];
+    let empty = [0x11, 0x00, 0x01, 0x00, 0x00];
     assert_eq!(private_message(1, "").to_bytes().unwrap(), empty);
     assert_eq!(decode(&empty).unwrap(), Some((decoded(1, ""), empty.len())));
 
     let max = "x".repeat(65_535);
-    let mut frame = vec![0x04, 0xff, 0xff, 0xff, 0xff];
+    let mut frame = vec![0x11, 0xff, 0xff, 0xff, 0xff];
     frame.extend_from_slice(max.as_bytes());
     let unit = private_message(u16::MAX, &max);
     assert_eq!(unit.encoded_len().unwrap(), frame.len());
@@ -93,7 +93,7 @@ fn encode_errors_leave_the_destination_unchanged() {
 #[test]
 fn rejects_invalid_utf8_in_a_complete_message() {
     assert!(matches!(
-        decode(&[0x04, 0, 1, 0, 1, 0xff]),
+        decode(&[0x11, 0, 1, 0, 1, 0xff]),
         Err(DecodeError::InvalidUTF8)
     ));
 }

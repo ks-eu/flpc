@@ -73,7 +73,7 @@ impl From<Register> for FlpcUnit {
     }
 }
 
-/// The `Login` wire unit (opcode `0x02`).
+/// The `Login` wire unit (opcode `0x03`).
 ///
 /// After the opcode, the username comes first, followed by the password. Each
 /// field has a one-byte length prefix that counts UTF-8 bytes and allows up to
@@ -89,7 +89,7 @@ impl From<Register> for FlpcUnit {
 ///
 /// let unit = Login::new("Zoë".into(), "pāss".into());
 /// let bytes = [
-///     0x02, 0x04, 0x5a, 0x6f, 0xc3, 0xab, 0x05, 0x70, 0xc4, 0x81, 0x73, 0x73,
+///     0x03, 0x04, 0x5a, 0x6f, 0xc3, 0xab, 0x05, 0x70, 0xc4, 0x81, 0x73, 0x73,
 /// ];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
@@ -114,7 +114,7 @@ impl std::fmt::Debug for Login {
 }
 
 impl Login {
-    pub(crate) const OPCODE: u8 = 0x02;
+    pub(crate) const OPCODE: u8 = 0x03;
 
     pub fn new(username: String, password: String) -> Self {
         Self { username, password }
@@ -135,7 +135,7 @@ impl From<Login> for FlpcUnit {
     }
 }
 
-/// A message sent to the server (opcode `0x03`).
+/// A message sent to the server (opcode `0x10`).
 ///
 /// The message is encoded as UTF-8 after a two-byte big-endian length prefix.
 /// The prefix counts UTF-8 bytes, so a message may contain at most 65,535
@@ -151,7 +151,7 @@ impl From<Login> for FlpcUnit {
 /// };
 ///
 /// let message = Message::new("é".into());
-/// let bytes = [0x03, 0x00, 0x02, 0xc3, 0xa9];
+/// let bytes = [0x10, 0x00, 0x02, 0xc3, 0xa9];
 /// assert_eq!(message.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = message.into();
 /// assert_eq!(
@@ -165,7 +165,7 @@ pub struct Message {
 }
 
 impl Message {
-    pub(crate) const OPCODE: u8 = 0x03;
+    pub(crate) const OPCODE: u8 = 0x10;
 
     /// Creates a message. Encoding checks the 65,535 UTF-8 byte limit.
     pub fn new(message: String) -> Self {
@@ -183,7 +183,7 @@ impl From<Message> for FlpcUnit {
     }
 }
 
-/// A private message sent to a target (opcode `0x04`).
+/// A private message sent to a target (opcode `0x11`).
 ///
 /// The target is an unsigned 16-bit big-endian integer. The message follows
 /// as UTF-8 preceded by a two-byte big-endian length counting UTF-8 bytes, so
@@ -199,7 +199,7 @@ impl From<Message> for FlpcUnit {
 /// };
 ///
 /// let message = PrivateMessage::new(0x1234, "é".into());
-/// let bytes = [0x04, 0x12, 0x34, 0x00, 0x02, 0xc3, 0xa9];
+/// let bytes = [0x11, 0x12, 0x34, 0x00, 0x02, 0xc3, 0xa9];
 /// assert_eq!(message.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = message.into();
 /// assert_eq!(
@@ -214,7 +214,7 @@ pub struct PrivateMessage {
 }
 
 impl PrivateMessage {
-    pub(crate) const OPCODE: u8 = 0x04;
+    pub(crate) const OPCODE: u8 = 0x11;
 
     pub fn new(target: u16, message: String) -> Self {
         Self { target, message }
@@ -235,7 +235,7 @@ impl From<PrivateMessage> for FlpcUnit {
     }
 }
 
-/// A request to change the client's username (opcode `0x05`).
+/// A request to change the client's username (opcode `0x12`).
 ///
 /// The username is UTF-8 preceded by a one-byte length counting UTF-8 bytes,
 /// so it may contain at most 255 bytes. Encoding a longer username returns
@@ -250,7 +250,7 @@ impl From<PrivateMessage> for FlpcUnit {
 /// };
 ///
 /// let unit = ChangeUsername::new("Zoë".into());
-/// let bytes = [0x05, 0x04, 0x5a, 0x6f, 0xc3, 0xab];
+/// let bytes = [0x12, 0x04, 0x5a, 0x6f, 0xc3, 0xab];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -264,7 +264,7 @@ pub struct ChangeUsername {
 }
 
 impl ChangeUsername {
-    pub(crate) const OPCODE: u8 = 0x05;
+    pub(crate) const OPCODE: u8 = 0x12;
 
     pub fn new(username: String) -> Self {
         Self { username }
@@ -282,7 +282,7 @@ impl From<ChangeUsername> for FlpcUnit {
 }
 
 /// A client request to remove an account authenticated by the supplied
-/// username and password (opcode `0x07`). Both fields are UTF-8 strings with
+/// username and password (opcode `0x02`). Both fields are UTF-8 strings with
 /// one-byte lengths that count UTF-8 bytes, so each can contain at most 255
 /// bytes.
 /// Debug output redacts the password. The credentials are sent as plaintext.
@@ -296,7 +296,7 @@ impl From<ChangeUsername> for FlpcUnit {
 /// };
 ///
 /// let unit = RemoveSelf::new("Zoë".into(), "pä".into());
-/// let bytes = [0x07, 0x04, b'Z', b'o', 0xc3, 0xab, 0x03, b'p', 0xc3, 0xa4];
+/// let bytes = [0x02, 0x04, b'Z', b'o', 0xc3, 0xab, 0x03, b'p', 0xc3, 0xa4];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
@@ -317,7 +317,7 @@ impl std::fmt::Debug for RemoveSelf {
 }
 
 impl RemoveSelf {
-    pub(crate) const OPCODE: u8 = 0x07;
+    pub(crate) const OPCODE: u8 = 0x02;
 
     pub fn new(username: String, password: String) -> Self {
         Self { username, password }

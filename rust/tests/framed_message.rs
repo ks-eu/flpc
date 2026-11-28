@@ -8,7 +8,7 @@ use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-const FRAME: &[u8] = b"\x03\x00\x05hello";
+const FRAME: &[u8] = b"\x10\x00\x05hello";
 
 fn message(value: &str) -> FlpcUnit {
     FlpcUnit::Message(Message::new(value.into()))
@@ -30,7 +30,7 @@ async fn sends_independent_bytes_to_a_raw_peer() {
 
 #[tokio::test]
 async fn receives_fragmented_prefix_and_utf8_before_ping_and_clean_eof() {
-    const UTF8_FRAME: &[u8] = b"\x03\x00\x04Zo\xc3\xab";
+    const UTF8_FRAME: &[u8] = b"\x10\x00\x04Zo\xc3\xab";
     let (stream, mut peer) = duplex(32);
     let mut framed = Framed::new(stream, FlpcCodec);
 
@@ -55,7 +55,7 @@ async fn reports_truncated_message_at_eof_after_complete_frame() {
     let (stream, mut peer) = duplex(32);
     let mut framed = Framed::new(stream, FlpcCodec);
     peer.write_all(FRAME).await.unwrap();
-    peer.write_all(&[0x03, 0x00, 0x02, b'x']).await.unwrap();
+    peer.write_all(&[0x10, 0x00, 0x02, b'x']).await.unwrap();
     peer.shutdown().await.unwrap();
 
     assert_eq!(framed.next().await.unwrap().unwrap(), message("hello"));

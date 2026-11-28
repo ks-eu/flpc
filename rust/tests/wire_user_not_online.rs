@@ -3,7 +3,7 @@ use flpc::{
     wire::{Encode, EncodeError, decode},
 };
 
-const FRAME: &[u8] = &[0x8e];
+const FRAME: &[u8] = &[0xb2];
 
 fn unit() -> UserNotOnline {
     UserNotOnline::new()

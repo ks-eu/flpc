@@ -3,8 +3,8 @@ use flpc::{
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
-// Opcode 05 carries one one-byte-length UTF-8 username.
-const FRAME: &[u8] = b"\x05\x02\xc3\xa9";
+// Opcode 12 carries one one-byte-length UTF-8 username.
+const FRAME: &[u8] = b"\x12\x02\xc3\xa9";
 
 fn expected() -> FlpcUnit {
     FlpcUnit::ChangeUsername(ChangeUsername::new("é".into()))
@@ -42,7 +42,7 @@ fn decode_waits_for_complete_username_and_consumes_one_frame() {
         assert_eq!(decode(&FRAME[..end]).unwrap(), None, "prefix {end}");
     }
 
-    let adjacent = [FRAME, &[0x05, 0]].concat();
+    let adjacent = [FRAME, &[0x12, 0]].concat();
     assert_eq!(decode(&adjacent).unwrap(), Some((expected(), FRAME.len())));
 }
 
@@ -50,10 +50,10 @@ fn decode_waits_for_complete_username_and_consumes_one_frame() {
 fn empty_and_255_byte_usernames_round_trip() {
     let full = "x".repeat(255);
     for (unit, bytes) in [
-        (ChangeUsername::new(String::new()), &[0x05, 0][..]),
+        (ChangeUsername::new(String::new()), &[0x12, 0][..]),
         (
             ChangeUsername::new(full.clone()),
-            &[&[0x05, 0xff][..], full.as_bytes()].concat(),
+            &[&[0x12, 0xff][..], full.as_bytes()].concat(),
         ),
     ] {
         assert_eq!(unit.to_bytes().unwrap(), bytes);
@@ -82,7 +82,7 @@ fn oversized_username_is_rejected_before_writing() {
 #[test]
 fn invalid_utf8_is_a_decode_error() {
     assert!(matches!(
-        decode(&[0x05, 1, 0xff]),
+        decode(&[0x12, 1, 0xff]),
         Err(DecodeError::InvalidUTF8)
     ));
 }

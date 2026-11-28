@@ -8,7 +8,7 @@ use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-const FRAME: &[u8] = &[0x8d, 0];
+const FRAME: &[u8] = &[0xc3, 0];
 const NEXT: &[u8] = &[0x00];
 
 fn unit() -> ServerSyncEnd {

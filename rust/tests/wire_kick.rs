@@ -3,8 +3,8 @@ use flpc::{
     wire::{Encode, EncodeError, decode},
 };
 
-// Opcode 7F carries unsigned big-endian ID 0xCDEF.
-const FRAME: &[u8] = b"\x7f\xcd\xef";
+// Opcode 62 carries unsigned big-endian ID 0xCDEF.
+const FRAME: &[u8] = b"\x62\xcd\xef";
 
 #[test]
 fn encode_matches_independent_bytes_and_preserves_tail() {
@@ -28,7 +28,7 @@ fn decode_waits_for_id_and_consumes_one_frame() {
         assert_eq!(decode(&FRAME[..end]).unwrap(), None, "prefix {end}");
     }
 
-    let adjacent = [FRAME, &[0x7f, 0x01, 0x23]].concat();
+    let adjacent = [FRAME, &[0x62, 0x01, 0x23]].concat();
     assert_eq!(
         decode(&adjacent).unwrap(),
         Some((FlpcUnit::Kick(Kick::new(0xcdef)), FRAME.len(),))

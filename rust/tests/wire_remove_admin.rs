@@ -3,8 +3,8 @@ use flpc::{
     wire::{Encode, EncodeError, decode},
 };
 
-// Opcode 7B carries unsigned big-endian ID 0x1234.
-const FRAME: &[u8] = b"\x7b\x12\x34";
+// Opcode 64 carries unsigned big-endian ID 0x1234.
+const FRAME: &[u8] = b"\x64\x12\x34";
 
 #[test]
 fn encode_matches_independent_bytes_and_preserves_tail() {
@@ -28,7 +28,7 @@ fn decode_waits_for_id_and_consumes_one_frame() {
         assert_eq!(decode(&FRAME[..end]).unwrap(), None, "prefix {end}");
     }
 
-    let adjacent = [FRAME, &[0x7b, 0, 0]].concat();
+    let adjacent = [FRAME, &[0x64, 0, 0]].concat();
     assert_eq!(
         decode(&adjacent).unwrap(),
         Some((FlpcUnit::RemoveAdmin(RemoveAdmin::new(0x1234)), FRAME.len(),))
@@ -37,7 +37,7 @@ fn decode_waits_for_id_and_consumes_one_frame() {
 
 #[test]
 fn round_trips_id_boundaries() {
-    for (id, bytes) in [(0, &[0x7b, 0, 0][..]), (u16::MAX, &[0x7b, 0xff, 0xff][..])] {
+    for (id, bytes) in [(0, &[0x64, 0, 0][..]), (u16::MAX, &[0x64, 0xff, 0xff][..])] {
         let unit = RemoveAdmin::new(id);
         assert_eq!(unit.to_bytes().unwrap(), bytes);
         assert_eq!(

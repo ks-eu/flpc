@@ -4,7 +4,7 @@ use flpc::{
 };
 
 const FRAME: &[u8] = &[
-    0x02, 0x04, 0x5a, 0x6f, 0xc3, 0xab, 0x05, 0x70, 0xc4, 0x81, 0x73, 0x73,
+    0x03, 0x04, 0x5a, 0x6f, 0xc3, 0xab, 0x05, 0x70, 0xc4, 0x81, 0x73, 0x73,
 ];
 
 fn unit() -> Login {
@@ -59,7 +59,7 @@ fn short_destination_fails_without_mutation() {
 
 #[test]
 fn utf8_lengths_and_field_limits_are_measured_in_bytes() {
-    let empty = [0x02, 0x00, 0x00];
+    let empty = [0x03, 0x00, 0x00];
     let empty_unit = Login::new(String::new(), String::new());
     assert_eq!(empty_unit.to_bytes().unwrap(), empty);
     assert_eq!(
@@ -68,7 +68,7 @@ fn utf8_lengths_and_field_limits_are_measured_in_bytes() {
     );
 
     let max = "é".repeat(127) + "x";
-    let mut max_frame = vec![0x02, 0xff];
+    let mut max_frame = vec![0x03, 0xff];
     max_frame.extend_from_slice(max.as_bytes());
     max_frame.push(0xff);
     max_frame.extend_from_slice(max.as_bytes());

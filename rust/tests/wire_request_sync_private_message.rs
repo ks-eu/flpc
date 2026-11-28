@@ -3,7 +3,7 @@ use flpc::{
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
-const FRAME: &[u8] = &[0x09, 0x12, 0x34, 1, 2, 3, 4, 5, 6, 7, 8, 1];
+const FRAME: &[u8] = &[0x21, 0x12, 0x34, 1, 2, 3, 4, 5, 6, 7, 8, 1];
 
 fn unit() -> RequestSyncPrivateMessage {
     RequestSyncPrivateMessage::new(0x1234, 0x0102_0304_0506_0708, 1)
@@ -65,12 +65,12 @@ fn validates_request_count_before_writing() {
     ));
     assert_eq!(dst, [0xaa; FRAME.len()]);
     assert!(matches!(
-        decode(&[0x09, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0]),
+        decode(&[0x21, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0]),
         Err(DecodeError::InvalidCount)
     ));
 
     let limit = RequestSyncPrivateMessage::new(1, 2, 255);
-    let bytes = &[0x09, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 255];
+    let bytes = &[0x21, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 255];
     assert_eq!(limit.to_bytes().unwrap(), bytes);
     assert_eq!(
         decode(bytes).unwrap(),

@@ -8,8 +8,8 @@ use futures_util::{SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-// Independent bytes from README opcode 0x80 field layout.
-const FRAME: &[u8] = &[0x80, 0x00];
+// Independent bytes from README opcode 0x90 field layout.
+const FRAME: &[u8] = &[0x90, 0x00];
 
 #[tokio::test]
 async fn split_flpc_sink_sends_and_receives_server_register() {

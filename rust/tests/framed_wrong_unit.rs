@@ -8,7 +8,7 @@ use futures_util::{FutureExt, SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt, duplex};
 use tokio_util::codec::Framed;
 
-const FRAME: &[u8] = &[0x8B];
+const FRAME: &[u8] = &[0x94];
 
 #[tokio::test]
 async fn sends_opcode_to_a_raw_peer() {
@@ -28,7 +28,7 @@ async fn receives_wrong_unit_then_ping_and_clean_eof() {
     let (stream, mut peer) = duplex(16);
     let mut framed = Framed::new(stream, FlpcCodec);
 
-    peer.write_all(&[0x8B]).await.unwrap();
+    peer.write_all(&[0x94]).await.unwrap();
 
     assert_eq!(
         framed.next().now_or_never().unwrap().unwrap().unwrap(),

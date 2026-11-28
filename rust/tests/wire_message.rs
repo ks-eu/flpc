@@ -3,7 +3,7 @@ use flpc::{
     wire::{DecodeError, Encode, EncodeError, decode},
 };
 
-const FRAME: &[u8] = b"\x03\x00\x05hello";
+const FRAME: &[u8] = b"\x10\x00\x05hello";
 
 fn message(value: &str) -> Message {
     Message::new(value.into())
@@ -52,12 +52,12 @@ fn waits_for_each_prefix_and_payload_byte() {
 
 #[test]
 fn measures_utf8_in_bytes_and_accepts_empty_and_maximum_messages() {
-    let empty = [0x03, 0x00, 0x00];
+    let empty = [0x10, 0x00, 0x00];
     assert_eq!(message("").to_bytes().unwrap(), empty);
     assert_eq!(decode(&empty).unwrap(), Some((decoded(""), empty.len())));
 
     let value = "é".repeat(129);
-    let mut frame = vec![0x03, 0x01, 0x02];
+    let mut frame = vec![0x10, 0x01, 0x02];
     frame.extend_from_slice(value.as_bytes());
     assert_eq!(message(&value).to_bytes().unwrap(), frame);
     assert_eq!(
@@ -66,7 +66,7 @@ fn measures_utf8_in_bytes_and_accepts_empty_and_maximum_messages() {
     );
 
     let max = "x".repeat(65_535);
-    let mut max_frame = vec![0x03, 0xff, 0xff];
+    let mut max_frame = vec![0x10, 0xff, 0xff];
     max_frame.extend_from_slice(max.as_bytes());
     let max_message = message(&max);
     assert_eq!(max_message.encoded_len().unwrap(), max_frame.len());
@@ -102,7 +102,7 @@ fn encode_errors_leave_the_destination_unchanged() {
 #[test]
 fn rejects_invalid_utf8_in_a_complete_message() {
     assert!(matches!(
-        decode(&[0x03, 0x00, 0x01, 0xff]),
+        decode(&[0x10, 0x00, 0x01, 0xff]),
         Err(DecodeError::InvalidUTF8)
     ));
 }

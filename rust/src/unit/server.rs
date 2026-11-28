@@ -2,7 +2,7 @@
 
 use super::FlpcUnit;
 
-/// Registration outcome from the server (opcode `0x80`).
+/// Registration outcome from the server (opcode `0x90`).
 ///
 /// The codec preserves the outcome byte. Peers agree on what each value means.
 ///
@@ -15,7 +15,7 @@ use super::FlpcUnit;
 /// };
 ///
 /// let unit = ServerRegister::new(1);
-/// let bytes: &[u8] = &[0x80, 0x01];
+/// let bytes: &[u8] = &[0x90, 0x01];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// assert_eq!(
 ///     decode(bytes).unwrap(),
@@ -31,7 +31,7 @@ pub struct ServerRegister {
 }
 
 impl ServerRegister {
-    pub(crate) const OPCODE: u8 = 0x80;
+    pub(crate) const OPCODE: u8 = 0x90;
 
     pub fn new(outcome: u8) -> Self {
         Self { outcome }
@@ -48,7 +48,7 @@ impl From<ServerRegister> for FlpcUnit {
     }
 }
 
-/// Login outcome from the server (opcode `0x81`).
+/// Login outcome from the server (opcode `0x92`).
 ///
 /// The codec preserves the outcome byte. Peers agree on what each value means.
 ///
@@ -61,7 +61,7 @@ impl From<ServerRegister> for FlpcUnit {
 /// };
 ///
 /// let unit = ServerLogin::new(1);
-/// let bytes: &[u8] = &[0x81, 0x01];
+/// let bytes: &[u8] = &[0x92, 0x01];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -75,7 +75,7 @@ pub struct ServerLogin {
 }
 
 impl ServerLogin {
-    pub(crate) const OPCODE: u8 = 0x81;
+    pub(crate) const OPCODE: u8 = 0x92;
 
     pub fn new(outcome: u8) -> Self {
         Self { outcome }
@@ -92,7 +92,7 @@ impl From<ServerLogin> for FlpcUnit {
     }
 }
 
-/// A chat message from a user (opcode `0x82`).
+/// A chat message from a user (opcode `0xA0`).
 ///
 /// The sender ID and timestamp are big-endian. The UTF-8 message has a
 /// two-byte big-endian length prefix.
@@ -106,7 +106,7 @@ impl From<ServerLogin> for FlpcUnit {
 /// };
 ///
 /// let unit = ServerMessage::new(7, 42, "hi".into());
-/// let bytes: &[u8] = &[0x82, 0x00, 0x07, 0, 0, 0, 0, 0, 0, 0, 42, 0, 2, b'h', b'i'];
+/// let bytes: &[u8] = &[0xA0, 0x00, 0x07, 0, 0, 0, 0, 0, 0, 0, 42, 0, 2, b'h', b'i'];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -122,7 +122,7 @@ pub struct ServerMessage {
 }
 
 impl ServerMessage {
-    pub(crate) const OPCODE: u8 = 0x82;
+    pub(crate) const OPCODE: u8 = 0xA0;
 
     pub fn new(id: u16, timestamp: u64, message: String) -> Self {
         Self {
@@ -152,7 +152,7 @@ impl From<ServerMessage> for FlpcUnit {
     }
 }
 
-/// A private chat message from a user (opcode `0x83`).
+/// A private chat message from a user (opcode `0xA1`).
 ///
 /// The sender ID, target ID, and timestamp are big-endian. The UTF-8 message
 /// has a two-byte big-endian length prefix.
@@ -166,7 +166,7 @@ impl From<ServerMessage> for FlpcUnit {
 /// };
 ///
 /// let unit = ServerPrivateMessage::new(7, 8, 42, "hi".into());
-/// let bytes: &[u8] = &[0x83, 0, 7, 0, 8, 0, 0, 0, 0, 0, 0, 0, 42, 0, 2, b'h', b'i'];
+/// let bytes: &[u8] = &[0xA1, 0, 7, 0, 8, 0, 0, 0, 0, 0, 0, 0, 42, 0, 2, b'h', b'i'];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -183,7 +183,7 @@ pub struct ServerPrivateMessage {
 }
 
 impl ServerPrivateMessage {
-    pub(crate) const OPCODE: u8 = 0x83;
+    pub(crate) const OPCODE: u8 = 0xA1;
 
     pub fn new(id: u16, target: u16, timestamp: u64, message: String) -> Self {
         Self {
@@ -218,7 +218,7 @@ impl From<ServerPrivateMessage> for FlpcUnit {
     }
 }
 
-/// A notification that a user registered (opcode `0x84`).
+/// A notification that a user registered (opcode `0x81`).
 ///
 /// The user ID is big-endian. The UTF-8 username has a one-byte length prefix.
 ///
@@ -231,7 +231,7 @@ impl From<ServerPrivateMessage> for FlpcUnit {
 /// };
 ///
 /// let unit = UserRegistered::new(7, "é".into());
-/// let bytes: &[u8] = &[0x84, 0, 7, 2, 0xc3, 0xa9];
+/// let bytes: &[u8] = &[0x81, 0, 7, 2, 0xc3, 0xa9];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -246,7 +246,7 @@ pub struct UserRegistered {
 }
 
 impl UserRegistered {
-    pub(crate) const OPCODE: u8 = 0x84;
+    pub(crate) const OPCODE: u8 = 0x81;
 
     pub fn new(id: u16, username: String) -> Self {
         Self { id, username }
@@ -267,7 +267,7 @@ impl From<UserRegistered> for FlpcUnit {
     }
 }
 
-/// A notification that a user was removed (opcode `0x85`).
+/// A notification that a user was removed (opcode `0x82`).
 ///
 /// The user ID is big-endian.
 ///
@@ -280,7 +280,7 @@ impl From<UserRegistered> for FlpcUnit {
 /// };
 ///
 /// let unit = UserRemoved::new(7);
-/// let bytes: &[u8] = &[0x85, 0, 7];
+/// let bytes: &[u8] = &[0x82, 0, 7];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -294,7 +294,7 @@ pub struct UserRemoved {
 }
 
 impl UserRemoved {
-    pub(crate) const OPCODE: u8 = 0x85;
+    pub(crate) const OPCODE: u8 = 0x82;
 
     pub fn new(id: u16) -> Self {
         Self { id }
@@ -311,7 +311,7 @@ impl From<UserRemoved> for FlpcUnit {
     }
 }
 
-/// A notification that a user joined (opcode `0x86`).
+/// A notification that a user joined (opcode `0x83`).
 ///
 /// The user ID is big-endian.
 ///
@@ -324,7 +324,7 @@ impl From<UserRemoved> for FlpcUnit {
 /// };
 ///
 /// let unit = UserJoined::new(7);
-/// let bytes: &[u8] = &[0x86, 0, 7];
+/// let bytes: &[u8] = &[0x83, 0, 7];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -338,7 +338,7 @@ pub struct UserJoined {
 }
 
 impl UserJoined {
-    pub(crate) const OPCODE: u8 = 0x86;
+    pub(crate) const OPCODE: u8 = 0x83;
 
     pub fn new(id: u16) -> Self {
         Self { id }
@@ -355,7 +355,7 @@ impl From<UserJoined> for FlpcUnit {
     }
 }
 
-/// A notification that a user left (opcode `0x87`).
+/// A notification that a user left (opcode `0x84`).
 ///
 /// The user ID is big-endian.
 ///
@@ -368,7 +368,7 @@ impl From<UserJoined> for FlpcUnit {
 /// };
 ///
 /// let unit = UserLeft::new(7);
-/// let bytes: &[u8] = &[0x87, 0, 7];
+/// let bytes: &[u8] = &[0x84, 0, 7];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -382,7 +382,7 @@ pub struct UserLeft {
 }
 
 impl UserLeft {
-    pub(crate) const OPCODE: u8 = 0x87;
+    pub(crate) const OPCODE: u8 = 0x84;
 
     pub fn new(id: u16) -> Self {
         Self { id }
@@ -399,7 +399,7 @@ impl From<UserLeft> for FlpcUnit {
     }
 }
 
-/// A notification that a username changed (opcode `0x88`).
+/// A notification that a username changed (opcode `0x85`).
 ///
 /// The user ID is big-endian. The UTF-8 username has a one-byte length prefix.
 ///
@@ -412,7 +412,7 @@ impl From<UserLeft> for FlpcUnit {
 /// };
 ///
 /// let unit = ChangedUsername::new(7, "é".into());
-/// let bytes: &[u8] = &[0x88, 0, 7, 2, 0xc3, 0xa9];
+/// let bytes: &[u8] = &[0x85, 0, 7, 2, 0xc3, 0xa9];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -427,7 +427,7 @@ pub struct ChangedUsername {
 }
 
 impl ChangedUsername {
-    pub(crate) const OPCODE: u8 = 0x88;
+    pub(crate) const OPCODE: u8 = 0x85;
 
     pub fn new(id: u16, username: String) -> Self {
         Self { id, username }
@@ -448,7 +448,7 @@ impl From<ChangedUsername> for FlpcUnit {
     }
 }
 
-/// A server response indicating that a client's first unit was unexpected (opcode `0x8B`).
+/// A server response indicating that a client's first unit was unexpected (opcode `0x94`).
 ///
 /// # Examples
 ///
@@ -459,7 +459,7 @@ impl From<ChangedUsername> for FlpcUnit {
 /// };
 ///
 /// let unit = WrongUnit::new();
-/// let bytes: &[u8] = &[0x8B];
+/// let bytes: &[u8] = &[0x94];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(
@@ -471,7 +471,7 @@ impl From<ChangedUsername> for FlpcUnit {
 pub struct WrongUnit {}
 
 impl WrongUnit {
-    pub(crate) const OPCODE: u8 = 0x8B;
+    pub(crate) const OPCODE: u8 = 0x94;
 
     pub fn new() -> Self {
         Self {}
@@ -484,7 +484,7 @@ impl From<WrongUnit> for FlpcUnit {
     }
 }
 
-/// A raw result byte returned for a remove-self request (opcode `0x8C`). The
+/// A raw result byte returned for a remove-self request (opcode `0x91`). The
 /// codec preserves the byte without assigning meaning to its values.
 ///
 /// # Examples
@@ -496,7 +496,7 @@ impl From<WrongUnit> for FlpcUnit {
 /// };
 ///
 /// let unit = ServerRemoveSelf::new(0xa5);
-/// let bytes = [0x8c, 0xa5];
+/// let bytes = [0x91, 0xa5];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
@@ -507,7 +507,7 @@ pub struct ServerRemoveSelf {
 }
 
 impl ServerRemoveSelf {
-    pub(crate) const OPCODE: u8 = 0x8C;
+    pub(crate) const OPCODE: u8 = 0x91;
 
     pub fn new(result: u8) -> Self {
         Self { result }
@@ -524,7 +524,7 @@ impl From<ServerRemoveSelf> for FlpcUnit {
 }
 
 /// A server response indicating that a requested user is not online
-/// (opcode `0x8E`). The unit contains only its opcode.
+/// (opcode `0xB2`). The unit contains only its opcode.
 ///
 /// # Examples
 ///
@@ -535,7 +535,7 @@ impl From<ServerRemoveSelf> for FlpcUnit {
 /// };
 ///
 /// let unit = UserNotOnline::new();
-/// let bytes = [0x8e];
+/// let bytes = [0xb2];
 /// assert_eq!(unit.to_bytes().unwrap(), bytes);
 /// let wrapped: FlpcUnit = unit.into();
 /// assert_eq!(decode(&bytes).unwrap(), Some((wrapped, bytes.len())));
@@ -544,7 +544,7 @@ impl From<ServerRemoveSelf> for FlpcUnit {
 pub struct UserNotOnline;
 
 impl UserNotOnline {
-    pub(crate) const OPCODE: u8 = 0x8E;
+    pub(crate) const OPCODE: u8 = 0xB2;
 
     pub fn new() -> Self {
         Self
