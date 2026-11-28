@@ -740,3 +740,26 @@ impl From<OnboardingEnd> for FlpcUnit {
         Self::OnboardingEnd(unit)
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServerMessageFail {
+    reason: u8,
+}
+
+impl ServerMessageFail {
+    pub(crate) const OPCODE: u8 = 0xB0;
+
+    pub fn new(reason: u8) -> Self {
+        Self { reason }
+    }
+
+    pub fn reason(&self) -> &u8 {
+        &self.reason
+    }
+}
+
+impl From<ServerMessageFail> for FlpcUnit {
+    fn from(unit: ServerMessageFail) -> Self {
+        Self::ServerMessageFail(unit)
+    }
+}
