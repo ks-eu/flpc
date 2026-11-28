@@ -670,3 +670,26 @@ impl From<UserAdminRemoved> for FlpcUnit {
         Self::UserAdminRemoved(unit)
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ServerChangedPassword {
+    outcome: u8,
+}
+
+impl ServerChangedPassword {
+    pub(crate) const OPCODE: u8 = 0x93;
+
+    pub fn new(outcome: u8) -> Self {
+        Self { outcome }
+    }
+
+    pub fn outcome(&self) -> &u8 {
+        &self.outcome
+    }
+}
+
+impl From<ServerChangedPassword> for FlpcUnit {
+    fn from(unit: ServerChangedPassword) -> Self {
+        Self::ServerChangedPassword(unit)
+    }
+}
