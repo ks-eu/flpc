@@ -13,8 +13,8 @@ minimising header size as much as possible.
 
 ## Wire format
 
-This section specifies the new opcode map. The Rust implementation is being
-updated in stages. See [the detailed wire specification](docs/spec.md) for
+The Rust rollout has added support for `ChangePassword`.
+See [the detailed wire specification](docs/spec.md) for
 each unit's payload layout and validation rules.
 
 Each unit starts with a one-byte opcode. Multibyte integers use big-endian

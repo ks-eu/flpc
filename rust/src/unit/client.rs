@@ -338,6 +338,23 @@ impl From<RemoveSelf> for FlpcUnit {
     }
 }
 
+/// A client request to change its password (opcode `0x04`).
+///
+/// Username, current password, and new password are UTF-8 strings with
+/// one-byte byte-length prefixes, so each is limited to 255 bytes. Passwords
+/// are plaintext on the wire. `Debug` redacts both password fields.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{unit::{ChangePassword, FlpcUnit}, wire::{decode, Encode}};
+///
+/// let unit = ChangePassword::new("é".into(), "p".into(), "pw".into());
+/// let bytes: &[u8] = &[0x04, 0x02, 0xc3, 0xa9, 0x01, b'p', 0x02, b'p', b'w'];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Clone, PartialEq, Eq)]
 pub struct ChangePassword {
     username: String,

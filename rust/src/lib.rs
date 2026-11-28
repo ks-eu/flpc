@@ -33,8 +33,9 @@
 //!
 //! # Credentials
 //!
-//! [`unit::Register`], [`unit::Login`], and [`unit::Add`] carry passwords
-//! as plaintext UTF-8. The registration token in [`unit::Register`] is also
+//! [`unit::Register`], [`unit::Login`], [`unit::RemoveSelf`],
+//! [`unit::ChangePassword`], and [`unit::Add`] carry passwords as plaintext
+//! UTF-8. The registration token in [`unit::Register`] is also
 //! plaintext. The unit types display passwords and the registration token
 //! as `[redacted]` in `Debug` output.
 
