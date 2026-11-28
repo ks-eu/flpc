@@ -40,6 +40,21 @@ impl From<ServerAdd> for FlpcUnit {
     }
 }
 
+/// Reports the outcome of a remove-user request (opcode `0xE1`).
+///
+/// The outcome is preserved as a raw `u8`. Peers agree on its meaning.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{unit::{FlpcUnit, ServerRemove}, wire::{decode, Encode}};
+///
+/// let unit = ServerRemove::new(0x2a);
+/// let bytes: &[u8] = &[0xe1, 0x2a];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerRemove {
     outcome: u8,
