@@ -1,11 +1,11 @@
 use super::DecodeError;
 use crate::unit::{
     Add, ChangePassword, ChangeUsername, ChangedUsername, FlpcUnit, Kick, Login, MakeAdmin,
-    Message, Ping, PrivateMessage, Register, Remove, RemoveAdmin, RemoveSelf, RequestSyncMessage,
-    RequestSyncPrivateMessage, RequestSyncUsername, ServerChangedPassword, ServerLogin,
-    ServerMessage, ServerPrivateMessage, ServerRegister, ServerRemoveSelf, ServerResponse, SyncEnd,
-    SyncMessage, SyncPrivateMessage, SyncUsername, UserAdmin, UserAdminRemoved, UserJoined,
-    UserLeft, UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
+    Message, OnboardingEnd, Ping, PrivateMessage, Register, Remove, RemoveAdmin, RemoveSelf,
+    RequestSyncMessage, RequestSyncPrivateMessage, RequestSyncUsername, ServerChangedPassword,
+    ServerLogin, ServerMessage, ServerPrivateMessage, ServerRegister, ServerRemoveSelf,
+    ServerResponse, SyncEnd, SyncMessage, SyncPrivateMessage, SyncUsername, UserAdmin,
+    UserAdminRemoved, UserJoined, UserLeft, UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
 };
 
 /// Decodes the first unit and returns it with the byte count, including its opcode.
@@ -404,6 +404,8 @@ pub fn decode(buf: &[u8]) -> Result<Option<(FlpcUnit, usize)>, DecodeError> {
                 outcome,
             )))
         }
+        // 0x95
+        OnboardingEnd::OPCODE => Some(FlpcUnit::OnboardingEnd(OnboardingEnd::new())),
         _ => return Err(DecodeError::UnknownOpcode),
     };
     Ok(unit.map(|unit| (unit, buf.len() - remaining.len())))

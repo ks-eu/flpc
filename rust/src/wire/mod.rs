@@ -100,5 +100,6 @@ fn concrete_unit(unit: &FlpcUnit) -> &dyn Encode {
         FlpcUnit::UserAdmin(unit) => unit,
         FlpcUnit::UserAdminRemoved(unit) => unit,
         FlpcUnit::ServerChangedPassword(unit) => unit,
+        FlpcUnit::OnboardingEnd(unit) => unit,
     }
 }

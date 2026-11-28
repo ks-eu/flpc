@@ -22,9 +22,9 @@ pub use client::{
 pub use ping::Ping;
 pub use requestsync::{RequestSyncMessage, RequestSyncPrivateMessage, RequestSyncUsername};
 pub use server::{
-    ChangedUsername, ServerChangedPassword, ServerLogin, ServerMessage, ServerPrivateMessage,
-    ServerRegister, ServerRemoveSelf, ServerResponse, UserAdmin, UserAdminRemoved, UserJoined,
-    UserLeft, UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
+    ChangedUsername, OnboardingEnd, ServerChangedPassword, ServerLogin, ServerMessage,
+    ServerPrivateMessage, ServerRegister, ServerRemoveSelf, ServerResponse, UserAdmin,
+    UserAdminRemoved, UserJoined, UserLeft, UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
 };
 pub use serversync::{SyncEnd, SyncMessage, SyncPrivateMessage, SyncUsername};
 
@@ -69,4 +69,5 @@ pub enum FlpcUnit {
     UserAdmin(UserAdmin),
     UserAdminRemoved(UserAdminRemoved),
     ServerChangedPassword(ServerChangedPassword),
+    OnboardingEnd(OnboardingEnd),
 }

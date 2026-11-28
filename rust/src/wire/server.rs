@@ -6,9 +6,9 @@ use super::{
     },
 };
 use crate::unit::{
-    ChangedUsername, ServerChangedPassword, ServerLogin, ServerMessage, ServerPrivateMessage,
-    ServerRegister, ServerRemoveSelf, ServerResponse, UserAdmin, UserAdminRemoved, UserJoined,
-    UserLeft, UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
+    ChangedUsername, OnboardingEnd, ServerChangedPassword, ServerLogin, ServerMessage,
+    ServerPrivateMessage, ServerRegister, ServerRemoveSelf, ServerResponse, UserAdmin,
+    UserAdminRemoved, UserJoined, UserLeft, UserNotOnline, UserRegistered, UserRemoved, WrongUnit,
 };
 
 impl Encode for ServerRemoveSelf {
@@ -202,5 +202,14 @@ impl Encode for ServerChangedPassword {
     }
     fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
         encode_frame(buf, 2, Self::OPCODE, |dst| dst[0] = *self.outcome())
+    }
+}
+
+impl Encode for OnboardingEnd {
+    fn encoded_len(&self) -> Result<usize, EncodeError> {
+        Ok(1)
+    }
+    fn encode_into(&self, buf: &mut [u8]) -> Result<usize, EncodeError> {
+        encode_frame(buf, 1, Self::OPCODE, |_| {})
     }
 }

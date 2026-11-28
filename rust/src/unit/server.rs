@@ -708,3 +708,20 @@ impl From<ServerChangedPassword> for FlpcUnit {
         Self::ServerChangedPassword(unit)
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OnboardingEnd;
+
+impl OnboardingEnd {
+    pub(crate) const OPCODE: u8 = 0x95;
+
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl From<OnboardingEnd> for FlpcUnit {
+    fn from(unit: OnboardingEnd) -> Self {
+        Self::OnboardingEnd(unit)
+    }
+}
