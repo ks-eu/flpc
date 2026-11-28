@@ -557,6 +557,21 @@ impl From<UserNotOnline> for FlpcUnit {
     }
 }
 
+/// A response from the server (opcode `0x80`).
+///
+/// The UTF-8 response uses a two-byte big-endian byte-length prefix and may contain at most 65,535 bytes.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{unit::{FlpcUnit, ServerResponse}, wire::{decode, Encode}};
+///
+/// let unit = ServerResponse::new("é".into());
+/// let bytes: &[u8] = &[0x80, 0x00, 0x02, 0xc3, 0xa9];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerResponse {
     response: String,
