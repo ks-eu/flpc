@@ -671,6 +671,21 @@ impl From<UserAdminRemoved> for FlpcUnit {
     }
 }
 
+/// Reports the outcome of a password change request (opcode `0x93`).
+///
+/// The outcome is preserved as a raw `u8`. Peers agree on its meaning.
+///
+/// # Examples
+///
+/// ```
+/// use flpc::{unit::{FlpcUnit, ServerChangedPassword}, wire::{decode, Encode}};
+///
+/// let unit = ServerChangedPassword::new(0x2a);
+/// let bytes: &[u8] = &[0x93, 0x2a];
+/// assert_eq!(unit.to_bytes().unwrap(), bytes);
+/// let wrapped: FlpcUnit = unit.into();
+/// assert_eq!(decode(bytes).unwrap(), Some((wrapped, bytes.len())));
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerChangedPassword {
     outcome: u8,
