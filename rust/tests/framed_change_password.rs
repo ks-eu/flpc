@@ -1,7 +1,7 @@
 #![cfg(feature = "tokio")]
 
 use flpc::{
-    tokio::FlpcCodec,
+    tokio::{CodecError, FlpcCodec},
     unit::{ChangePassword, FlpcUnit},
 };
 use futures_util::{FutureExt, SinkExt, StreamExt};
@@ -13,12 +13,12 @@ const FRAME: &[u8] = &[
 ];
 
 #[tokio::test]
-async fn raw_peer_send_and_fragmented_receive() {
+async fn exchanges_literal_bytes_with_raw_peer() {
+    let unit = ChangePassword::new("alice".into(), "old".into(), "nëw".into());
+    let expected = FlpcUnit::ChangePassword(unit.clone());
     let (stream, mut peer) = duplex(64);
     let (mut sink, _) = Framed::new(stream, FlpcCodec).split::<FlpcUnit>();
-    sink.send((ChangePassword::new("alice".into(), "old".into(), "nëw".into())).into())
-        .await
-        .unwrap();
+    sink.send(unit.into()).await.unwrap();
     drop(sink);
     let mut sent = Vec::new();
     peer.read_to_end(&mut sent).await.unwrap();
@@ -26,19 +26,14 @@ async fn raw_peer_send_and_fragmented_receive() {
 
     let (stream, mut peer) = duplex(64);
     let mut framed = Framed::new(stream, FlpcCodec);
-    peer.write_all(&FRAME[..1]).await.unwrap();
+    let split = FRAME.len() - 1;
+    peer.write_all(&FRAME[..split]).await.unwrap();
     assert!(framed.next().now_or_never().is_none());
-    peer.write_all(&FRAME[1..]).await.unwrap();
-    peer.write_all(&[0x00]).await.unwrap();
+    peer.write_all(&[&FRAME[split..], &[0x00]].concat())
+        .await
+        .unwrap();
     peer.shutdown().await.unwrap();
-    assert_eq!(
-        framed.next().await.unwrap().unwrap(),
-        FlpcUnit::ChangePassword(ChangePassword::new(
-            "alice".into(),
-            "old".into(),
-            "nëw".into()
-        ))
-    );
+    assert_eq!(framed.next().await.unwrap().unwrap(), expected);
     assert_eq!(
         framed.next().await.unwrap().unwrap(),
         FlpcUnit::Ping(flpc::unit::Ping::new())
@@ -52,5 +47,5 @@ async fn reports_truncated_frame_at_eof() {
     let mut framed = Framed::new(stream, FlpcCodec);
     peer.write_all(&FRAME[..FRAME.len() - 1]).await.unwrap();
     peer.shutdown().await.unwrap();
-    assert!(matches!(framed.next().await, Some(Err(_))));
+    assert!(matches!(framed.next().await, Some(Err(CodecError::Io(_)))));
 }
